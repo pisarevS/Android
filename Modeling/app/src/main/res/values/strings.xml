@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Modeling</string>
+    <string name="buttonStart_name">START</string>
+    <string name="buttonReset_name">RESET</string>
+</resources>
