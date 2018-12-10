@@ -1,7 +1,6 @@
 package pisarev.com.modeling;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -14,23 +13,19 @@ import android.view.View;
 
 public class MyView extends View {
     private Paint paintCoordinateDottedLine;
-
-    private Bitmap bitmap;
-    private Canvas canvas;
     private Draw draw;
     private Path path;
     private Point pointCoordinateZero = new Point();
-    private Point pointContour=new Point( );
     private boolean isTouch;
+    private boolean isZoom;
     private float downX;
     private float downZ;
     private float moveX;
     private float moveZ;
+    private float zoom=1;
     public static int button;
-    public final static int START=1;
-    public final static int RESET=2;
-
-
+    public final static int START = 1;
+    public final static int RESET = 2;
 
     public MyView(Context context) {
         super( context );
@@ -45,35 +40,38 @@ public class MyView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw( canvas );
-        switch (button){
+        switch (button) {
             case START:
                 manager( canvas );
                 break;
             case RESET:
-                initCoordinate( canvas,true );
-                button=0;
+                initSystemCoordinate( canvas, true );
+                button = 0;
                 break;
         }
-        drawSystemCoordinate( canvas,isTouch,button );
-
-    }
-    private void manager(Canvas canvas){
-        draw=new Draw(  );
-        draw.drawContour( canvas,pointCoordinateZero,1 );
+        drawSystemCoordinate( canvas, isTouch, button );
     }
 
-    private void drawSystemCoordinate(Canvas canvas,boolean isTouch,int button){
-        if (!isTouch||button==RESET) {
-            initCoordinate( canvas,true );
-        } else if(isTouch||button==START) {
-            initCoordinate( canvas,false );
-            if(button==START&&isTouch)
-            manager( canvas );
+    private void manager(Canvas canvas) {
+        draw = new Draw();
+        draw.drawContour( canvas, pointCoordinateZero, zoom );
+    }
+
+    private void drawSystemCoordinate(Canvas canvas, boolean isTouch, int button) {
+        if (!isTouch || button == RESET) {
+            initSystemCoordinate( canvas, true );
+        } else if (isTouch || button == START) {
+            initSystemCoordinate( canvas, false );
+            if (button == START && isTouch)
+                manager( canvas );
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float x;
+        float z;
+        int pointerIndex=event.getActionIndex();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downX = event.getX();
@@ -83,33 +81,47 @@ public class MyView extends View {
                 isTouch = true;
                 invalidate();
                 break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    isZoom=true;
+                    pointerIndex=event.getActionIndex();
+                    break;
             case MotionEvent.ACTION_MOVE:
-                pointCoordinateZero.x =event.getX()+ moveX;
-                pointCoordinateZero.z =event.getY()+ moveZ;
+                if(isZoom){
+                x=event.getX( pointerIndex );
+                z=event.getY( pointerIndex );
+                zoom=Math.abs( z-downZ);
+                }
+                pointCoordinateZero.x = event.getX() + moveX;
+                pointCoordinateZero.z = event.getY() + moveZ;
+
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 invalidate();
                 break;
+                case MotionEvent.ACTION_POINTER_UP:
+                    isZoom=false;
+                    invalidate();
+                    break;
         }
         return true;
     }
 
-    private void initCoordinate(Canvas canvas,boolean isInit){
-        if(isInit){
-            path=new Path( );
-            pointCoordinateZero.x= getWidth() / 2 ;
-            pointCoordinateZero.z= getHeight() / 2;
+    private void initSystemCoordinate(Canvas canvas, boolean isInit) {
+        if (isInit) {
+            path = new Path();
+            pointCoordinateZero.x = getWidth() / 2;
+            pointCoordinateZero.z = getHeight() / 2;
             path.moveTo( 0, pointCoordinateZero.z );
             path.lineTo( getWidth(), pointCoordinateZero.z );
-            path.moveTo(pointCoordinateZero.x, 0  );
+            path.moveTo( pointCoordinateZero.x, 0 );
             path.lineTo( pointCoordinateZero.x, getHeight() );
             canvas.drawPath( path, paintCoordinateDottedLine );
-        }else {
-            path=new Path( );
+        } else {
+            path = new Path();
             path.moveTo( 0, pointCoordinateZero.z );
             path.lineTo( getWidth(), pointCoordinateZero.z );
-            path.moveTo(pointCoordinateZero.x, 0  );
+            path.moveTo( pointCoordinateZero.x, 0 );
             path.lineTo( pointCoordinateZero.x, getHeight() );
             canvas.drawPath( path, paintCoordinateDottedLine );
         }
