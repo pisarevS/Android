@@ -1,29 +1,27 @@
 package pisarev.com.modeling;
 
-import android.content.pm.ActivityInfo;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 
-public class MainActivity extends AppCompatActivity {
+import com.saber.chentianslideback.SlideBackActivity;
 
-    private Canvas canvas;
-    private Bitmap bitmap;
-    private Paint paint;
+public class SecondActivity extends SlideBackActivity {
+
     private MyView myView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
-        getWindow().addFlags( WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED );
-        setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
+        //getWindow().addFlags( WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED );
+        //setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_main );
+        setContentView( R.layout.activity_second );
         myView=(MyView)findViewById( R.id.myView );
     }
 
@@ -35,5 +33,12 @@ public class MainActivity extends AppCompatActivity {
     public void onClickButtonReset(View v){
         MyView.button=MyView.RESET;
         myView.invalidate();
+    }
+
+    @Override
+    protected void slideBackSuccess(){
+        Intent intent=new Intent( SecondActivity.this,FirstActivity.class );
+        startActivity( intent );
+        finish();
     }
 }
