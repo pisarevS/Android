@@ -69,9 +69,6 @@ public class MyView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x;
-        float z;
-        int pointerIndex=event.getActionIndex();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downX = event.getX();
@@ -82,25 +79,16 @@ public class MyView extends View {
                 invalidate();
                 break;
                 case MotionEvent.ACTION_POINTER_DOWN:
-                    isZoom=true;
-                    pointerIndex=event.getActionIndex();
                     break;
             case MotionEvent.ACTION_MOVE:
-                if(isZoom){
-                x=event.getX( pointerIndex );
-                z=event.getY( pointerIndex );
-                zoom=Math.abs( z-downZ);
-                }
                 pointCoordinateZero.x = event.getX() + moveX;
                 pointCoordinateZero.z = event.getY() + moveZ;
-
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 invalidate();
                 break;
                 case MotionEvent.ACTION_POINTER_UP:
-                    isZoom=false;
                     invalidate();
                     break;
         }
