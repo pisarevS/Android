@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pisarev.com.modeling.SecondActivity">
+    tools:context="pisarev.com.modeling.Activity.SecondActivity">
 
     <pisarev.com.modeling.MyView
         android:id="@+id/myView"

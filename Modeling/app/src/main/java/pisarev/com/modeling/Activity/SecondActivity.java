@@ -1,4 +1,4 @@
-package pisarev.com.modeling;
+package pisarev.com.modeling.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.saber.chentianslideback.SlideBackActivity;
+
+import pisarev.com.modeling.MyView;
+import pisarev.com.modeling.R;
 
 
 public class SecondActivity extends SlideBackActivity implements View.OnTouchListener {
@@ -34,7 +37,7 @@ public class SecondActivity extends SlideBackActivity implements View.OnTouchLis
 
     @Override
     protected void slideBackSuccess(){
-        Intent intent=new Intent( SecondActivity.this,FirstActivity.class );
+        Intent intent=new Intent( SecondActivity.this,MainActivity.class );
         startActivity( intent );
         finish();
     }
