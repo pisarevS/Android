@@ -1,4 +1,4 @@
-package pisarev.com.modeling;
+package pisarev.com.modeling.mvp.model;
 
 import java.util.*;
 

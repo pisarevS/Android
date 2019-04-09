@@ -1,4 +1,4 @@
-package pisarev.com.modeling;
+package pisarev.com.modeling.mvp.model;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -6,6 +6,12 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.util.Log;
+
+import javax.inject.Inject;
+
+import pisarev.com.modeling.Const;
+import pisarev.com.modeling.application.App;
 
 public class Draw {
     private Path path;
@@ -14,6 +20,8 @@ public class Draw {
     private RectF rectF;
     private Paint paintFullLine;
     private Paint paintDottedLine;
+    @Inject
+    MyData data;
 
     public Draw() {
         init();
@@ -124,6 +132,7 @@ public class Draw {
     }
 
     public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom) {
+        App.getComponent().inject( this );
         drawLine( canvas, paintFullLine, pointCoordinateZero, new Point( 650, 250 ), new Point( 100, 100 ), 1 );
         drawArc( canvas, paintFullLine, pointCoordinateZero, new Point( 500, 500 ), new Point( 700, 300 ), 200, 1, true );
         drawArc( canvas, paintFullLine, pointCoordinateZero, new Point( 500, 500 ), new Point( 700, 300 ), 200, 1, false );

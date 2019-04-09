@@ -1,38 +1,54 @@
-package pisarev.com.modeling.Activity;
+package pisarev.com.modeling.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.saber.chentianslideback.SlideBackActivity;
 
-import pisarev.com.modeling.MyView;
+import javax.inject.Inject;
+
+import pisarev.com.modeling.application.App;
+import pisarev.com.modeling.mvp.ViewMvp;
+
+import pisarev.com.modeling.mvp.model.MyData;
+import pisarev.com.modeling.mvp.view.customview.MyView;
 import pisarev.com.modeling.R;
 
 
-public class SecondActivity extends SlideBackActivity implements View.OnTouchListener {
+public class SecondActivity extends SlideBackActivity implements ViewMvp.SecondViewMvp,View.OnTouchListener {
 
     private MyView myView;
     private ImageView start;
     private ImageView singleBlock;
     private ImageView reset;
     private int count=0;
+    @Inject
+    MyData data;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
         super.onCreate( savedInstanceState );
+        App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
-        myView=(MyView)findViewById( R.id.myView );
-        start=(ImageView)findViewById( R.id.start );
-        singleBlock =(ImageView)findViewById( R.id.single_block );
-        reset=(ImageView)findViewById( R.id.reset );
+        myView=findViewById( R.id.myView );
+        start=findViewById( R.id.start );
+        singleBlock =findViewById( R.id.single_block );
+        reset=findViewById( R.id.reset );
         start.setOnTouchListener(this);
         singleBlock.setOnTouchListener(this);
         reset.setOnTouchListener(this);
+        MyView.button=MyView.RESET;
+        myView.invalidate();
+        Toast.makeText( getApplicationContext(),""+data.getProgramList().size()+" "+data.getParameterList().size(),Toast.LENGTH_SHORT ).show();
     }
 
     @Override

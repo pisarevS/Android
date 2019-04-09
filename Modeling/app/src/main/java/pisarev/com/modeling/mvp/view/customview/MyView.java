@@ -1,4 +1,4 @@
-package pisarev.com.modeling;
+package pisarev.com.modeling.mvp.view.customview;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,6 +10,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import pisarev.com.modeling.mvp.ViewMvp;
+import pisarev.com.modeling.mvp.model.Point;
+import pisarev.com.modeling.mvp.model.Draw;
 
 public class MyView extends View {
     private Paint paintCoordinateDottedLine;
@@ -26,6 +30,7 @@ public class MyView extends View {
     public static int button;
     public final static int START = 1;
     public final static int RESET = 2;
+
 
     public MyView(Context context) {
         super( context );

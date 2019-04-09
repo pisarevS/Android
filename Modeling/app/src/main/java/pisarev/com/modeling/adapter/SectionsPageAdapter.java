@@ -1,12 +1,12 @@
-package pisarev.com.modeling;
+package pisarev.com.modeling.adapter;
 
-import android.os.Bundle;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import pisarev.com.modeling.Fragments.ParameterFragment;
-import pisarev.com.modeling.Fragments.ProgramFragment;
+import pisarev.com.modeling.mvp.view.fragments.ParameterFragment;
+import pisarev.com.modeling.mvp.view.fragments.ProgramFragment;
 
 public class SectionsPageAdapter extends FragmentPagerAdapter {
     public SectionsPageAdapter (FragmentManager fm) {
