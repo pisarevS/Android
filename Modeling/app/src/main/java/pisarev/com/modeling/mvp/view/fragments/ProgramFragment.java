@@ -8,27 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import javax.inject.Inject;
-
 import pisarev.com.modeling.Const;
 import pisarev.com.modeling.R;
-import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.mvp.model.MyData;
 
 public class ProgramFragment extends Fragment  {
 
     private static EditText editText;
-    @Inject
-    MyData data;
 
     @Override
     public void setArguments(@Nullable Bundle args) {
         super.setArguments( args );
         if (args != null) {
             editText.setText(args.getString( Const.PROGRAM ));
-        }
-        if(args.getBoolean( Const.TOUCH_FAB )){
-            data.setProgram( editText.getText().toString()  );
         }
     }
 
@@ -37,10 +28,6 @@ public class ProgramFragment extends Fragment  {
                              Bundle savedInstanceState){
         View rootView = inflater.inflate(R.layout.fragment_program, container, false);
         editText =rootView.findViewById( R.id.editText );
-        App.getComponent().inject(this  );
-        if(data.getProgram()!=""){
-            editText.setText( data.getProgram() );
-        }
         return rootView;
     }
 

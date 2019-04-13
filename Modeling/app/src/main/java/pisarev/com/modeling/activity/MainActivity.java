@@ -39,9 +39,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ViewPager mViewPager;
     private ViewMvp.PresenterMainMvp presenter;
     private ChangeVariables changeVariables;
-    @Inject
-    MyData data;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,15 +142,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        App.getComponent().inject( this );
-        data.setProgram( ProgramFragment.getText());
-        data.setParameter( ParameterFragment.getText() );
         changeVariables=new ChangeVariables(ProgramFragment.getText(),ParameterFragment.getText()  );
         Thread thread=new Thread( changeVariables );
         thread.start();
         Intent intent = new Intent( MainActivity.this, SecondActivity.class );
         startActivity( intent );
-        finish();
     }
 
 }
