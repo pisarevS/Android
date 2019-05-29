@@ -11,16 +11,15 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import pisarev.com.modeling.Const;
 import pisarev.com.modeling.application.App;
 
 public class ChangeVariables implements Runnable {
 
     private String program;
     private String parameter;
-    private ArrayList<StringBuffer>programList;
-    private ArrayList<StringBuffer>parameterList;
-    private Map<String,String> variablesList;
+    private ArrayList<StringBuffer>programList=new ArrayList<>(  );
+    private ArrayList<StringBuffer>parameterList=new ArrayList<>(  );
+    private Map<String,String> variablesList=new HashMap(  );
     @Inject
     MyData data;
 
@@ -28,6 +27,7 @@ public class ChangeVariables implements Runnable {
         this.program=program;
         this.parameter=parameter;
         App.getComponent().inject( this );
+        data.getProgramList().clear();
     }
 
     @Override
@@ -36,10 +36,10 @@ public class ChangeVariables implements Runnable {
         getParameterList(parameter);
         readParameterVariables(parameterList);
         replaceProgramVariables( programList );
+
     }
 
     private void getProgramList(String program){
-        programList=new ArrayList<>(  );
         try {
             BufferedReader br = new BufferedReader( new StringReader(program) );
             String line;
@@ -53,7 +53,6 @@ public class ChangeVariables implements Runnable {
     }
 
     private void getParameterList(String parameter){
-        parameterList=new ArrayList<>(  );
         try {
             BufferedReader br = new BufferedReader( new StringReader(parameter) );
             String line;
@@ -67,7 +66,6 @@ public class ChangeVariables implements Runnable {
     }
 
     private void readParameterVariables(ArrayList<StringBuffer>parameterList){
-        variablesList=new HashMap(  );
         for(int i=0;i<parameterList.size();i++){
             if(parameterList.get(i).toString().contains(";")){
                 parameterList.get(i).delete(parameterList.get(i).indexOf(";"),parameterList.get(i).length());

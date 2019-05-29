@@ -8,26 +8,42 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import pisarev.com.modeling.Const;
 import pisarev.com.modeling.application.App;
 
 public class Draw {
+    @Inject
+    MyData data;
     private Path path;
-    private Point pStart;
-    private Point pEnd;
     private RectF rectF;
     private Paint paintFullLine;
     private Paint paintDottedLine;
-    @Inject
-    MyData data;
+    private Paint line;
+    private int x=0;
+    private int u=0;
+    private String horizontal="X";
+    private String vertical="Z";
+    private final String radiusCR="CR";
+    private String strCR;
+    private boolean isHorizontal;
+    private boolean isVertical;
+    private boolean isCR;
+    private boolean clockwise;
+    private ArrayList<StringBuffer> programList;
+
 
     public Draw() {
         init();
     }
 
     private void init() {
+        App.getComponent().inject( this );
+        programList= data.getProgramList();
+        line=new Paint();
         paintFullLine = new Paint();
         paintFullLine.setColor( Color.GREEN );
         paintFullLine.setStyle( Paint.Style.STROKE );
@@ -41,8 +57,8 @@ public class Draw {
 
     private void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
         path = new Path();
-        pStart = new Point( pointStart.x, pointStart.z );
-        pEnd = new Point( pointEnd.x, pointEnd.z );
+        Point pStart = new Point( pointStart.x, pointStart.z );
+        Point pEnd = new Point( pointEnd.x, pointEnd.z );
         pStart.x *= zoom;
         pStart.z *= zoom;
         pEnd.x *= zoom;
@@ -58,8 +74,8 @@ public class Draw {
 
     private void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
         path = new Path();
-        pStart = new Point( pointStart.x, pointStart.z );
-        pEnd = new Point( pointEnd.x, pointEnd.z );
+        Point pStart = new Point( pointStart.x, pointStart.z );
+        Point pEnd = new Point( pointEnd.x, pointEnd.z );
         rectF = new RectF();
         pStart.x *= zoom;
         pStart.z *= zoom;
@@ -131,11 +147,222 @@ public class Draw {
         canvas.drawPath( path, paint );
     }
 
+
     public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom) {
-        App.getComponent().inject( this );
-        drawLine( canvas, paintFullLine, pointCoordinateZero, new Point( 650, 250 ), new Point( 100, 100 ), 1 );
-        drawArc( canvas, paintFullLine, pointCoordinateZero, new Point( 500, 500 ), new Point( 700, 300 ), 200, 1, true );
-        drawArc( canvas, paintFullLine, pointCoordinateZero, new Point( 500, 500 ), new Point( 700, 300 ), 200, 1, false );
+        StringBuffer cadre;
+        Point pStart=new Point();
+        Point pEnd=new Point();
+        pStart.x=650f;
+        pStart.z=250f;
+        pEnd.x=650f;
+        pEnd.z=250f;
+        float radius=0;
+        drawArc(canvas,line,pointCoordinateZero,pStart,pEnd,radius,1,clockwise);
+
+        selectCoordinateSystem( programList );
+        for (int i = 0; i <programList.size(); i++) {
+            cadre=programList.get( i );
+            containsGCode( cadre.toString() );
+
+            if(contains( cadre,horizontal )){
+                float xTemp=coordinateSearch(cadre,horizontal);
+                pEnd.x=xTemp;
+                isHorizontal=true;
+            }
+            if(contains( cadre,vertical )){
+                float zTemp=coordinateSearch(cadre,vertical);
+                pEnd.z=zTemp;
+                isVertical=true;
+            }
+            if(contains(cadre,radiusCR)){
+                float crTemp=coordinateSearch(cadre,radiusCR);
+                radius=crTemp;
+                isCR=true;
+            }
+            if(isHorizontal && isVertical&&isCR){
+                Log.d(Const.TEG,""+radius);
+                drawArc(canvas,line,pointCoordinateZero,pStart,pEnd,radius,3,clockwise);
+                pStart.x =pEnd.x;
+                pStart.z = pEnd.z;
+                isHorizontal = false;
+                isVertical = false;
+                isCR=false;
+            }
+            if (isHorizontal || isVertical) {
+                drawLine( canvas, line, pointCoordinateZero, pStart, pEnd, 3 );
+                pStart.x =pEnd.x;
+                pStart.z = pEnd.z;
+                isHorizontal = false;
+                isVertical = false;
+
+            }
+        }
     }
+
+    private float coordinateSearch(StringBuffer cadre, String axis){
+        String strAxis="";
+        Expression expression=new Expression();
+        StringBuffer temp=new StringBuffer(  );
+        int n = cadre.indexOf(axis);
+        if(checkSymbol(cadre.charAt( n+axis.length() ) )){
+            for (int i = n+axis.length(); i <cadre.length() ; i++) {
+                if (readUp( cadre.charAt( i ) )){
+                    temp.append( cadre.charAt( i ) );
+                }else {break;}
+            }
+            if (cadre.charAt( n+axis.length() )=='='){
+                strAxis= temp.toString().replace( "=","" );
+                return expression.calculate(strAxis) ;
+            }
+            return Float.parseFloat(temp.toString());
+        }
+        return Const.FIBO;
+    }
+
+    private void selectCoordinateSystem(ArrayList<StringBuffer> programList){
+        for (int i = 0; i <programList.size() ; i++) {
+            if (programList.get( i ).toString().contains( "X" ))
+                x++;
+            if (programList.get( i ).toString().contains( "U" ))
+                u++;
+            if(x>u){
+                horizontal="X";
+                vertical="Z";
+            }else {
+                horizontal="U";
+                vertical="W";
+            }
+        }
+    }
+
+    public  boolean isDigit(char input)
+    {
+        switch (input)
+        {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isG17(ArrayList<StringBuffer> programList)
+    {
+        for (int i = 0; i < programList.size(); i++)
+            if (programList.get( i ).toString().contains( "G17" )) {
+                return true;
+            }
+        return false;
+    }
+
+    private void containsGCode(String cadre)
+    {
+        boolean isG17=isG17(programList);
+        if (cadre.contains("G"))
+        {
+            String G = "G";
+            for (int i = 0; i < cadre.length(); i++)
+            {
+                char c=cadre.charAt( i );
+                if (c == 'G')
+                {
+                    for (int j = i + 1; j < cadre.length(); j++)
+                    {
+                        char t=cadre.charAt( j );
+                        if (isDigit(t))
+                        {
+                            G += t;
+                        }
+                        else { break; }
+                    }
+                    switch (G)
+                    {
+                        case "G0":
+                        case "G00":
+                            line = paintDottedLine;
+                            break;
+                        case "G1":
+                        case "G01":
+                            line = paintFullLine;
+                            break;
+                        case "G2":
+                        case "G02":
+                            if (isG17)
+                            {
+                                clockwise = true;
+                            }
+                            else { clockwise = false; }
+                            break;
+                        case "G3":
+                        case "G03":
+                            if (isG17)
+                            {
+                                clockwise = false;
+                            }
+                            else { clockwise = true; }
+                            break;
+                    }
+                    G = "G";
+                }
+            }
+        }
+    }
+
+    public boolean contains(StringBuffer sb, String findString){
+        return sb.indexOf(findString) > -1;
+    }
+
+    public static boolean checkSymbol(char input)
+    {
+        switch (input)
+        {
+            case '+':
+            case '-':
+            case '=':
+            case '0':
+            case '1':
+            case '2':
+            case '8':
+            case '7':
+            case '6':
+            case '5':
+            case '4':
+            case '3':
+            case '9':
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean readUp(char input)
+    {
+        switch (input)
+        {
+            case 'C':
+            case 'X':
+            case 'G':
+            case 'M':
+            case 'F':
+            case 'W':
+            case 'Z':
+            case 'D':
+            case 'S':
+            case 'A':
+            case 'U':
+            case 'L':
+                return false;
+        }
+        return true;
+    }
+
+
 }
 

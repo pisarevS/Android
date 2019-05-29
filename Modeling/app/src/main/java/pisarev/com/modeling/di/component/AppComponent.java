@@ -3,6 +3,7 @@ package pisarev.com.modeling.di.component;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import pisarev.com.modeling.activity.MainActivity;
 import pisarev.com.modeling.di.module.AppModule;
 import pisarev.com.modeling.mvp.model.ChangeVariables;
 import pisarev.com.modeling.mvp.model.Draw;
