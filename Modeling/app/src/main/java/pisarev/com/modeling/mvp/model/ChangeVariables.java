@@ -1,6 +1,5 @@
 package pisarev.com.modeling.mvp.model;
 
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;

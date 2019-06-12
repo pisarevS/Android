@@ -126,14 +126,15 @@ public class Draw {
                 catet = pEnd.x - x02;
                 if (pEnd.x == x02)
                     startAngle = 90;
-                else startAngle = (float) (Math.acos( catet / radius ) * (180 * Math.PI));
+                else startAngle = (float) (Math.acos( catet / radius ) * (180 / Math.PI));
             }
             if (pEnd.x < x02 && pEnd.z <= z02) {
-                catet = x02 - pEnd.z;
+                catet = x02 - pEnd.x;
                 if (pEnd.z == z02)
                     startAngle = 180;
-                else startAngle = (float) (180 - Math.acos( catet / radius ) * (180 / Math.PI));
+                else startAngle = (float) (180 - Math.acos(catet / radius) * (180 / Math.PI));
             }
+
             if (pEnd.x <= x02 && pEnd.z > z02) {
                 catet = x02 - pEnd.x;
                 if (pEnd.x == x02)
@@ -148,7 +149,7 @@ public class Draw {
     }
 
 
-    public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom) {
+    public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom,int index) {
         StringBuffer cadre;
         Point pStart=new Point();
         Point pEnd=new Point();

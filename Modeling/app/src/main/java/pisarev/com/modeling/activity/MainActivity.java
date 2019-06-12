@@ -21,12 +21,8 @@ import com.obsez.android.lib.filechooser.ChooserDialog;
 import java.io.File;
 import java.io.IOException;
 
-import javax.inject.Inject;
-
-import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.mvp.ViewMvp;
 import pisarev.com.modeling.mvp.model.ChangeVariables;
-import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;

@@ -24,6 +24,8 @@ public class MyView extends View {
     private boolean isZoom;
     private float downX;
     private float downZ;
+    private float downXTwo;
+    private float downZTwo;
     private float moveX;
     private float moveZ;
     private float zoom=1;
@@ -74,6 +76,8 @@ public class MyView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float catetX=0,catetZ=0;
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downX = event.getX();
@@ -83,8 +87,6 @@ public class MyView extends View {
                 isTouch = true;
                 invalidate();
                 break;
-                case MotionEvent.ACTION_POINTER_DOWN:
-                    break;
             case MotionEvent.ACTION_MOVE:
                 pointCoordinateZero.x = event.getX() + moveX;
                 pointCoordinateZero.z = event.getY() + moveZ;
@@ -93,9 +95,15 @@ public class MyView extends View {
             case MotionEvent.ACTION_UP:
                 invalidate();
                 break;
-                case MotionEvent.ACTION_POINTER_UP:
-                    invalidate();
-                    break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                downXTwo = event.getX();
+                downZTwo = event.getY();
+                //catetX=Math.abs(downX-downXTwo);
+                //catetZ=Math.abs(downZ-downZTwo);
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                invalidate();
+                break;
         }
         return true;
     }
