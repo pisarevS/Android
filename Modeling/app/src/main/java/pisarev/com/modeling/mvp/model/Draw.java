@@ -148,6 +148,19 @@ public class Draw {
         canvas.drawPath( path, paint );
     }
 
+    private void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom){
+        Paint paint=new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.RED);
+        path = new Path();
+        Point pEnd = new Point( pointEnd.x, pointEnd.z );
+        pEnd.x *= zoom;
+        pEnd.z *= zoom;
+        if (pEnd.z > 0) pEnd.z = pointCoordinateZero.z - pEnd.z;
+        else pEnd.z = pointCoordinateZero.z + Math.abs( pEnd.z );
+        path.addCircle(pointCoordinateZero.x + pEnd.x, pEnd.z,7, Path.Direction.CW);
+        canvas.drawPath(path,paint);
+    }
 
     public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom,int index) {
         StringBuffer cadre;
@@ -161,7 +174,7 @@ public class Draw {
         drawArc(canvas,line,pointCoordinateZero,pStart,pEnd,radius,1,clockwise);
 
         selectCoordinateSystem( programList );
-        for (int i = 0; i <programList.size(); i++) {
+        for (int i = 0; i <index; i++) {
             cadre=programList.get( i );
             containsGCode( cadre.toString() );
 
@@ -195,9 +208,9 @@ public class Draw {
                 pStart.z = pEnd.z;
                 isHorizontal = false;
                 isVertical = false;
-
             }
         }
+        drawPoint(canvas,pointCoordinateZero,pEnd,3);
     }
 
     private float coordinateSearch(StringBuffer cadre, String axis){

@@ -26,6 +26,7 @@ import pisarev.com.modeling.mvp.model.ChangeVariables;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;
+import pisarev.com.modeling.mvp.view.customview.MyView;
 import pisarev.com.modeling.mvp.view.fragments.ParameterFragment;
 import pisarev.com.modeling.mvp.view.fragments.ProgramFragment;
 
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        MyView.index=0;
         changeVariables=new ChangeVariables(ProgramFragment.getText(),ParameterFragment.getText()  );
         Thread thread=new Thread( changeVariables );
         thread.start();

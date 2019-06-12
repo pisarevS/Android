@@ -8,10 +8,15 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.mvp.ViewMvp;
 
+import pisarev.com.modeling.mvp.model.MyData;
+import pisarev.com.modeling.mvp.presenter.SecondPresenterImpl;
 import pisarev.com.modeling.mvp.view.customview.MyView;
 import pisarev.com.modeling.R;
+
+import javax.inject.Inject;
 
 
 public class SecondActivity extends AppCompatActivity implements ViewMvp.SecondViewMvp,View.OnTouchListener {
@@ -21,12 +26,16 @@ public class SecondActivity extends AppCompatActivity implements ViewMvp.SecondV
     private ImageView singleBlock;
     private ImageView reset;
     private int count=0;
+    boolean isSingleBlockDown=false;
+    @Inject
+    MyData data;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
         super.onCreate( savedInstanceState );
+        App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
         myView=findViewById( R.id.myView );
         start=findViewById( R.id.start );
@@ -41,10 +50,12 @@ public class SecondActivity extends AppCompatActivity implements ViewMvp.SecondV
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
         switch (v.getId()){
             case R.id.start:
                 MyView.button=MyView.START;
+                if(isSingleBlockDown&&MyView.index<data.getProgramList().size()){
+                    MyView.index++;
+                }else MyView.index=data.getProgramList().size();
                 myView.invalidate();
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
@@ -59,8 +70,10 @@ public class SecondActivity extends AppCompatActivity implements ViewMvp.SecondV
                     if(event.getAction()==MotionEvent.ACTION_DOWN){
                         count++;
                         if(count%2!=0){
+                            isSingleBlockDown=true;
                             singleBlock.setImageResource( R.drawable.single_block_down );
                         }else {
+                            isSingleBlockDown=false;
                             singleBlock.setImageResource( R.drawable.single_block );
                         }
                     }
@@ -68,6 +81,7 @@ public class SecondActivity extends AppCompatActivity implements ViewMvp.SecondV
             case R.id.reset:
                 MyView.button=MyView.RESET;
                 myView.invalidate();
+                MyView.index=0;
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         reset.setImageResource( R.drawable.reset_down );
