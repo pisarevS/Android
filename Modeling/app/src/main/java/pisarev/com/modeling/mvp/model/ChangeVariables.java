@@ -99,6 +99,7 @@ public class ChangeVariables implements Runnable {
                     String str = programList.get( i ).toString().replace( entry.getKey().toString(),entry.getValue().toString() );
                     programList.get( i ).replace( 0,programList.get( i ).length(),str );
                 }
+
             }
         }
         data.getProgramList().addAll( programList );

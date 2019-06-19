@@ -11,13 +11,12 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.mvp.ViewMvp;
+import android.widget.Toast;
+import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.Point;
 import pisarev.com.modeling.mvp.model.Draw;
-import pisarev.com.modeling.mvp.presenter.SecondPresenterImpl;
 
-public class MyView extends View  {
+public class MyView extends View implements ViewMvp.MyViewMvp {
     private Paint paintCoordinateDottedLine;
     private Draw draw;
     private Path path;
@@ -63,7 +62,7 @@ public class MyView extends View  {
     }
 
     private void manager(Canvas canvas) {
-        draw = new Draw();
+        draw = new Draw(this);
         draw.drawContour( canvas, pointCoordinateZero, zoom,index );
     }
 
@@ -137,5 +136,10 @@ public class MyView extends View  {
         paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
         paintCoordinateDottedLine.setAntiAlias( true );
         paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
+    }
+
+    @Override
+    public void showError(String error) {
+        Toast.makeText(getContext(),error,Toast.LENGTH_LONG).show();
     }
 }

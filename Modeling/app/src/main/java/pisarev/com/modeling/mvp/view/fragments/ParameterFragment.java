@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import pisarev.com.modeling.Const;
+import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.R;
 
 public class ParameterFragment extends Fragment {

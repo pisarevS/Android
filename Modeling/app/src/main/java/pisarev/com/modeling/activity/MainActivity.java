@@ -19,9 +19,8 @@ import android.widget.Toast;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
-import java.io.IOException;
 
-import pisarev.com.modeling.mvp.ViewMvp;
+import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.ChangeVariables;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        presenter=new PresenterMainImpl(this,this );
+        presenter=new PresenterMainImpl(this );
         java.io.File sdcard = Environment.getExternalStorageDirectory();
         if (id == R.id.action_openProgram) {
             new ChooserDialog(MainActivity.this)
@@ -119,12 +118,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
         return super.onOptionsItemSelected( item );
-    }
-
-
-    @Override
-    public void showError(IOException e) {
-        Toast.makeText( getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT ).show();
     }
 
     @Override

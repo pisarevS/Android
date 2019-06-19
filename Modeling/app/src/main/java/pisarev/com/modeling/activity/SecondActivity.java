@@ -9,24 +9,23 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.mvp.ViewMvp;
+import pisarev.com.modeling.interfaces.ViewMvp;
 
 import pisarev.com.modeling.mvp.model.MyData;
-import pisarev.com.modeling.mvp.presenter.SecondPresenterImpl;
 import pisarev.com.modeling.mvp.view.customview.MyView;
 import pisarev.com.modeling.R;
 
 import javax.inject.Inject;
 
 
-public class SecondActivity extends AppCompatActivity implements ViewMvp.SecondViewMvp,View.OnTouchListener {
+public class SecondActivity extends AppCompatActivity implements View.OnTouchListener, ViewMvp {
 
     private MyView myView;
     private ImageView start;
     private ImageView singleBlock;
     private ImageView reset;
     private int count=0;
-    boolean isSingleBlockDown=false;
+    private boolean isSingleBlockDown=false;
     @Inject
     MyData data;
 

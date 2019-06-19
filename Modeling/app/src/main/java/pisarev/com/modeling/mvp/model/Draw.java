@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-import pisarev.com.modeling.Const;
 import pisarev.com.modeling.application.App;
+import pisarev.com.modeling.interfaces.ViewMvp;
 
 public class Draw {
     @Inject
@@ -34,10 +34,11 @@ public class Draw {
     private boolean isCR;
     private boolean clockwise;
     private ArrayList<StringBuffer> programList;
+    private ViewMvp.MyViewMvp myViewMvp;
 
-
-    public Draw() {
-        init();
+    public Draw(ViewMvp.MyViewMvp myViewMvp){
+       this.myViewMvp =myViewMvp;
+       init();
     }
 
     private void init() {
@@ -163,7 +164,7 @@ public class Draw {
     }
 
     public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom,int index) {
-        StringBuffer cadre;
+        StringBuffer cadre=new StringBuffer();
         Point pStart=new Point();
         Point pEnd=new Point();
         pStart.x=650f;
@@ -174,41 +175,46 @@ public class Draw {
         drawArc(canvas,line,pointCoordinateZero,pStart,pEnd,radius,1,clockwise);
 
         selectCoordinateSystem( programList );
-        for (int i = 0; i <index; i++) {
-            cadre=programList.get( i );
-            containsGCode( cadre.toString() );
+        try {
+            for (int i = 0; i < index; i++) {
+                cadre = programList.get(i);
+                containsGCode(cadre.toString());
 
-            if(contains( cadre,horizontal )){
-                float xTemp=coordinateSearch(cadre,horizontal);
-                pEnd.x=xTemp;
-                isHorizontal=true;
+                if (contains(cadre, horizontal)) {
+                    float xTemp = coordinateSearch(cadre, horizontal);
+                    pEnd.x = xTemp;
+                    isHorizontal = true;
+                }
+                if (contains(cadre, vertical)) {
+                    float zTemp = coordinateSearch(cadre, vertical);
+                    pEnd.z = zTemp;
+                    isVertical = true;
+                }
+                if (contains(cadre, radiusCR)) {
+                    float crTemp = coordinateSearch(cadre, radiusCR);
+                    radius = crTemp;
+                    isCR = true;
+                }
+                if (isHorizontal && isVertical && isCR) {
+                    Log.d(Const.TEG, "" + radius);
+                    drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, 3, clockwise);
+                    pStart.x = pEnd.x;
+                    pStart.z = pEnd.z;
+                    isHorizontal = false;
+                    isVertical = false;
+                    isCR = false;
+                }
+                if (isHorizontal || isVertical) {
+                    drawLine(canvas, line, pointCoordinateZero, pStart, pEnd, 3);
+                    pStart.x = pEnd.x;
+                    pStart.z = pEnd.z;
+                    isHorizontal = false;
+                    isVertical = false;
+                }
             }
-            if(contains( cadre,vertical )){
-                float zTemp=coordinateSearch(cadre,vertical);
-                pEnd.z=zTemp;
-                isVertical=true;
-            }
-            if(contains(cadre,radiusCR)){
-                float crTemp=coordinateSearch(cadre,radiusCR);
-                radius=crTemp;
-                isCR=true;
-            }
-            if(isHorizontal && isVertical&&isCR){
-                Log.d(Const.TEG,""+radius);
-                drawArc(canvas,line,pointCoordinateZero,pStart,pEnd,radius,3,clockwise);
-                pStart.x =pEnd.x;
-                pStart.z = pEnd.z;
-                isHorizontal = false;
-                isVertical = false;
-                isCR=false;
-            }
-            if (isHorizontal || isVertical) {
-                drawLine( canvas, line, pointCoordinateZero, pStart, pEnd, 3 );
-                pStart.x =pEnd.x;
-                pStart.z = pEnd.z;
-                isHorizontal = false;
-                isVertical = false;
-            }
+        }catch (Exception e){
+            Log.d(Const.TEG,cadre.toString());
+            myViewMvp.showError(cadre.toString());
         }
         drawPoint(canvas,pointCoordinateZero,pEnd,3);
     }
