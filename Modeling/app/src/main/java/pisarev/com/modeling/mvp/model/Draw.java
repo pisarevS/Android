@@ -121,7 +121,7 @@ public class Draw {
                 catet = pEnd.x - x02;
                 if (pEnd.z == z02)
                     startAngle = 0;
-                else startAngle = (float) (360 - Math.acos( (catet / radius) * (180 / Math.PI) ));
+                else startAngle = (float) (360- Math.acos( catet / radius ) * (180 / Math.PI));
             }
             if (pEnd.x >= x02 && pEnd.z < z02) {
                 catet = pEnd.x - x02;
