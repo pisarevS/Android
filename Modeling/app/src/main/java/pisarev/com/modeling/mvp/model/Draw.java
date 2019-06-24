@@ -19,15 +19,13 @@ public class Draw {
     @Inject
     MyData data;
     private Path path;
-    private RectF rectF;
     private Paint paintFullLine;
     private Paint paintDottedLine;
     private Paint line;
-    private int x=0;
-    private int u=0;
-    private String horizontal="X";
-    private String vertical="Z";
-    private final String radiusCR="CR";
+    private int x;
+    private int u;
+    private String horizontal;
+    private String vertical;
     private boolean isHorizontal;
     private boolean isVertical;
     private boolean isCR;
@@ -76,7 +74,7 @@ public class Draw {
         path = new Path();
         Point pStart = new Point( pointStart.x, pointStart.z );
         Point pEnd = new Point( pointEnd.x, pointEnd.z );
-        rectF = new RectF();
+        RectF rectF = new RectF();
         pStart.x *= zoom;
         pStart.z *= zoom;
         pEnd.x *= zoom;
@@ -144,7 +142,7 @@ public class Draw {
             rectF.set( pointCoordinateZero.x + x02 - radius, pointCoordinateZero.z - z02 - radius, pointCoordinateZero.x + x02 + radius, pointCoordinateZero.z - z02 + radius );
         }
         sweetAngle = (float) (2 * Math.asin( hord / (2 * radius) ) * (180 / Math.PI));
-        path.addArc( rectF, startAngle, sweetAngle );
+        path.addArc(rectF, startAngle, sweetAngle );
         canvas.drawPath( path, paint );
     }
 
@@ -163,7 +161,7 @@ public class Draw {
     }
 
     public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom,int index) {
-        StringBuffer cadre=new StringBuffer();
+        StringBuffer cadre;
         Point pStart=new Point();
         Point pEnd=new Point();
         pStart.x=650f;
@@ -172,33 +170,45 @@ public class Draw {
         pEnd.z=250f;
         float radius=0;
         selectCoordinateSystem( programList );
-        try {
+
             for (int i = 0; i < index; i++) {
                 cadre = programList.get(i);
                 containsGCode(cadre.toString());
-
-                if(contains(cadre, horizontal+"=IC")){
-                    pEnd.x=pEnd.x+ incrementSearch(cadre, horizontal+"=IC");
-                    isHorizontal = true;
-                }else if (contains(cadre, horizontal)) {
-                    pEnd.x = coordinateSearch(cadre, horizontal);
-                    isHorizontal = true;
+                try{
+                    if(contains(cadre, horizontal+"=IC")){
+                        pEnd.x=pEnd.x+ incrementSearch(cadre, horizontal+"=IC");
+                        isHorizontal = true;
+                    }else if (contains(cadre, horizontal)) {
+                        pEnd.x = coordinateSearch(cadre, horizontal);
+                        isHorizontal = true;
+                    }
+                }catch (Exception e){
+                    Log.d(Const.TEG,cadre.toString());
+                    myViewMvp.showError("Error "+horizontal+"\n"+ cadre.toString());
                 }
-
-                if(contains(cadre,vertical+"=IC")){
-                    pEnd.z=pEnd.z+ incrementSearch(cadre,vertical+"=IC");
-                    isVertical = true;
-                }else if (contains(cadre, vertical)) {
-                    pEnd.z = coordinateSearch(cadre, vertical);
-                    isVertical = true;
+                try {
+                    if(contains(cadre,vertical+"=IC")){
+                        pEnd.z=pEnd.z+ incrementSearch(cadre,vertical+"=IC");
+                        isVertical = true;
+                    }else if (contains(cadre, vertical)) {
+                        pEnd.z = coordinateSearch(cadre, vertical);
+                        isVertical = true;
+                    }
+                }catch (Exception e){
+                    Log.d(Const.TEG,cadre.toString());
+                    myViewMvp.showError("Error "+vertical+"\n"+ cadre.toString());
                 }
-
-                if (contains(cadre, radiusCR)) {
-                    radius = coordinateSearch(cadre, radiusCR);
-                    isCR = true;
+                String radiusCR = "CR";
+                try {
+                    if (contains(cadre, "CR")) {
+                        radius = coordinateSearch(cadre, radiusCR);
+                        isCR = true;
+                    }
+                }catch (Exception e){
+                    Log.d(Const.TEG,cadre.toString());
+                    myViewMvp.showError("Error "+radiusCR+"\n"+ cadre.toString());
                 }
                 if (isHorizontal && isVertical && isCR) {
-                    Log.d(Const.TEG, "" + radius);
                     drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, 3, clockwise);
                     pStart.x = pEnd.x;
                     pStart.z = pEnd.z;
@@ -214,10 +224,7 @@ public class Draw {
                     isVertical = false;
                 }
             }
-        }catch (Exception e){
-            Log.d(Const.TEG,cadre.toString());
-            myViewMvp.showError(cadre.toString());
-        }
+
         drawPoint(canvas,pointCoordinateZero,pEnd,3);
     }
 
@@ -361,29 +368,6 @@ public class Draw {
         return sb.indexOf(findString) > -1;
     }
 
-    public static boolean checkSymbol(char input)
-    {
-        switch (input)
-        {
-            case '+':
-            case '-':
-            case '=':
-            case '0':
-            case '1':
-            case '2':
-            case '8':
-            case '7':
-            case '6':
-            case '5':
-            case '4':
-            case '3':
-            case '9':
-            case '(':
-                return true;
-        }
-        return false;
-    }
-
     public static boolean readUp(char input)
     {
         switch (input)
@@ -404,7 +388,5 @@ public class Draw {
         }
         return true;
     }
-
-
 }
 
