@@ -18,7 +18,7 @@ public class ChangeVariables implements Runnable {
     private String parameter;
     private ArrayList<StringBuffer>programList=new ArrayList<>(  );
     private ArrayList<StringBuffer>parameterList=new ArrayList<>(  );
-    private Map<String,String> variablesList=new HashMap(  );
+    private Map<String,String> variablesList=new HashMap<>(  );
     @Inject
     MyData data;
 
@@ -31,6 +31,7 @@ public class ChangeVariables implements Runnable {
 
     @Override
     public void run() {
+
         getProgramList(program);
         getParameterList(parameter);
         readParameterVariables(parameterList);

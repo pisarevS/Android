@@ -28,7 +28,6 @@ public class Draw {
     private String horizontal="X";
     private String vertical="Z";
     private final String radiusCR="CR";
-    private String strCR;
     private boolean isHorizontal;
     private boolean isVertical;
     private boolean isCR;
@@ -172,27 +171,30 @@ public class Draw {
         pEnd.x=650f;
         pEnd.z=250f;
         float radius=0;
-        drawArc(canvas,line,pointCoordinateZero,pStart,pEnd,radius,1,clockwise);
-
         selectCoordinateSystem( programList );
         try {
             for (int i = 0; i < index; i++) {
                 cadre = programList.get(i);
                 containsGCode(cadre.toString());
 
-                if (contains(cadre, horizontal)) {
-                    float xTemp = coordinateSearch(cadre, horizontal);
-                    pEnd.x = xTemp;
+                if(contains(cadre, horizontal+"=IC")){
+                    pEnd.x=pEnd.x+ incrementSearch(cadre, horizontal+"=IC");
+                    isHorizontal = true;
+                }else if (contains(cadre, horizontal)) {
+                    pEnd.x = coordinateSearch(cadre, horizontal);
                     isHorizontal = true;
                 }
-                if (contains(cadre, vertical)) {
-                    float zTemp = coordinateSearch(cadre, vertical);
-                    pEnd.z = zTemp;
+
+                if(contains(cadre,vertical+"=IC")){
+                    pEnd.z=pEnd.z+ incrementSearch(cadre,vertical+"=IC");
+                    isVertical = true;
+                }else if (contains(cadre, vertical)) {
+                    pEnd.z = coordinateSearch(cadre, vertical);
                     isVertical = true;
                 }
+
                 if (contains(cadre, radiusCR)) {
-                    float crTemp = coordinateSearch(cadre, radiusCR);
-                    radius = crTemp;
+                    radius = coordinateSearch(cadre, radiusCR);
                     isCR = true;
                 }
                 if (isHorizontal && isVertical && isCR) {
@@ -219,24 +221,42 @@ public class Draw {
         drawPoint(canvas,pointCoordinateZero,pEnd,3);
     }
 
-    private float coordinateSearch(StringBuffer cadre, String axis){
-        String strAxis="";
+    private float incrementSearch(StringBuffer cadre, String axis){
         Expression expression=new Expression();
         StringBuffer temp=new StringBuffer(  );
         int n = cadre.indexOf(axis);
-        if(checkSymbol(cadre.charAt( n+axis.length() ) )){
+
+        if(cadre.charAt( n+axis.length()  )=='('){
             for (int i = n+axis.length(); i <cadre.length() ; i++) {
                 if (readUp( cadre.charAt( i ) )){
                     temp.append( cadre.charAt( i ) );
                 }else {break;}
             }
-            if (cadre.charAt( n+axis.length() )=='='){
-                strAxis= temp.toString().replace( "=","" );
-                return expression.calculate(strAxis) ;
-            }
-            return Float.parseFloat(temp.toString());
+            return expression.calculate(temp.toString()) ;
         }
-        return Const.FIBO;
+        return Float.parseFloat(temp.toString());
+    }
+
+    private float coordinateSearch(StringBuffer cadre, String axis){
+        Expression expression=new Expression();
+        StringBuffer temp=new StringBuffer(  );
+        int n = cadre.indexOf(axis);
+
+        if(isDigit(cadre.charAt( n+axis.length()))){
+            for (int i = n+axis.length(); i <cadre.length() ; i++) {
+                if (readUp( cadre.charAt( i ) )){
+                    temp.append( cadre.charAt( i ) );
+                }else {break;}
+            }
+        }else if(cadre.charAt( n+axis.length()  )=='='){
+            for (int i = n+axis.length(); i <cadre.length() ; i++) {
+                if (readUp( cadre.charAt( i ) )){
+                    temp.append( cadre.charAt( i ) );
+                }else {break;}
+            }
+            return expression.calculate(temp.toString()) ;
+        }
+        return Float.parseFloat(temp.toString());
     }
 
     private void selectCoordinateSystem(ArrayList<StringBuffer> programList){
@@ -303,6 +323,7 @@ public class Draw {
                         }
                         else { break; }
                     }
+                    Log.d(Const.TEG,G);
                     switch (G)
                     {
                         case "G0":
@@ -357,6 +378,7 @@ public class Draw {
             case '4':
             case '3':
             case '9':
+            case '(':
                 return true;
         }
         return false;
