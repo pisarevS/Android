@@ -20,10 +20,14 @@ import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
+import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.ChangeVariables;
 import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.Expression;
+import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;
@@ -36,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SectionsPageAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private ViewMvp.PresenterMainMvp presenter;
-   // private ChangeVariables changeVariables;
+    @Inject
+    MyData data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FloatingActionButton fab = findViewById( R.id.fab );
         fab.setOnClickListener( this );
+        App.getComponent().inject( this );
     }
 
     @Override
@@ -134,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        data.getProgramListTextView().clear();
+        data.getProgramList().clear();
         DrawView.index=0;
         Thread thread=new Thread( new ChangeVariables(ProgramFragment.getText(),ParameterFragment.getText()));
         thread.start();

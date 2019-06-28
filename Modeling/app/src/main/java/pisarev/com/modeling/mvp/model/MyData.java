@@ -5,17 +5,27 @@ import java.util.ArrayList;
 public class MyData  {
 
 
-    public void setProgramList(ArrayList<StringBuffer> programList) {
-        this.programList = programList;
-    }
-
     private ArrayList<StringBuffer>programList=new ArrayList<>(  );
+
+    private ArrayList<String>programListTextView=new ArrayList<>(  );
 
     public MyData(){
     }
 
     public ArrayList<StringBuffer> getProgramList() {
         return programList;
+    }
+
+    public void setProgramList(ArrayList<StringBuffer> programList) {
+        this.programList = programList;
+    }
+
+    public ArrayList<String> getProgramListTextView() {
+        return programListTextView;
+    }
+
+    public void setProgramListTextView(ArrayList<String> programListTextView) {
+        this.programListTextView = programListTextView;
     }
 
 

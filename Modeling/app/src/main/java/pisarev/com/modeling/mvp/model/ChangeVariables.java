@@ -31,7 +31,6 @@ public class ChangeVariables implements Runnable {
 
     @Override
     public void run() {
-
         getProgramList(program);
         getParameterList(parameter);
         readParameterVariables(parameterList);
@@ -45,6 +44,7 @@ public class ChangeVariables implements Runnable {
             String line;
             while ((line = br.readLine()) != null) {
                 programList.add(new StringBuffer( line )  );
+                data.getProgramListTextView().add( line );
             }
             br.close();
         }catch (IOException e){
@@ -103,6 +103,6 @@ public class ChangeVariables implements Runnable {
 
             }
         }
-        data.getProgramList().addAll( programList );
+        data.setProgramList( programList );
     }
 }

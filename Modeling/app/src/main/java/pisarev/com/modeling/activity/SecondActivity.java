@@ -61,7 +61,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                         DrawView.button= DrawView.START;
                         if(isSingleBlockDown&& DrawView.index<data.getProgramList().size()){
                             DrawView.index++;
-                            textViewCadr.setText(DrawView.index +"  "+ChangeVariables.programList.get(DrawView.index-1));
+                            textViewCadr.setText(DrawView.index +"  "+data.getProgramListTextView().get(DrawView.index-1));
                         }else DrawView.index=data.getProgramList().size();
                         drawView.invalidate();
                         break;
