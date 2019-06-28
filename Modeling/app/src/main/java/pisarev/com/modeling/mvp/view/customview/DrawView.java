@@ -8,42 +8,40 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import android.widget.Toast;
+
 import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.Point;
 import pisarev.com.modeling.mvp.model.Draw;
 
 public class DrawView extends View implements ViewMvp.MyViewMvp {
     private Paint paintCoordinateDottedLine;
-    private Draw draw;
-    private Path path;
     private Point pointCoordinateZero = new Point();
     private boolean isTouch;
-    private boolean isZoom;
-    private float downX;
-    private float downZ;
-    private float downXTwo;
-    private float downZTwo;
     private float moveX;
     private float moveZ;
-    private float zoom=1;
+    private float zoom=3;
     public static int button;
     public final static int START = 1;
     public final static int RESET = 2;
     public static int index;
-
+    private ScaleGestureDetector scaleGestureDetector;
 
     public DrawView(Context context) {
         super( context );
         init();
+        scaleGestureDetector=new ScaleGestureDetector(context,new ScaleListener());
     }
 
     public DrawView(Context context, @Nullable AttributeSet attrs) {
         super( context, attrs );
         init();
+        scaleGestureDetector=new ScaleGestureDetector(context,new ScaleListener());
     }
 
     @Override
@@ -62,7 +60,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     }
 
     private void manager(Canvas canvas) {
-        draw = new Draw(this);
+        Draw draw = new Draw(this);
         draw.drawContour( canvas, pointCoordinateZero, zoom,index );
     }
 
@@ -78,12 +76,11 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float catetX=0,catetZ=0;
-
+        scaleGestureDetector.onTouchEvent(event);
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                downX = event.getX();
-                downZ = event.getY();
+                float downX = event.getX();
+                float downZ = event.getY();
                 moveX = pointCoordinateZero.x - downX;
                 moveZ = pointCoordinateZero.z - downZ;
                 isTouch = true;
@@ -97,20 +94,12 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
             case MotionEvent.ACTION_UP:
                 invalidate();
                 break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                downXTwo = event.getX();
-                downZTwo = event.getY();
-                //catetX=Math.abs(downX-downXTwo);
-                //catetZ=Math.abs(downZ-downZTwo);
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                invalidate();
-                break;
         }
         return true;
     }
 
     private void initSystemCoordinate(Canvas canvas, boolean isInit) {
+        Path path;
         if (isInit) {
             path = new Path();
             pointCoordinateZero.x = getWidth() / 2;
@@ -119,14 +108,14 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
             path.lineTo( getWidth(), pointCoordinateZero.z );
             path.moveTo( pointCoordinateZero.x, 0 );
             path.lineTo( pointCoordinateZero.x, getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
+            canvas.drawPath(path, paintCoordinateDottedLine );
         } else {
             path = new Path();
             path.moveTo( 0, pointCoordinateZero.z );
             path.lineTo( getWidth(), pointCoordinateZero.z );
             path.moveTo( pointCoordinateZero.x, 0 );
             path.lineTo( pointCoordinateZero.x, getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
+            canvas.drawPath(path, paintCoordinateDottedLine );
         }
     }
 
@@ -141,5 +130,15 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     @Override
     public void showError(String error) {
         Toast.makeText(getContext(),error,Toast.LENGTH_LONG).show();
+    }
+
+    public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            zoom*=detector.getScaleFactor();
+            invalidate();
+            return true;
+        }
     }
 }

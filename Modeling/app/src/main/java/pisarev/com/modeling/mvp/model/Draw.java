@@ -183,7 +183,6 @@ public class Draw {
                         isHorizontal = true;
                     }
                 }catch (Exception e){
-                    Log.d(Const.TEG,cadre.toString());
                     myViewMvp.showError("Error "+horizontal+"\n"+ cadre.toString());
                 }
                 try {
@@ -195,7 +194,6 @@ public class Draw {
                         isVertical = true;
                     }
                 }catch (Exception e){
-                    Log.d(Const.TEG,cadre.toString());
                     myViewMvp.showError("Error "+vertical+"\n"+ cadre.toString());
                 }
                 String radiusCR = "CR";
@@ -205,11 +203,10 @@ public class Draw {
                         isCR = true;
                     }
                 }catch (Exception e){
-                    Log.d(Const.TEG,cadre.toString());
                     myViewMvp.showError("Error "+radiusCR+"\n"+ cadre.toString());
                 }
                 if (isHorizontal && isVertical && isCR) {
-                    drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, 3, clockwise);
+                    drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, zoom, clockwise);
                     pStart.x = pEnd.x;
                     pStart.z = pEnd.z;
                     isHorizontal = false;
@@ -217,7 +214,7 @@ public class Draw {
                     isCR = false;
                 }
                 if (isHorizontal || isVertical) {
-                    drawLine(canvas, line, pointCoordinateZero, pStart, pEnd, 3);
+                    drawLine(canvas, line, pointCoordinateZero, pStart, pEnd, zoom);
                     pStart.x = pEnd.x;
                     pStart.z = pEnd.z;
                     isHorizontal = false;
@@ -225,7 +222,7 @@ public class Draw {
                 }
             }
 
-        drawPoint(canvas,pointCoordinateZero,pEnd,3);
+        drawPoint(canvas,pointCoordinateZero,pEnd,zoom);
     }
 
     private float incrementSearch(StringBuffer cadre, String axis){
@@ -249,14 +246,14 @@ public class Draw {
         StringBuffer temp=new StringBuffer(  );
         int n = cadre.indexOf(axis);
 
-        if(isDigit(cadre.charAt( n+axis.length()))){
+        if(isDigit(cadre.charAt( n+axis.length()))||cadre.charAt( n+axis.length())=='-'||cadre.charAt( n+axis.length())=='+'){
             for (int i = n+axis.length(); i <cadre.length() ; i++) {
                 if (readUp( cadre.charAt( i ) )){
                     temp.append( cadre.charAt( i ) );
                 }else {break;}
             }
         }else if(cadre.charAt( n+axis.length()  )=='='){
-            for (int i = n+axis.length(); i <cadre.length() ; i++) {
+            for (int i = n+axis.length()+1; i <cadre.length() ; i++) {
                 if (readUp( cadre.charAt( i ) )){
                     temp.append( cadre.charAt( i ) );
                 }else {break;}
@@ -330,7 +327,7 @@ public class Draw {
                         }
                         else { break; }
                     }
-                    Log.d(Const.TEG,G);
+                    //Log.d(Const.TEG,G);
                     switch (G)
                     {
                         case "G0":

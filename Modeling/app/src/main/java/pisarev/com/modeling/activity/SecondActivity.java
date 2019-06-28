@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
     private TextView textViewCadr;
     private int count=0;
     private boolean isSingleBlockDown=false;
+    private ScaleGestureDetector scaleGestureDetector;
     @Inject
     MyData data;
 
@@ -51,6 +53,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         drawView.invalidate();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()){
