@@ -22,10 +22,12 @@ import java.io.File;
 
 import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.ChangeVariables;
+import pisarev.com.modeling.mvp.model.Const;
+import pisarev.com.modeling.mvp.model.Expression;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;
-import pisarev.com.modeling.mvp.view.customview.MyView;
+import pisarev.com.modeling.mvp.view.customview.DrawView;
 import pisarev.com.modeling.mvp.view.fragments.ParameterFragment;
 import pisarev.com.modeling.mvp.view.fragments.ProgramFragment;
 
@@ -34,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SectionsPageAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private ViewMvp.PresenterMainMvp presenter;
-    private ChangeVariables changeVariables;
+   // private ChangeVariables changeVariables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,9 +134,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        MyView.index=0;
-        changeVariables=new ChangeVariables(ProgramFragment.getText(),ParameterFragment.getText()  );
-        Thread thread=new Thread( changeVariables );
+        DrawView.index=0;
+        Thread thread=new Thread( new ChangeVariables(ProgramFragment.getText(),ParameterFragment.getText()));
         thread.start();
         Intent intent = new Intent( MainActivity.this, SecondActivity.class );
         startActivity( intent );

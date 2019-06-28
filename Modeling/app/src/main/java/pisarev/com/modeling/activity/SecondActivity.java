@@ -8,11 +8,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import android.widget.TextView;
 import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.ViewMvp;
 
+import pisarev.com.modeling.mvp.model.ChangeVariables;
 import pisarev.com.modeling.mvp.model.MyData;
-import pisarev.com.modeling.mvp.view.customview.MyView;
+import pisarev.com.modeling.mvp.view.customview.DrawView;
 import pisarev.com.modeling.R;
 
 import javax.inject.Inject;
@@ -20,10 +22,11 @@ import javax.inject.Inject;
 
 public class SecondActivity extends AppCompatActivity implements View.OnTouchListener, ViewMvp {
 
-    private MyView myView;
+    private DrawView drawView;
     private ImageView start;
     private ImageView singleBlock;
     private ImageView reset;
+    private TextView textViewCadr;
     private int count=0;
     private boolean isSingleBlockDown=false;
     @Inject
@@ -36,29 +39,31 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         super.onCreate( savedInstanceState );
         App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
-        myView=findViewById( R.id.myView );
+        drawView =findViewById( R.id.myView );
+        textViewCadr=findViewById(R.id.textViewCadr);
         start=findViewById( R.id.start );
         singleBlock =findViewById( R.id.single_block );
         reset=findViewById( R.id.reset );
         start.setOnTouchListener(this);
         singleBlock.setOnTouchListener(this);
         reset.setOnTouchListener(this);
-        MyView.button=MyView.RESET;
-        myView.invalidate();
+        DrawView.button= DrawView.RESET;
+        drawView.invalidate();
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()){
             case R.id.start:
-                MyView.button=MyView.START;
-                if(isSingleBlockDown&&MyView.index<data.getProgramList().size()){
-                    MyView.index++;
-                }else MyView.index=data.getProgramList().size();
-                myView.invalidate();
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         start.setImageResource( R.drawable.sysle_start_down );
+                        DrawView.button= DrawView.START;
+                        if(isSingleBlockDown&& DrawView.index<data.getProgramList().size()){
+                            DrawView.index++;
+                            textViewCadr.setText(DrawView.index +"  "+ChangeVariables.programList.get(DrawView.index-1));
+                        }else DrawView.index=data.getProgramList().size();
+                        drawView.invalidate();
                         break;
                     case MotionEvent.ACTION_UP:
                         start.setImageResource( R.drawable.sysle_start );
@@ -78,11 +83,12 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                     }
                 break;
             case R.id.reset:
-                MyView.button=MyView.RESET;
-                myView.invalidate();
-                MyView.index=0;
+                DrawView.button= DrawView.RESET;
+                drawView.invalidate();
+                DrawView.index=0;
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
+                        textViewCadr.setText("");
                         reset.setImageResource( R.drawable.reset_down );
                         break;
                     case MotionEvent.ACTION_UP:

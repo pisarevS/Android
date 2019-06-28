@@ -16,7 +16,7 @@ import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.Point;
 import pisarev.com.modeling.mvp.model.Draw;
 
-public class MyView extends View implements ViewMvp.MyViewMvp {
+public class DrawView extends View implements ViewMvp.MyViewMvp {
     private Paint paintCoordinateDottedLine;
     private Draw draw;
     private Path path;
@@ -36,12 +36,12 @@ public class MyView extends View implements ViewMvp.MyViewMvp {
     public static int index;
 
 
-    public MyView(Context context) {
+    public DrawView(Context context) {
         super( context );
         init();
     }
 
-    public MyView(Context context, @Nullable AttributeSet attrs) {
+    public DrawView(Context context, @Nullable AttributeSet attrs) {
         super( context, attrs );
         init();
     }
