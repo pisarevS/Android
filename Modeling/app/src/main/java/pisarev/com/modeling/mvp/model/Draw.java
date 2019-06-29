@@ -32,6 +32,7 @@ public class Draw {
     private boolean clockwise;
     private ArrayList<StringBuffer> programList;
     private ViewMvp.MyViewMvp myViewMvp;
+    private float FIBO=1123581220;
 
     public Draw(ViewMvp.MyViewMvp myViewMvp){
        this.myViewMvp =myViewMvp;
@@ -179,8 +180,11 @@ public class Draw {
                         pEnd.x=pEnd.x+ incrementSearch(cadre, horizontal+"=IC");
                         isHorizontal = true;
                     }else if (contains(cadre, horizontal)) {
-                        pEnd.x = coordinateSearch(cadre, horizontal);
-                        isHorizontal = true;
+                        float tempHorizontal=coordinateSearch(cadre, horizontal);
+                        if(tempHorizontal!=FIBO){
+                            pEnd.x =tempHorizontal;
+                            isHorizontal = true;
+                        }
                     }
                 }catch (Exception e){
                     myViewMvp.showError("Error "+horizontal+"\n"+ cadre.toString());
@@ -190,8 +194,11 @@ public class Draw {
                         pEnd.z=pEnd.z+ incrementSearch(cadre,vertical+"=IC");
                         isVertical = true;
                     }else if (contains(cadre, vertical)) {
-                        pEnd.z = coordinateSearch(cadre, vertical);
-                        isVertical = true;
+                        float tempVertical=coordinateSearch(cadre, vertical);
+                        if(tempVertical!=FIBO){
+                            pEnd.z = tempVertical;
+                            isVertical = true;
+                        }
                     }
                 }catch (Exception e){
                     myViewMvp.showError("Error "+vertical+"\n"+ cadre.toString());
@@ -199,8 +206,11 @@ public class Draw {
                 String radiusCR = "CR";
                 try {
                     if (contains(cadre, "CR")) {
-                        radius = coordinateSearch(cadre, radiusCR);
-                        isCR = true;
+                        float tempCR=coordinateSearch(cadre, radiusCR);
+                        if(tempCR!=FIBO){
+                            radius =tempCR;
+                            isCR = true;
+                        }
                     }
                 }catch (Exception e){
                     myViewMvp.showError("Error "+radiusCR+"\n"+ cadre.toString());
@@ -252,6 +262,7 @@ public class Draw {
                     temp.append( cadre.charAt( i ) );
                 }else {break;}
             }
+            return Float.parseFloat(temp.toString());
         }else if(cadre.charAt( n+axis.length()  )=='='){
             for (int i = n+axis.length()+1; i <cadre.length() ; i++) {
                 if (readUp( cadre.charAt( i ) )){
@@ -260,7 +271,7 @@ public class Draw {
             }
             return expression.calculate(temp.toString()) ;
         }
-        return Float.parseFloat(temp.toString());
+        return FIBO;
     }
 
     private void selectCoordinateSystem(ArrayList<StringBuffer> programList){

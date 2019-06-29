@@ -15,7 +15,15 @@ import android.view.View;
 
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.inject.Inject;
+
+import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.ViewMvp;
+import pisarev.com.modeling.mvp.model.Const;
+import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
 import pisarev.com.modeling.mvp.model.Draw;
 
@@ -31,6 +39,9 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     public final static int RESET = 2;
     public static int index;
     private ScaleGestureDetector scaleGestureDetector;
+    @Inject
+    MyData data;
+
 
     public DrawView(Context context) {
         super( context );
@@ -50,6 +61,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         switch (button) {
             case START:
                 manager( canvas );
+                invalidate();
                 break;
             case RESET:
                 initSystemCoordinate( canvas, true );
@@ -125,6 +137,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
         paintCoordinateDottedLine.setAntiAlias( true );
         paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
+        App.getComponent().inject( this );
     }
 
     @Override

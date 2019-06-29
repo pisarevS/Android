@@ -4,16 +4,17 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import android.widget.TextView;
-import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.ViewMvp;
 
-import pisarev.com.modeling.mvp.model.ChangeVariables;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import pisarev.com.modeling.application.App;
+
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.view.customview.DrawView;
 import pisarev.com.modeling.R;
@@ -21,16 +22,16 @@ import pisarev.com.modeling.R;
 import javax.inject.Inject;
 
 
-public class SecondActivity extends AppCompatActivity implements View.OnTouchListener, ViewMvp {
+public class SecondActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private DrawView drawView;
     private ImageView start;
     private ImageView singleBlock;
     private ImageView reset;
-    private TextView textViewCadr;
+    private TextView textViewCadre;
     private int count=0;
     private boolean isSingleBlockDown=false;
-    private ScaleGestureDetector scaleGestureDetector;
+    private boolean isReset=false;
     @Inject
     MyData data;
 
@@ -42,7 +43,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
         drawView =findViewById( R.id.myView );
-        textViewCadr=findViewById(R.id.textViewCadr);
+        textViewCadre =findViewById(R.id.textViewCadr);
         start=findViewById( R.id.start );
         singleBlock =findViewById( R.id.single_block );
         reset=findViewById( R.id.reset );
@@ -61,12 +62,36 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         start.setImageResource( R.drawable.sysle_start_down );
-                        DrawView.button= DrawView.START;
+
                         if(isSingleBlockDown&& DrawView.index<data.getProgramList().size()){
+                            DrawView.button = DrawView.START;
                             DrawView.index++;
-                            textViewCadr.setText(DrawView.index +"  "+data.getProgramListTextView().get(DrawView.index-1));
-                        }else DrawView.index=data.getProgramList().size();
-                        drawView.invalidate();
+                            textViewCadre.setText(data.getProgramListTextView().get(DrawView.index-1));
+                        }
+                        if(!isSingleBlockDown&& DrawView.index<data.getProgramList().size()) {
+                            DrawView.button = DrawView.START;
+                            final Timer timer = new Timer();
+                            timer.schedule( new TimerTask() {
+                                @Override
+                                public void run() {
+                                    DrawView.index++;
+                                    if (DrawView.index < data.getProgramList().size()&&!isSingleBlockDown&&!isReset) {
+                                        DrawView.button = DrawView.START;
+
+                                            SecondActivity.this.runOnUiThread( new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                   textViewCadre.setText(  data.getProgramListTextView().get( DrawView.index - 1 ) );
+                                                }
+                                            } );
+
+                                    } else {
+                                        isReset=false;
+                                        timer.cancel();
+                                    }
+                                }
+                            }, 1000, 200 );
+                        }
                         break;
                     case MotionEvent.ACTION_UP:
                         start.setImageResource( R.drawable.sysle_start );
@@ -86,12 +111,13 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                     }
                 break;
             case R.id.reset:
-                DrawView.button= DrawView.RESET;
-                drawView.invalidate();
-                DrawView.index=0;
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
-                        textViewCadr.setText("");
+                        DrawView.button= DrawView.RESET;
+                        DrawView.index=0;
+                        isReset=true;
+                        textViewCadre.setText("");
+                        drawView.invalidate();
                         reset.setImageResource( R.drawable.reset_down );
                         break;
                     case MotionEvent.ACTION_UP:
@@ -102,4 +128,5 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         }
         return true;
     }
+
 }

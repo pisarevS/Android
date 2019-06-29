@@ -72,8 +72,6 @@ public class ChangeVariables implements Runnable {
         variablesList.put("N_GANTRYPOS_U","650");
         variablesList.put("N_GANTRYPOS_W","250");
         variablesList.put("$P_TOOLR","16");
-        variablesList.put("V_CUT","85");
-        variablesList.put("_SPEC_WP","100");
         for(int i=0;i<parameterList.size();i++){
             if(parameterList.get(i).toString().contains(";")){
                 parameterList.get(i).delete(parameterList.get(i).indexOf(";"),parameterList.get(i).length());
@@ -108,11 +106,6 @@ public class ChangeVariables implements Runnable {
         listIgnor.add("G59 U=N_WP_ZP_U_S1 W=N_WP_ZP_W_S1");
         listIgnor.add("G58 U=0 W=N_CHUCK_HEIGHT_W_S2[N_CHUCK_JAWS]");
         listIgnor.add("G59 U=N_WP_ZP_U_S2 W=N_WP_ZP_W_S2");
-        listIgnor.add("N_WAITM");
-        listIgnor.add("DEF INT");
-        listIgnor.add("DEF REAL");
-        listIgnor.add("N_TWOCHANNELS");
-        listIgnor.add("CALL");
 
      for(int i=0;i<programList.size();i++){
          for(int j=0;j<listIgnor.size();j++){
