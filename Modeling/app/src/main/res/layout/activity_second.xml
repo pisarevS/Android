@@ -24,7 +24,7 @@
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/single_block"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/sysle_start" />
+        app:srcCompat="@drawable/cycle_start" />
 
     <ImageView
         android:id="@+id/single_block"

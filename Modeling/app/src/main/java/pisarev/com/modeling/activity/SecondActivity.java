@@ -2,6 +2,7 @@ package pisarev.com.modeling.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,13 +26,15 @@ import javax.inject.Inject;
 public class SecondActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private DrawView drawView;
-    private ImageView start;
-    private ImageView singleBlock;
-    private ImageView reset;
-    private TextView textViewCadre;
-    private int count=0;
+    private ImageView buttonCycleStart;
+    private ImageView buttonSingleBlock;
+    private ImageView buttonReset;
+    private TextView textViewFrame;
     private boolean isSingleBlockDown=false;
-    private boolean isReset=false;
+    private boolean isResetDown =false;
+    private boolean isStartDown =false;
+    private int count=0;
+    Vibrator vibrator;
     @Inject
     MyData data;
 
@@ -43,15 +46,16 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
         drawView =findViewById( R.id.myView );
-        textViewCadre =findViewById(R.id.textViewCadr);
-        start=findViewById( R.id.start );
-        singleBlock =findViewById( R.id.single_block );
-        reset=findViewById( R.id.reset );
-        start.setOnTouchListener(this);
-        singleBlock.setOnTouchListener(this);
-        reset.setOnTouchListener(this);
+        textViewFrame =findViewById(R.id.textViewCadr);
+        buttonCycleStart =findViewById( R.id.start );
+        buttonSingleBlock =findViewById( R.id.single_block );
+        buttonReset =findViewById( R.id.reset );
+        buttonCycleStart.setOnTouchListener(this);
+        buttonSingleBlock.setOnTouchListener(this);
+        buttonReset.setOnTouchListener(this);
         DrawView.button= DrawView.RESET;
         drawView.invalidate();
+        vibrator = (Vibrator) getSystemService(getApplicationContext().VIBRATOR_SERVICE);
     }
 
     @SuppressLint("SetTextI18n")
@@ -61,32 +65,37 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
             case R.id.start:
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
-                        start.setImageResource( R.drawable.sysle_start_down );
-
+                        buttonCycleStart.setImageResource( R.drawable.cycle_start_down );
                         if(isSingleBlockDown&& DrawView.index<data.getProgramList().size()){
+                            isResetDown =false;
                             DrawView.button = DrawView.START;
                             DrawView.index++;
-                            textViewCadre.setText(data.getProgramListTextView().get(DrawView.index-1));
+                            textViewFrame.setText(data.getProgramListTextView().get(DrawView.index-1));
+                            if (vibrator.hasVibrator()) {
+                                vibrator.vibrate(20);
+                            }
                         }
-                        if(!isSingleBlockDown&& DrawView.index<data.getProgramList().size()) {
+                        if(!isSingleBlockDown&& DrawView.index<data.getProgramList().size()&&!isStartDown) {
+                            if (vibrator.hasVibrator()) {
+                                vibrator.vibrate(20);
+                            }
+                            isResetDown =false;
+                            isStartDown =true;
                             DrawView.button = DrawView.START;
                             final Timer timer = new Timer();
                             timer.schedule( new TimerTask() {
                                 @Override
                                 public void run() {
-                                    DrawView.index++;
-                                    if (DrawView.index < data.getProgramList().size()&&!isSingleBlockDown&&!isReset) {
-                                        DrawView.button = DrawView.START;
-
+                                    if (DrawView.index < data.getProgramList().size()&&!isSingleBlockDown&&!isResetDown) {
+                                        DrawView.index++;
                                             SecondActivity.this.runOnUiThread( new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                   textViewCadre.setText(  data.getProgramListTextView().get( DrawView.index - 1 ) );
+                                                   textViewFrame.setText(  data.getProgramListTextView().get( DrawView.index - 1 ) );
                                                 }
                                             } );
-
                                     } else {
-                                        isReset=false;
+                                        isResetDown =false;
                                         timer.cancel();
                                     }
                                 }
@@ -94,7 +103,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        start.setImageResource( R.drawable.sysle_start );
+                        buttonCycleStart.setImageResource( R.drawable.cycle_start );
                         break;
                 }
                 break;
@@ -102,26 +111,39 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                     if(event.getAction()==MotionEvent.ACTION_DOWN){
                         count++;
                         if(count%2!=0){
+                            if (vibrator.hasVibrator()) {
+                                vibrator.vibrate(20);
+                            }
                             isSingleBlockDown=true;
-                            singleBlock.setImageResource( R.drawable.single_block_down );
+                            buttonSingleBlock.setImageResource( R.drawable.single_block_down );
                         }else {
+                            if (vibrator.hasVibrator()) {
+                                vibrator.vibrate(20);
+                            }
+                            isStartDown =false;
                             isSingleBlockDown=false;
-                            singleBlock.setImageResource( R.drawable.single_block );
+                            buttonSingleBlock.setImageResource( R.drawable.single_block );
                         }
                     }
                 break;
             case R.id.reset:
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
-                        DrawView.button= DrawView.RESET;
-                        DrawView.index=0;
-                        isReset=true;
-                        textViewCadre.setText("");
-                        drawView.invalidate();
-                        reset.setImageResource( R.drawable.reset_down );
+                        if(!isResetDown) {
+                            if (vibrator.hasVibrator()) {
+                                vibrator.vibrate(20);
+                            }
+                            DrawView.button = DrawView.RESET;
+                            DrawView.index = 0;
+                            isStartDown =false;
+                            isResetDown = true;
+                            textViewFrame.setText( "" );
+                            drawView.invalidate();
+                        }
+                        buttonReset.setImageResource( R.drawable.reset_down );
                         break;
                     case MotionEvent.ACTION_UP:
-                        reset.setImageResource( R.drawable.reset );
+                        buttonReset.setImageResource( R.drawable.reset );
                         break;
                 }
                 break;

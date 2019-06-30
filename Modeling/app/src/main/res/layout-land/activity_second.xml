@@ -44,7 +44,7 @@
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/single_block"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/sysle_start" />
+        app:srcCompat="@drawable/cycle_start" />
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

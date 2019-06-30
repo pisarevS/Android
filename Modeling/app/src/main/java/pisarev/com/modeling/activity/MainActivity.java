@@ -19,16 +19,12 @@ import android.widget.Toast;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.ViewMvp;
-import pisarev.com.modeling.mvp.model.ChangeVariables;
-import pisarev.com.modeling.mvp.model.Const;
-import pisarev.com.modeling.mvp.model.Expression;
+import pisarev.com.modeling.mvp.model.ProgramParameters;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
@@ -145,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         data.getProgramListTextView().clear();
         data.getProgramList().clear();
         DrawView.index=0;
-        Thread thread=new Thread( new ChangeVariables(ProgramFragment.getText(),ParameterFragment.getText()));
+        Thread thread=new Thread( new ProgramParameters(ProgramFragment.getText(),ParameterFragment.getText()));
         thread.start();
         Intent intent = new Intent( MainActivity.this, SecondActivity.class );
         startActivity( intent );

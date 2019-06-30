@@ -6,7 +6,6 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -24,10 +23,10 @@ public class Draw {
     private Paint line;
     private int x;
     private int u;
-    private String horizontal;
-    private String vertical;
-    private boolean isHorizontal;
-    private boolean isVertical;
+    private String horizontalAxis;
+    private String verticalAxis;
+    private boolean isHorizontalAxis;
+    private boolean isVerticalAxis;
     private boolean isCR;
     private boolean clockwise;
     private ArrayList<StringBuffer> programList;
@@ -162,7 +161,7 @@ public class Draw {
     }
 
     public void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom,int index) {
-        StringBuffer cadre;
+        StringBuffer frame;
         Point pStart=new Point();
         Point pEnd=new Point();
         pStart.x=650f;
@@ -173,77 +172,77 @@ public class Draw {
         selectCoordinateSystem( programList );
 
             for (int i = 0; i < index; i++) {
-                cadre = programList.get(i);
-                containsGCode(cadre.toString());
+                frame = programList.get(i);
+                containsGCode(frame.toString());
                 try{
-                    if(contains(cadre, horizontal+"=IC")){
-                        pEnd.x=pEnd.x+ incrementSearch(cadre, horizontal+"=IC");
-                        isHorizontal = true;
-                    }else if (contains(cadre, horizontal)) {
-                        float tempHorizontal=coordinateSearch(cadre, horizontal);
+                    if(contains(frame, horizontalAxis +"=IC")){
+                        pEnd.x=pEnd.x+ incrementSearch(frame, horizontalAxis +"=IC");
+                        isHorizontalAxis = true;
+                    }else if (contains(frame, horizontalAxis )) {
+                        float tempHorizontal=coordinateSearch(frame, horizontalAxis );
                         if(tempHorizontal!=FIBO){
                             pEnd.x =tempHorizontal;
-                            isHorizontal = true;
+                            isHorizontalAxis = true;
                         }
                     }
                 }catch (Exception e){
-                    myViewMvp.showError("Error "+horizontal+"\n"+ cadre.toString());
+                    myViewMvp.showError("Error "+ horizontalAxis +"\n"+ frame.toString());
                 }
                 try {
-                    if(contains(cadre,vertical+"=IC")){
-                        pEnd.z=pEnd.z+ incrementSearch(cadre,vertical+"=IC");
-                        isVertical = true;
-                    }else if (contains(cadre, vertical)) {
-                        float tempVertical=coordinateSearch(cadre, vertical);
+                    if(contains(frame, verticalAxis +"=IC")){
+                        pEnd.z=pEnd.z+ incrementSearch(frame, verticalAxis +"=IC");
+                        isVerticalAxis = true;
+                    }else if (contains(frame, verticalAxis )) {
+                        float tempVertical=coordinateSearch(frame, verticalAxis );
                         if(tempVertical!=FIBO){
                             pEnd.z = tempVertical;
-                            isVertical = true;
+                            isVerticalAxis = true;
                         }
                     }
                 }catch (Exception e){
-                    myViewMvp.showError("Error "+vertical+"\n"+ cadre.toString());
+                    myViewMvp.showError("Error "+ verticalAxis +"\n"+ frame.toString());
                 }
                 String radiusCR = "CR";
                 try {
-                    if (contains(cadre, "CR")) {
-                        float tempCR=coordinateSearch(cadre, radiusCR);
+                    if (contains(frame, "CR")) {
+                        float tempCR=coordinateSearch(frame, radiusCR);
                         if(tempCR!=FIBO){
                             radius =tempCR;
                             isCR = true;
                         }
                     }
                 }catch (Exception e){
-                    myViewMvp.showError("Error "+radiusCR+"\n"+ cadre.toString());
+                    myViewMvp.showError("Error "+radiusCR+"\n"+ frame.toString());
                 }
-                if (isHorizontal && isVertical && isCR) {
+                if (isHorizontalAxis && isVerticalAxis && isCR) {
                     drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, zoom, clockwise);
                     pStart.x = pEnd.x;
                     pStart.z = pEnd.z;
-                    isHorizontal = false;
-                    isVertical = false;
+                    isHorizontalAxis = false;
+                    isVerticalAxis = false;
                     isCR = false;
                 }
-                if (isHorizontal || isVertical) {
+                if (isHorizontalAxis || isVerticalAxis) {
                     drawLine(canvas, line, pointCoordinateZero, pStart, pEnd, zoom);
                     pStart.x = pEnd.x;
                     pStart.z = pEnd.z;
-                    isHorizontal = false;
-                    isVertical = false;
+                    isHorizontalAxis = false;
+                    isVerticalAxis = false;
                 }
             }
 
         drawPoint(canvas,pointCoordinateZero,pEnd,zoom);
     }
 
-    private float incrementSearch(StringBuffer cadre, String axis){
+    private float incrementSearch(StringBuffer frame, String axis){
         Expression expression=new Expression();
         StringBuffer temp=new StringBuffer(  );
-        int n = cadre.indexOf(axis);
+        int n = frame.indexOf(axis);
 
-        if(cadre.charAt( n+axis.length()  )=='('){
-            for (int i = n+axis.length(); i <cadre.length() ; i++) {
-                if (readUp( cadre.charAt( i ) )){
-                    temp.append( cadre.charAt( i ) );
+        if(frame.charAt( n+axis.length()  )=='('){
+            for (int i = n+axis.length(); i <frame.length() ; i++) {
+                if (readUp( frame.charAt( i ) )){
+                    temp.append( frame.charAt( i ) );
                 }else {break;}
             }
             return expression.calculate(temp.toString()) ;
@@ -251,22 +250,22 @@ public class Draw {
         return Float.parseFloat(temp.toString());
     }
 
-    private float coordinateSearch(StringBuffer cadre, String axis){
+    private float coordinateSearch(StringBuffer frame, String axis){
         Expression expression=new Expression();
         StringBuffer temp=new StringBuffer(  );
-        int n = cadre.indexOf(axis);
+        int n = frame.indexOf(axis);
 
-        if(isDigit(cadre.charAt( n+axis.length()))||cadre.charAt( n+axis.length())=='-'||cadre.charAt( n+axis.length())=='+'){
-            for (int i = n+axis.length(); i <cadre.length() ; i++) {
-                if (readUp( cadre.charAt( i ) )){
-                    temp.append( cadre.charAt( i ) );
+        if(isDigit(frame.charAt( n+axis.length()))||frame.charAt( n+axis.length())=='-'||frame.charAt( n+axis.length())=='+'){
+            for (int i = n+axis.length(); i <frame.length() ; i++) {
+                if (readUp( frame.charAt( i ) )){
+                    temp.append( frame.charAt( i ) );
                 }else {break;}
             }
             return Float.parseFloat(temp.toString());
-        }else if(cadre.charAt( n+axis.length()  )=='='){
-            for (int i = n+axis.length()+1; i <cadre.length() ; i++) {
-                if (readUp( cadre.charAt( i ) )){
-                    temp.append( cadre.charAt( i ) );
+        }else if(frame.charAt( n+axis.length()  )=='='){
+            for (int i = n+axis.length()+1; i <frame.length() ; i++) {
+                if (readUp( frame.charAt( i ) )){
+                    temp.append( frame.charAt( i ) );
                 }else {break;}
             }
             return expression.calculate(temp.toString()) ;
@@ -281,11 +280,11 @@ public class Draw {
             if (programList.get( i ).toString().contains( "U" ))
                 u++;
             if(x>u){
-                horizontal="X";
-                vertical="Z";
+                horizontalAxis ="X";
+                verticalAxis ="Z";
             }else {
-                horizontal="U";
-                vertical="W";
+                horizontalAxis ="U";
+                verticalAxis ="W";
             }
         }
     }
@@ -318,27 +317,26 @@ public class Draw {
         return false;
     }
 
-    private void containsGCode(String cadre)
+    private void containsGCode(String frame)
     {
         boolean isG17=isG17(programList);
-        if (cadre.contains("G"))
+        if (frame.contains("G"))
         {
             String G = "G";
-            for (int i = 0; i < cadre.length(); i++)
+            for (int i = 0; i < frame.length(); i++)
             {
-                char c=cadre.charAt( i );
+                char c=frame.charAt( i );
                 if (c == 'G')
                 {
-                    for (int j = i + 1; j < cadre.length(); j++)
+                    for (int j = i + 1; j < frame.length(); j++)
                     {
-                        char t=cadre.charAt( j );
+                        char t=frame.charAt( j );
                         if (isDigit(t))
                         {
                             G += t;
                         }
                         else { break; }
                     }
-                    //Log.d(Const.TEG,G);
                     switch (G)
                     {
                         case "G0":
@@ -392,6 +390,7 @@ public class Draw {
             case 'A':
             case 'U':
             case 'L':
+            case 'O':
                 return false;
         }
         return true;
