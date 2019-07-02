@@ -15,6 +15,7 @@ import android.view.View;
 
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -142,7 +143,10 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
 
     @Override
     public void showError(String error) {
-        Toast.makeText(getContext(),error,Toast.LENGTH_LONG).show();
+        if(!data.getErrorList().contains(error)){
+            data.setErrorList(error);
+            Toast.makeText(getContext(),error,Toast.LENGTH_LONG).show();
+        }
     }
 
     public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

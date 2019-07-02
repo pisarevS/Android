@@ -9,6 +9,8 @@ public class MyData  {
 
     private ArrayList<String>programListTextView=new ArrayList<>(  );
 
+    private ArrayList<String>errorList=new ArrayList<>();
+
     public MyData(){
     }
 
@@ -28,5 +30,11 @@ public class MyData  {
         this.programListTextView = programListTextView;
     }
 
+    public ArrayList<String> getErrorList() {
+        return errorList;
+    }
 
+    public void setErrorList(String error) {
+        this.errorList.add(error);
+    }
 }

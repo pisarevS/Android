@@ -66,6 +66,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         buttonCycleStart.setImageResource( R.drawable.cycle_start_down );
+
                         if(isSingleBlockDown&& DrawView.index<data.getProgramList().size()){
                             isResetDown =false;
                             DrawView.button = DrawView.START;
@@ -133,12 +134,12 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             if (vibrator.hasVibrator()) {
                                 vibrator.vibrate(20);
                             }
+                            data.getErrorList().clear();
                             DrawView.button = DrawView.RESET;
                             DrawView.index = 0;
                             isStartDown =false;
                             isResetDown = true;
                             textViewFrame.setText( "" );
-                            drawView.invalidate();
                         }
                         buttonReset.setImageResource( R.drawable.reset_down );
                         break;
