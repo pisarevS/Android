@@ -22,6 +22,7 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
+import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.MyData;
@@ -34,7 +35,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     private boolean isTouch;
     private float moveX;
     private float moveZ;
-    private float zoom=3;
+    private float zoom = 3;
     public static int button;
     public final static int START = 1;
     public final static int RESET = 2;
@@ -47,13 +48,13 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     public DrawView(Context context) {
         super( context );
         init();
-        scaleGestureDetector=new ScaleGestureDetector(context,new ScaleListener());
+        scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
     }
 
     public DrawView(Context context, @Nullable AttributeSet attrs) {
         super( context, attrs );
         init();
-        scaleGestureDetector=new ScaleGestureDetector(context,new ScaleListener());
+        scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
     }
 
     @Override
@@ -73,35 +74,35 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     }
 
     private void manager(Canvas canvas) {
-        Draw draw = new Draw(this);
-        draw.drawContour( canvas, pointCoordinateZero, zoom,index );
+        IDraw draw = new Draw( this );
+        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
     }
 
     private void drawSystemCoordinate(Canvas canvas, boolean isTouch, int button) {
         if (!isTouch || button == RESET) {
             initSystemCoordinate( canvas, true );
-        } else if (isTouch || button == START) {
+        } else {
             initSystemCoordinate( canvas, false );
-            if (button == START && isTouch)
+            if (button == START)
                 manager( canvas );
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        scaleGestureDetector.onTouchEvent(event);
+        scaleGestureDetector.onTouchEvent( event );
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 float downX = event.getX();
                 float downZ = event.getY();
-                moveX = pointCoordinateZero.x - downX;
-                moveZ = pointCoordinateZero.z - downZ;
+                moveX = pointCoordinateZero.getX() - downX;
+                moveZ = pointCoordinateZero.getZ() - downZ;
                 isTouch = true;
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                pointCoordinateZero.x = event.getX() + moveX;
-                pointCoordinateZero.z = event.getY() + moveZ;
+                pointCoordinateZero.setX( event.getX() + moveX );
+                pointCoordinateZero.setZ( event.getY() + moveZ );
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
@@ -115,20 +116,20 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         Path path;
         if (isInit) {
             path = new Path();
-            pointCoordinateZero.x = getWidth() / 2;
-            pointCoordinateZero.z = getHeight() / 2;
-            path.moveTo( 0, pointCoordinateZero.z );
-            path.lineTo( getWidth(), pointCoordinateZero.z );
-            path.moveTo( pointCoordinateZero.x, 0 );
-            path.lineTo( pointCoordinateZero.x, getHeight() );
-            canvas.drawPath(path, paintCoordinateDottedLine );
+            pointCoordinateZero.setX( getWidth() >> 1 );
+            pointCoordinateZero.setZ( getHeight() >> 1 );
+            path.moveTo( 0, pointCoordinateZero.getZ() );
+            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
+            path.moveTo( pointCoordinateZero.getX(), 0 );
+            path.lineTo( pointCoordinateZero.getX(), getHeight() );
+            canvas.drawPath( path, paintCoordinateDottedLine );
         } else {
             path = new Path();
-            path.moveTo( 0, pointCoordinateZero.z );
-            path.lineTo( getWidth(), pointCoordinateZero.z );
-            path.moveTo( pointCoordinateZero.x, 0 );
-            path.lineTo( pointCoordinateZero.x, getHeight() );
-            canvas.drawPath(path, paintCoordinateDottedLine );
+            path.moveTo( 0, pointCoordinateZero.getZ() );
+            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
+            path.moveTo( pointCoordinateZero.getX(), 0 );
+            path.lineTo( pointCoordinateZero.getX(), getHeight() );
+            canvas.drawPath( path, paintCoordinateDottedLine );
         }
     }
 
@@ -143,9 +144,9 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
 
     @Override
     public void showError(String error) {
-        if(!data.getErrorList().contains(error)){
-            data.setErrorList(error);
-            Toast.makeText(getContext(),error,Toast.LENGTH_LONG).show();
+        if (!data.getErrorList().contains( error )) {
+            data.setErrorList( error );
+            Toast.makeText( getContext(), error, Toast.LENGTH_LONG ).show();
         }
     }
 
@@ -153,7 +154,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            zoom*=detector.getScaleFactor();
+            zoom *= detector.getScaleFactor();
             invalidate();
             return true;
         }

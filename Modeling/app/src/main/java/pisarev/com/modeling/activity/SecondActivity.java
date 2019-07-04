@@ -30,10 +30,10 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
     private ImageView buttonSingleBlock;
     private ImageView buttonReset;
     private TextView textViewFrame;
-    private boolean isSingleBlockDown=false;
-    private boolean isResetDown =false;
-    private boolean isStartDown =false;
-    private int count=0;
+    private boolean isSingleBlockDown = false;
+    private boolean isResetDown = false;
+    private boolean isStartDown = false;
+    private int count = 0;
     Vibrator vibrator;
     @Inject
     MyData data;
@@ -45,58 +45,58 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         super.onCreate( savedInstanceState );
         App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
-        drawView =findViewById( R.id.myView );
-        textViewFrame =findViewById(R.id.textViewCadr);
-        buttonCycleStart =findViewById( R.id.start );
-        buttonSingleBlock =findViewById( R.id.single_block );
-        buttonReset =findViewById( R.id.reset );
-        buttonCycleStart.setOnTouchListener(this);
-        buttonSingleBlock.setOnTouchListener(this);
-        buttonReset.setOnTouchListener(this);
-        DrawView.button= DrawView.RESET;
+        drawView = findViewById( R.id.myView );
+        textViewFrame = findViewById( R.id.textViewCadr );
+        buttonCycleStart = findViewById( R.id.start );
+        buttonSingleBlock = findViewById( R.id.single_block );
+        buttonReset = findViewById( R.id.reset );
+        buttonCycleStart.setOnTouchListener( this );
+        buttonSingleBlock.setOnTouchListener( this );
+        buttonReset.setOnTouchListener( this );
+        DrawView.button = DrawView.RESET;
         drawView.invalidate();
-        vibrator = (Vibrator) getSystemService(getApplicationContext().VIBRATOR_SERVICE);
+        vibrator = (Vibrator) getSystemService( getApplicationContext().VIBRATOR_SERVICE );
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.start:
-                switch (event.getAction()){
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         buttonCycleStart.setImageResource( R.drawable.cycle_start_down );
 
-                        if(isSingleBlockDown&& DrawView.index<data.getProgramList().size()){
-                            isResetDown =false;
+                        if (isSingleBlockDown && DrawView.index < data.getProgramList().size()) {
+                            isResetDown = false;
                             DrawView.button = DrawView.START;
                             DrawView.index++;
-                            textViewFrame.setText(data.getProgramListTextView().get(DrawView.index-1));
+                            textViewFrame.setText( data.getProgramListTextView().get( DrawView.index - 1 ) );
                             if (vibrator.hasVibrator()) {
-                                vibrator.vibrate(20);
+                                vibrator.vibrate( 20 );
                             }
                         }
-                        if(!isSingleBlockDown&& DrawView.index<data.getProgramList().size()&&!isStartDown) {
+                        if (!isSingleBlockDown && DrawView.index < data.getProgramList().size() && !isStartDown) {
                             if (vibrator.hasVibrator()) {
-                                vibrator.vibrate(20);
+                                vibrator.vibrate( 20 );
                             }
-                            isResetDown =false;
-                            isStartDown =true;
+                            isResetDown = false;
+                            isStartDown = true;
                             DrawView.button = DrawView.START;
                             final Timer timer = new Timer();
                             timer.schedule( new TimerTask() {
                                 @Override
                                 public void run() {
-                                    if (DrawView.index < data.getProgramList().size()&&!isSingleBlockDown&&!isResetDown) {
+                                    if (DrawView.index < data.getProgramList().size() && !isSingleBlockDown && !isResetDown) {
                                         DrawView.index++;
-                                            SecondActivity.this.runOnUiThread( new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                   textViewFrame.setText(  data.getProgramListTextView().get( DrawView.index - 1 ) );
-                                                }
-                                            } );
+                                        SecondActivity.this.runOnUiThread( new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                textViewFrame.setText( data.getProgramListTextView().get( DrawView.index - 1 ) );
+                                            }
+                                        } );
                                     } else {
-                                        isResetDown =false;
+                                        isResetDown = false;
                                         timer.cancel();
                                     }
                                 }
@@ -109,35 +109,35 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                 }
                 break;
             case R.id.single_block:
-                    if(event.getAction()==MotionEvent.ACTION_DOWN){
-                        count++;
-                        if(count%2!=0){
-                            if (vibrator.hasVibrator()) {
-                                vibrator.vibrate(20);
-                            }
-                            isSingleBlockDown=true;
-                            buttonSingleBlock.setImageResource( R.drawable.single_block_down );
-                        }else {
-                            if (vibrator.hasVibrator()) {
-                                vibrator.vibrate(20);
-                            }
-                            isStartDown =false;
-                            isSingleBlockDown=false;
-                            buttonSingleBlock.setImageResource( R.drawable.single_block );
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    count++;
+                    if (count % 2 != 0) {
+                        if (vibrator.hasVibrator()) {
+                            vibrator.vibrate( 20 );
                         }
+                        isSingleBlockDown = true;
+                        buttonSingleBlock.setImageResource( R.drawable.single_block_down );
+                    } else {
+                        if (vibrator.hasVibrator()) {
+                            vibrator.vibrate( 20 );
+                        }
+                        isStartDown = false;
+                        isSingleBlockDown = false;
+                        buttonSingleBlock.setImageResource( R.drawable.single_block );
                     }
+                }
                 break;
             case R.id.reset:
-                switch (event.getAction()){
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        if(!isResetDown) {
+                        if (!isResetDown) {
                             if (vibrator.hasVibrator()) {
-                                vibrator.vibrate(20);
+                                vibrator.vibrate( 20 );
                             }
                             data.getErrorList().clear();
                             DrawView.button = DrawView.RESET;
                             DrawView.index = 0;
-                            isStartDown =false;
+                            isStartDown = false;
                             isResetDown = true;
                             textViewFrame.setText( "" );
                         }

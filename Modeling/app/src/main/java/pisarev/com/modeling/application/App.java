@@ -13,17 +13,17 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        component=provideAppComponent();
+        component = provideAppComponent();
     }
 
     public static AppComponent getComponent() {
         return component;
     }
 
-    AppComponent provideAppComponent(){
-        return component= DaggerAppComponent
+    AppComponent provideAppComponent() {
+        return component = DaggerAppComponent
                 .builder()
-                .appModule( new AppModule(this) )
+                .appModule( new AppModule( this ) )
                 .build();
     }
 

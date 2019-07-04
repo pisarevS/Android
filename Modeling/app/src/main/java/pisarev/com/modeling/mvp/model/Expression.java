@@ -2,19 +2,15 @@ package pisarev.com.modeling.mvp.model;
 
 import java.util.*;
 
-public class Expression {
+class Expression {
     //Метод возвращает true, если проверяемый символ - разделитель ("пробел" или "равно")
     private static boolean isDelimeter(char c) {
-        if ((" =".indexOf( c ) != -1))
-            return true;
-        return false;
+        return (" =".indexOf( c ) != -1);
     }
 
     //Метод возвращает true, если проверяемый символ - оператор
     private static boolean isOperator(char с) {
-        if (("+-/*^()".indexOf( с ) != -1))
-            return true;
-        return false;
+        return ("+-/*^()".indexOf( с ) != -1);
     }
 
     //Метод возвращает приоритет оператора
@@ -40,11 +36,10 @@ public class Expression {
     }
 
     //"Входной" метод класса
-    public float calculate(String input) {
+    float calculate(String input) {
         input = insertZero( input );
         String output = getExpression( input ); //Преобразовываем выражение в постфиксную запись
-        float result = counting( output ); //Решаем полученное выражение
-        return result; //Возвращаем результат
+        return counting( output ); //Возвращаем результат
     }
 
     private String insertZero(String input) {
@@ -54,7 +49,15 @@ public class Expression {
         } else if (input.contains( "-" ) && sb.indexOf( "-" ) != 0) {
             for (int i = 0; i < sb.length(); i++) {
                 if (sb.charAt( i ) == '-') {
-                    if (sb.charAt( i - 1 ) == '(') {
+                    if (sb.charAt( i - 1 ) == '('||sb.charAt( i - 1 ) =='+'||sb.charAt( i - 1 ) =='-') {
+                        sb = sb.replace( i, i, "0" );
+                    }
+                }
+            }
+        }else if (input.contains( "+" ) && sb.indexOf( "+" ) != 0) {
+            for (int i = 0; i < sb.length(); i++) {
+                if (sb.charAt( i ) == '+') {
+                    if (sb.charAt( i - 1 ) == '(' || sb.charAt( i - 1 ) == '+' || sb.charAt( i - 1 ) == '-') {
                         sb = sb.replace( i, i, "0" );
                     }
                 }
@@ -64,7 +67,7 @@ public class Expression {
     }
 
     private static String getExpression(String input) {
-        String output = ""; //Строка для хранения выражения
+        StringBuilder output = new StringBuilder(); //Строка для хранения выражения
         Stack<Character> operStack = new Stack<>(); //Стек для хранения операторо
         char[] inputArr = input.toCharArray();
 
@@ -79,13 +82,13 @@ public class Expression {
             {
                 //Читаем до разделителя или оператора, что бы получить число
                 while (!isDelimeter( inputArr[i] ) && !isOperator( inputArr[i] )) {
-                    output += inputArr[i]; //Добавляем каждую цифру числа к нашей строке
+                    output.append( inputArr[i] ); //Добавляем каждую цифру числа к нашей строке
                     i++; //Переходим к следующему символу
 
                     if (i == inputArr.length) break; //Если символ - последний, то выходим из цикла
                 }
 
-                output += " "; //Дописываем после числа пробел в строку с выражением
+                output.append( " " ); //Дописываем после числа пробел в строку с выражением
                 i--; //Возвращаемся на один символ назад, к символу перед разделителем
             }
 
@@ -100,7 +103,7 @@ public class Expression {
                     char s = operStack.pop();
 
                     while (s != '(') {
-                        output += s + " ";
+                        output.append( s ).append( " " );
                         s = operStack.pop();
                     }
                 } else //Если любой другой оператор
@@ -108,7 +111,7 @@ public class Expression {
                     if (operStack.size() > 0) //Если в стеке есть элементы
                         if (getPriority( inputArr[i] ) <= getPriority( operStack.peek() )) //И если приоритет нашего оператора меньше и
                             //ли равен приоритету оператора на вершине стека
-                            output += operStack.pop() + " "; //То добавляем последний оператор из стека в строку с выражением
+                            output.append( operStack.pop() ).append( " " ); //То добавляем последний оператор из стека в строку с выражением
 
                     operStack.push( inputArr[i] ); //Если стек пуст, или же приоритет оператора выше - добавляем операторов на вершину стека
                 }
@@ -116,8 +119,8 @@ public class Expression {
         }
         //Когда прошли по всем символам, выкидываем из стека все оставшиеся там операторы в строку
         while (operStack.size() > 0)
-            output += operStack.pop() + " ";
-        return output; //Возвращаем выражение в постфиксной записи
+            output.append( operStack.pop() ).append( " " );
+        return output.toString(); //Возвращаем выражение в постфиксной записи
     }
 
     private static float counting(String input) {
@@ -128,14 +131,14 @@ public class Expression {
         {
             //Если символ - цифра, то читаем все число и записываем на вершину стека
             if (Character.isDigit( inputArr[i] )) {
-                String a = "";
+                StringBuilder a = new StringBuilder();
                 while (!isDelimeter( inputArr[i] ) && !isOperator( inputArr[i] )) //Пока не разделитель
                 {
-                    a += inputArr[i]; //Добавляем
+                    a.append( inputArr[i] ); //Добавляем
                     i++;
                     if (i == input.length()) break;
                 }
-                temp.push( Float.parseFloat( a ) ); //Записываем в стек
+                temp.push( Float.parseFloat( a.toString() ) ); //Записываем в стек
                 i--;
             } else if (isOperator( inputArr[i] )) //Если символ - оператор
             {

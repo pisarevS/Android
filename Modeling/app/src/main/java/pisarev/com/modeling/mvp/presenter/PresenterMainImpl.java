@@ -8,19 +8,19 @@ public class PresenterMainImpl implements ViewMvp.PresenterMainMvp {
     private ViewMvp.MainViewMvp mainViewMvp;
     private File file;
 
-    public PresenterMainImpl(ViewMvp.MainViewMvp mainViewMvp){
-        this.mainViewMvp=mainViewMvp;
-        file=new File();
+    public PresenterMainImpl(ViewMvp.MainViewMvp mainViewMvp) {
+        this.mainViewMvp = mainViewMvp;
+        file = new File();
     }
 
     @Override
     public void openProgram(String path) {
-        mainViewMvp.showProgram(file.readFile( path )  );
+        mainViewMvp.showProgram( file.readFile( path ) );
     }
 
     @Override
     public void openParameter(String path) {
-        mainViewMvp.showParameter(file.readFile(path ) );
+        mainViewMvp.showParameter( file.readFile( path ) );
     }
 
 }

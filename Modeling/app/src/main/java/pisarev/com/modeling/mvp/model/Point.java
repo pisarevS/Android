@@ -2,8 +2,10 @@ package pisarev.com.modeling.mvp.model;
 
 public class Point {
 
-    public float x;
-    public float z;
+    private float x;
+
+    private float z;
+
     public Point(){
 
     }
@@ -12,4 +14,19 @@ public class Point {
         this.z=z;
     }
 
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
 }
