@@ -96,6 +96,7 @@ public class ProgramParameters implements Runnable {
     }
 
     private void replaceProgramVariables(ArrayList<StringBuffer> programList) {
+        //ЛПО
         listIgnore.add( "G58 X=0 Z=N_CHUCK_HEIGHT_Z_S1[N_CHUCK_JAWS]" );
         listIgnore.add( "G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1" );
         listIgnore.add( "G59 X=N_WP_ZP_X_S1" );
@@ -106,6 +107,28 @@ public class ProgramParameters implements Runnable {
         listIgnore.add( "G59 U=N_WP_ZP_U_S1 W=N_WP_ZP_W_S1" );
         listIgnore.add( "G58 U=0 W=N_CHUCK_HEIGHT_W_S2[N_CHUCK_JAWS]" );
         listIgnore.add( "G59 U=N_WP_ZP_U_S2 W=N_WP_ZP_W_S2" );
+        //ЛПО2
+        listIgnore.add( "N_ZERO_O(54,X1,0,\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S1[0],\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,X1,WP_ZP_X1_S1,\"FI\")" );
+        listIgnore.add( "N_ZERO_O(54,Z1,WP_ZP_Z1_S1,\"FI\")" );
+
+        listIgnore.add( "N_ZERO_O(54,X1,0,\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S2[0],\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,X1,WP_ZP_X1_S2,\"FI\")" );
+        listIgnore.add( "N_ZERO_O(54,Z1,WP_ZP_Z1_S2,\"FI\")" );
+
+        listIgnore.add( "N_ZERO_O(54,X2,0,\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S1[0],\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,X2,WP_ZP_X2_S1,\"FI\")" );
+        listIgnore.add( "N_ZERO_O(54,Z2,WP_ZP_Z2_S1,\"FI\")" );
+
+        listIgnore.add( "N_ZERO_O(54,X2,0,\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S2[0],\"TR\")" );
+        listIgnore.add( "N_ZERO_O(54,X2,WP_ZP_X2_S2,\"FI\")" );
+        listIgnore.add( "N_ZERO_O(54,Z2,WP_ZP_Z2_S2,\"FI\")" );
+
+
 
         for (int i = 0; i < programList.size(); i++) {
             for (int j = 0; j < listIgnore.size(); j++) {
