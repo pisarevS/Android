@@ -54,7 +54,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         buttonSingleBlock.setOnTouchListener( this );
         buttonReset.setOnTouchListener( this );
         DrawView.button = DrawView.RESET;
-        drawView.invalidate();
         vibrator = (Vibrator) getSystemService( getApplicationContext().VIBRATOR_SERVICE );
     }
 
