@@ -12,11 +12,10 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.interfaces.ViewMvp;
 
 
-public abstract class BaseDraw implements IDraw {
+public abstract class BaseDraw  {
 
     private Paint paintFullLine;
     private Paint paintDottedLine;
@@ -52,8 +51,9 @@ public abstract class BaseDraw implements IDraw {
         paintDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
     }
 
-    @Override
-    public void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
+    public abstract void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom, int index) ;
+
+    void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -70,8 +70,7 @@ public abstract class BaseDraw implements IDraw {
         canvas.drawPath( path, paint );
     }
 
-    @Override
-    public void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
+    void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -147,8 +146,7 @@ public abstract class BaseDraw implements IDraw {
         canvas.drawPath( path, paint );
     }
 
-    @Override
-    public void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
+    void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
         float radiusPoint = 7F;
         Paint paint = new Paint();
         paint.setStyle( Paint.Style.FILL );
@@ -292,7 +290,7 @@ public abstract class BaseDraw implements IDraw {
         }
     }
 
-    void containsGCode(String frame) {
+    void checkGCode(String frame) {
         boolean isG17 = isG17( programList );
         if (frame.contains( "G" )) {
             StringBuilder G = new StringBuilder( "G" );
@@ -322,6 +320,59 @@ public abstract class BaseDraw implements IDraw {
                             break;
                         case "G3":
                         case "G03":
+                            clockwise = !isG17;
+                            break;
+                    }
+                    G = new StringBuilder( "G" );
+                }
+            }
+        }
+    }
+
+    String gCode="";
+    final String G0="G0";
+    final String G1="G1";
+    final String G2="G2";
+    final String G3="G3";
+
+    void checkGCode2(String frame) {
+        boolean isG17 = isG17( programList );
+        if (frame.contains( "G" )) {
+            StringBuilder G = new StringBuilder( "G" );
+            for (int i = 0; i < frame.length(); i++) {
+                char c = frame.charAt( i );
+                if (c == 'G') {
+                    for (int j = i + 1; j < frame.length(); j++) {
+                        char t = frame.charAt( j );
+                        if (isDigit( t )) {
+                            G.append( t );
+                        } else {
+                            break;
+                        }
+                    }
+                    switch (G.toString()) {
+                        case "G0":
+                        case "G00":
+                            gCode=G0;
+                            line = paintDottedLine;
+                            break;
+                        case "G1":
+                        case "G01":
+                            gCode=G1;
+                            line = paintFullLine;
+                            break;
+                        case "G2":
+                        case "G02":
+                            if(isG17){
+                                gCode=G2;
+                            }else gCode=G3;
+                            clockwise = isG17;
+                            break;
+                        case "G3":
+                        case "G03":
+                            if(!isG17){
+                                gCode=G3;
+                            }else gCode=G3;
                             clockwise = !isG17;
                             break;
                     }

@@ -2,6 +2,7 @@ package pisarev.com.modeling.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -35,6 +36,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
     private boolean isStartDown = false;
     private int count = 0;
     Vibrator vibrator;
+    Timer timer;
     @Inject
     MyData data;
 
@@ -83,21 +85,31 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             isResetDown = false;
                             isStartDown = true;
                             DrawView.button = DrawView.START;
-                            final Timer timer = new Timer();
+                            timer = new Timer();
                             timer.schedule( new TimerTask() {
                                 @Override
                                 public void run() {
-                                    if (DrawView.index < data.getProgramList().size() && !isSingleBlockDown && !isResetDown) {
+                                    if (DrawView.index < data.getProgramList().size() && !isSingleBlockDown && !isResetDown&&DrawView.button==DrawView.START) {
                                         DrawView.index++;
                                         SecondActivity.this.runOnUiThread( new Runnable() {
                                             @Override
                                             public void run() {
+                                                if(DrawView.button == DrawView.START)
                                                 textViewFrame.setText( data.getProgramListTextView().get( DrawView.index - 1 ) );
                                             }
                                         } );
                                     } else {
                                         isResetDown = false;
                                         timer.cancel();
+                                        SecondActivity.this.runOnUiThread( new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if(DrawView.button == DrawView.PAUSE){
+                                                    textViewFrame.setText( data.getProgramListTextView().get( DrawView.index-1 ) );
+                                                }
+                                            }
+                                        } );
+
                                     }
                                 }
                             }, 1000, 200 );
@@ -136,10 +148,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             }
                             data.getErrorList().clear();
                             DrawView.button = DrawView.RESET;
-                            DrawView.index = 0;
+                            timer.cancel();
                             isStartDown = false;
                             isResetDown = true;
                             textViewFrame.setText( "" );
+                            DrawView.index = 0;
                         }
                         buttonReset.setImageResource( R.drawable.reset_down );
                         break;
@@ -152,4 +165,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         return true;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        
+    }
 }
