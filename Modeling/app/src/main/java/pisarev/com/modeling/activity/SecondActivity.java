@@ -67,16 +67,16 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                     case MotionEvent.ACTION_DOWN:
                         buttonCycleStart.setImageResource( R.drawable.cycle_start_down );
 
-                        if (isSingleBlockDown && DrawView.index < data.getProgramList().size()) {
+                        if (isSingleBlockDown && DrawView.index < data.getFrameList().size()) {
                             isResetDown = false;
                             DrawView.button = DrawView.START;
                             DrawView.index++;
-                            textViewFrame.setText( data.getProgramListTextView().get( DrawView.index - 1 ) );
+                            textViewFrame.setText(  data.getProgramListTextView().get( data.getFrameList().get( DrawView.index-1 ).getId() ) );
                             if (vibrator.hasVibrator()) {
                                 vibrator.vibrate( 20 );
                             }
                         }
-                        if (!isSingleBlockDown && DrawView.index < data.getProgramList().size() && !isStartDown) {
+                        if (!isSingleBlockDown && DrawView.index < data.getFrameList().size() && !isStartDown) {
                             if (vibrator.hasVibrator()) {
                                 vibrator.vibrate( 20 );
                             }
@@ -87,12 +87,12 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             timer.schedule( new TimerTask() {
                                 @Override
                                 public void run() {
-                                    if (DrawView.index < data.getProgramList().size() && !isSingleBlockDown && !isResetDown) {
+                                    if (DrawView.index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown) {
                                         DrawView.index++;
                                         SecondActivity.this.runOnUiThread( new Runnable() {
                                             @Override
                                             public void run() {
-                                                textViewFrame.setText( data.getProgramListTextView().get( DrawView.index - 1 ) );
+                                                textViewFrame.setText( data.getProgramListTextView().get( data.getFrameList().get( DrawView.index-1 ).getId() ) );
                                             }
                                         } );
                                     } else {

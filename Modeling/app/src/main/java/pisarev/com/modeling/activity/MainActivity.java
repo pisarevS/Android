@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         data.getProgramListTextView().clear();
-        data.getProgramList().clear();
+        data.getFrameList().clear();
         data.getErrorList().clear();
         DrawView.index=0;
         Thread thread=new Thread( new ProgramParameters(ProgramFragment.getText(),ParameterFragment.getText()));

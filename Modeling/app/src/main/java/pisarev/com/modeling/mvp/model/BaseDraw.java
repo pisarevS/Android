@@ -27,7 +27,8 @@ public abstract class BaseDraw implements IDraw {
     Paint line;
     String horizontalAxis;
     String verticalAxis;
-    ArrayList<StringBuffer> programList;
+    ArrayList<String> programList;
+    ArrayList<Frame>frmeList;
     ViewMvp.MyViewMvp myViewMvp;
     @Inject
     MyData data;
@@ -39,7 +40,8 @@ public abstract class BaseDraw implements IDraw {
 
     private void init() {
         App.getComponent().inject( this );
-        programList = data.getProgramList();
+        programList = data.getProgramListTextView();
+        frmeList=data.getFrameList();
         line = new Paint();
         paintFullLine = new Paint();
         paintFullLine.setColor( Color.GREEN );
@@ -163,175 +165,35 @@ public abstract class BaseDraw implements IDraw {
         canvas.drawPath( path, paint );
     }
 
-    float incrementSearch(StringBuffer frame, String axis) {
-        Expression expression = new Expression();
-        StringBuilder temp = new StringBuilder();
-        int n = frame.indexOf( axis );
-
-        if (frame.charAt( n + axis.length() ) == '(') {
-            for (int i = n + axis.length(); i < frame.length(); i++) {
-                if (readUp( frame.charAt( i ) )) {
-                    temp.append( frame.charAt( i ) );
-                } else {
-                    break;
-                }
-            }
-            return expression.calculate( temp.toString() );
-        }
-        return Float.parseFloat( temp.toString() );
-    }
-
-    private boolean isG17(ArrayList<StringBuffer> programList) {
+    private boolean isG17(ArrayList<String> programList) {
         for (int i = 0; i < programList.size(); i++)
-            if (programList.get( i ).toString().contains( "G17" )) {
+            if (programList.get( i ).contains( "G17" )) {
                 return true;
             }
         return false;
     }
 
-    private static boolean readUp(char input) {
-        switch (input) {
-            case 'C':
-            case 'X':
-            case 'G':
-            case 'M':
-            case 'F':
-            case 'W':
-            case 'Z':
-            case 'D':
-            case 'S':
-            case 'A':
-            case 'U':
-            case 'L':
-            case 'O':
-                return false;
-        }
-        return true;
-    }
-
-    private boolean isDigit(char input) {
-        switch (input) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                return true;
-        }
-        return false;
-    }
-
-    float coordinateSearch(StringBuffer frame, String axis) {
-        Expression expression = new Expression();
-        StringBuffer temp = new StringBuffer();
-        int n = frame.indexOf( axis );
-
-        if (isDigit( frame.charAt( n + axis.length() ) ) || frame.charAt( n + axis.length() ) == '-' || frame.charAt( n + axis.length() ) == '+') {
-            for (int i = n + axis.length(); i < frame.length(); i++) {
-                if (readUp( frame.charAt( i ) )) {
-                    temp.append( frame.charAt( i ) );
-                } else {
-                    break;
-                }
-            }
-            return Float.parseFloat( temp.toString() );
-        } else if (frame.charAt( n + axis.length() ) == '=') {
-            for (int i = n + axis.length() + 1; i < frame.length(); i++) {
-                if (readUp( frame.charAt( i ) )) {
-                    temp.append( frame.charAt( i ) );
-                } else {
-                    break;
-                }
-            }
-            return expression.calculate( temp.toString() );
-        }
-        return FIBO;
-    }
-
-    boolean containsAxis(StringBuffer frame,String axis){
-        if(contains(frame, axis)){
-            int n=frame.indexOf(axis)+1;
-            char c=frame.charAt(n);
-            switch(c){
-                case '-':
-                case '=':
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    void selectCoordinateSystem(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++) {
-            if (programList.get( i ).toString().contains( "X" ))
-                x++;
-            if (programList.get( i ).toString().contains( "U" ))
-                u++;
-            if (x > u) {
-                horizontalAxis = "X";
-                verticalAxis = "Z";
-            } else {
-                horizontalAxis = "U";
-                verticalAxis = "W";
-            }
-        }
-    }
-
-    void containsGCode(String frame) {
+    void checkGCode(ArrayList<String>gCodeList){
         boolean isG17 = isG17( programList );
-        if (frame.contains( "G" )) {
-            StringBuilder G = new StringBuilder( "G" );
-            for (int i = 0; i < frame.length(); i++) {
-                char c = frame.charAt( i );
-                if (c == 'G') {
-                    for (int j = i + 1; j < frame.length(); j++) {
-                        char t = frame.charAt( j );
-                        if (isDigit( t )) {
-                            G.append( t );
-                        } else {
-                            break;
-                        }
-                    }
-                    switch (G.toString()) {
-                        case "G0":
-                        case "G00":
-                            line = paintDottedLine;
-                            break;
-                        case "G1":
-                        case "G01":
-                            line = paintFullLine;
-                            break;
-                        case "G2":
-                        case "G02":
-                            clockwise = isG17;
-                            break;
-                        case "G3":
-                        case "G03":
-                            clockwise = !isG17;
-                            break;
-                    }
-                    G = new StringBuilder( "G" );
-                }
+        for (String gCode:gCodeList) {
+            switch (gCode) {
+                case "G0":
+                case "G00":
+                    line = paintDottedLine;
+                    break;
+                case "G1":
+                case "G01":
+                    line = paintFullLine;
+                    break;
+                case "G2":
+                case "G02":
+                    clockwise = isG17;
+                    break;
+                case "G3":
+                case "G03":
+                    clockwise = !isG17;
+                    break;
             }
         }
-    }
-
-    boolean contains(StringBuffer sb, String findString) {
-        return sb.indexOf( findString ) > -1;
     }
 }
