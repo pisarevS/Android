@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 import javax.inject.Inject;
@@ -42,6 +44,7 @@ public class ProgramParameters implements Runnable {
 
     @Override
     public void run() {
+        initList();
         getProgramList(program);
         getParameterList(parameter);
         readParameterVariables(parameterList);
@@ -60,63 +63,7 @@ public class ProgramParameters implements Runnable {
 
     }
 
-    private void getProgramList(String program) {
-        try {
-            BufferedReader br = new BufferedReader(new StringReader(program));
-            String line;
-            while ((line = br.readLine()) != null) {
-                programList.add(new StringBuffer(line));
-                data.getProgramListTextView().add( line );
-            }
-            br.close();
-        } catch (IOException ignored) {
-
-        }
-    }
-
-    private void getParameterList(String parameter) {
-        try {
-            BufferedReader br = new BufferedReader(new StringReader(parameter));
-            String line;
-            while ((line = br.readLine()) != null) {
-                parameterList.add(new StringBuffer(line));
-            }
-            br.close();
-        } catch (IOException ignored) {
-
-        }
-    }
-
-    private void readParameterVariables(ArrayList<StringBuffer> parameterList) {
-        variablesList.put("N_GANTRYPOS_X", "650");
-        variablesList.put("N_GANTRYPOS_Z", "250");
-        variablesList.put("N_GANTRYPOS_U", "650");
-        variablesList.put("N_GANTRYPOS_W", "250");
-        variablesList.put("$P_TOOLR", "16");
-        for (int i = 0; i < parameterList.size(); i++) {
-            if (parameterList.get(i).toString().contains(";")) {
-                parameterList.get(i).delete(parameterList.get(i).indexOf(";"), parameterList.get(i).length());
-            }
-            if (parameterList.get(i).toString().contains("=")) {
-                variablesList.put(
-                        parameterList.get(i).substring(0, parameterList.get(i).indexOf("=")).replace(" ", "")
-                        , parameterList.get(i).substring(parameterList.get(i).indexOf("=") + 1, parameterList.get(i).length()).replace(" ", ""));
-            }
-        }
-        for (Map.Entry entry : variablesList.entrySet()) {
-            String key = entry.getKey().toString();
-            String value = entry.getValue().toString();
-
-            for (String keys : variablesList.keySet()) {
-                if (value.contains(keys)) {
-                    value = value.replace(keys, variablesList.get(keys));
-                    variablesList.put(key, value);
-                }
-            }
-        }
-    }
-
-    private void replaceProgramVariables(ArrayList<StringBuffer> programList) {
+    private void initList(){
         //ЛПО
         listIgnore.add("G58 X=0 Z=N_CHUCK_HEIGHT_Z_S1[N_CHUCK_JAWS]");
         listIgnore.add("G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1");
@@ -149,8 +96,65 @@ public class ProgramParameters implements Runnable {
         listIgnore.add("N_ZERO_O(54,X2,WP_ZP_X2_S2,\"FI\")");
         listIgnore.add("N_ZERO_O(54,Z2,WP_ZP_Z2_S2,\"FI\")");
 
+        variablesList.put("N_GANTRYPOS_X", "650");
+        variablesList.put("N_GANTRYPOS_Z", "250");
+        variablesList.put("N_GANTRYPOS_U", "650");
+        variablesList.put("N_GANTRYPOS_W", "250");
+        variablesList.put("$P_TOOLR", "16");
+    }
 
+    private void getProgramList(String program) {
+        try {
+            BufferedReader br = new BufferedReader(new StringReader(program));
+            String line;
+            while ((line = br.readLine()) != null) {
+                programList.add(new StringBuffer(line));
+                data.getProgramListTextView().add( line );
+            }
+            br.close();
+        } catch (IOException ignored) {
 
+        }
+    }
+
+    private void getParameterList(String parameter) {
+        try {
+            BufferedReader br = new BufferedReader(new StringReader(parameter));
+            String line;
+            while ((line = br.readLine()) != null) {
+                parameterList.add(new StringBuffer(line));
+            }
+            br.close();
+        } catch (IOException ignored) {
+
+        }
+    }
+
+    private void readParameterVariables(ArrayList<StringBuffer> parameterList) {
+        for (int i = 0; i < parameterList.size(); i++) {
+            if (parameterList.get(i).toString().contains(";")) {
+                parameterList.get(i).delete(parameterList.get(i).indexOf(";"), parameterList.get(i).length());
+            }
+            if (parameterList.get(i).toString().contains("=")) {
+                variablesList.put(
+                        parameterList.get(i).substring(0, parameterList.get(i).indexOf("=")).replace(" ", "")
+                        , parameterList.get(i).substring(parameterList.get(i).indexOf("=") + 1, parameterList.get(i).length()).replace(" ", ""));
+            }
+        }
+        for (Map.Entry entry : variablesList.entrySet()) {
+            String key = entry.getKey().toString();
+            String value = entry.getValue().toString();
+
+            for (String keys : variablesList.keySet()) {
+                if (value.contains(keys)) {
+                    value = value.replace(keys, variablesList.get(keys));
+                    variablesList.put(key, value);
+                }
+            }
+        }
+    }
+
+    private void replaceProgramVariables(ArrayList<StringBuffer> programList) {
         for (int i = 0; i < programList.size(); i++) {
             for (int j = 0; j < listIgnore.size(); j++) {
                 if (programList.get(i).toString().contains(listIgnore.get(j))) {
@@ -171,37 +175,13 @@ public class ProgramParameters implements Runnable {
         }
     }
 
-    private ArrayList<String> containsGCog(String frame) {
-        ArrayList<String> gCodeList= new ArrayList<>();
-        StringBuilder G = new StringBuilder("G");
-        if (frame.contains("G")) {
-
-            for (int i = 0; i < frame.length(); i++) {
-                char c = frame.charAt(i);
-                if (c == 'G') {
-                    for (int j = i + 1; j < frame.length(); j++) {
-                        char t = frame.charAt(j);
-                        if (isDigit(t)) {
-                            G.append(t);
-                        } else {
-                            gCodeList.add(G.toString());
-                            break;
-                        }
-                    }
-                    G = new StringBuilder("G");
-                }
-            }
-        }
-        return gCodeList;
-    }
-
     private void addFrame() {
         selectCoordinateSystem(programList);
         StringBuffer strFrame;
         boolean isHorizontalAxis = false;
         boolean isVerticalAxis = false;
-        float tempHorizontal=0;
-        float tempVertical=0;
+        float tempHorizontal=650;
+        float tempVertical=250;
         float tempCR=0;
         ArrayList<String> tempGCode;
         boolean isCR = false;
@@ -211,8 +191,11 @@ public class ProgramParameters implements Runnable {
 
             try {
                 if (contains(strFrame, "G")) {
-                    tempGCode = containsGCog(strFrame.toString());
+                    tempGCode = searchGCog(strFrame.toString());
                     frame.setGCode(tempGCode);
+                    frame.setId( i );
+                    frame.setX(tempHorizontal);
+                    frame.setZ(tempVertical);
                     frameList.add(frame);
                 }
             } catch (Exception e) {
@@ -284,47 +267,37 @@ public class ProgramParameters implements Runnable {
                 isVerticalAxis = false;
             }
         }
+        Set<Frame> s = new LinkedHashSet<>(frameList);
+        frameList.clear();
+        frameList.addAll( s );
         data.setFrameList( frameList );
     }
 
-    private static boolean readUp(char input) {
-        switch (input) {
-            case 'C':
-            case 'X':
-            case 'G':
-            case 'M':
-            case 'F':
-            case 'W':
-            case 'Z':
-            case 'D':
-            case 'S':
-            case 'A':
-            case 'U':
-            case 'L':
-            case 'O':
-                return false;
+    private ArrayList<String> searchGCog(String frame) {
+        ArrayList<String> gCodeList= new ArrayList<>();
+        StringBuilder G = new StringBuilder("G");
+        if (frame.contains("G")) {
+
+            for (int i = 0; i < frame.length(); i++) {
+                char c = frame.charAt(i);
+                if (c == 'G') {
+                    for (int j = i + 1; j < frame.length(); j++) {
+                        char t = frame.charAt(j);
+                        if (isDigit(t)) {
+                            G.append(t);
+                        } else {
+                            gCodeList.add(G.toString());
+                            break;
+                        }
+                    }
+                    G = new StringBuilder("G");
+                }
+            }
         }
-        return true;
+        return gCodeList;
     }
 
-    private boolean isDigit(char input) {
-        switch (input) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                return true;
-        }
-        return false;
-    }
-
-    float coordinateSearch(StringBuffer frame, String axis) {
+    private float coordinateSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuffer temp = new StringBuffer();
         int n = frame.indexOf(axis);
@@ -351,8 +324,7 @@ public class ProgramParameters implements Runnable {
         return FIBO;
     }
 
-
-    float incrementSearch(StringBuffer frame, String axis) {
+    private float incrementSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuilder temp = new StringBuilder();
         int n = frame.indexOf(axis);
@@ -370,7 +342,7 @@ public class ProgramParameters implements Runnable {
         return Float.parseFloat(temp.toString());
     }
 
-    boolean containsAxis(StringBuffer frame, String axis) {
+    private boolean containsAxis(StringBuffer frame, String axis) {
         if (contains(frame, axis)) {
             int n=frame.indexOf(axis) + 1;
             char c=frame.charAt(n);
@@ -393,7 +365,7 @@ public class ProgramParameters implements Runnable {
         return false;
     }
 
-    void selectCoordinateSystem(ArrayList<StringBuffer> programList) {
+    private void selectCoordinateSystem(ArrayList<StringBuffer> programList) {
         for (int i = 0; i < programList.size(); i++) {
             if (programList.get(i).toString().contains("X"))
                 x++;
@@ -409,8 +381,46 @@ public class ProgramParameters implements Runnable {
         }
     }
 
-    boolean contains(StringBuffer sb, String findString) {
+    private static boolean readUp(char input) {
+        switch (input) {
+            case 'C':
+            case 'X':
+            case 'G':
+            case 'M':
+            case 'F':
+            case 'W':
+            case 'Z':
+            case 'D':
+            case 'S':
+            case 'A':
+            case 'U':
+            case 'L':
+            case 'O':
+            case 'H':
+                return false;
+        }
+        return true;
+    }
+
+    private boolean contains(StringBuffer sb, String findString) {
         return sb.indexOf(findString) > -1;
+    }
+
+    private boolean isDigit(char input) {
+        switch (input) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return true;
+        }
+        return false;
     }
 
 }

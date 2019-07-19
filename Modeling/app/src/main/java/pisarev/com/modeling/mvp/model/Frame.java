@@ -10,17 +10,6 @@ public class Frame
     private boolean isCR=false;
     private boolean isAxisContains=false;
     private ArrayList<String> gCode=new ArrayList<>();;
-    public Frame(int id, float x, float z, float cr)
-    {
-        this.id = id;
-        this.x = x;
-        this.z = z;
-        this.cr = cr;
-
-    }
-
-    public Frame()
-    {}
 
     public boolean isAxisContains() {
         return isAxisContains;
