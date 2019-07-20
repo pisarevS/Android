@@ -12,15 +12,12 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.interfaces.ViewMvp;
 
-
-public abstract class BaseDraw implements IDraw {
+public abstract class BaseDraw {
 
     private Paint paintFullLine;
     private Paint paintDottedLine;
-
     boolean clockwise;
     Paint line;
     ArrayList<String> programList;
@@ -50,8 +47,9 @@ public abstract class BaseDraw implements IDraw {
         paintDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
     }
 
-    @Override
-    public void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
+    public abstract void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom, int index);
+
+    void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -68,8 +66,7 @@ public abstract class BaseDraw implements IDraw {
         canvas.drawPath( path, paint );
     }
 
-    @Override
-    public void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
+    void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -145,8 +142,7 @@ public abstract class BaseDraw implements IDraw {
         canvas.drawPath( path, paint );
     }
 
-    @Override
-    public void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
+    void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
         float radiusPoint = 7F;
         Paint paint = new Paint();
         paint.setStyle( Paint.Style.FILL );

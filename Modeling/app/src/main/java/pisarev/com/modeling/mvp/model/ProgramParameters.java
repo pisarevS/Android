@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
 
 import javax.inject.Inject;
 
@@ -26,7 +24,6 @@ public class ProgramParameters implements Runnable {
     private Map<String, String> variablesList = new HashMap<>();
     private ArrayList<Frame> frameList=new ArrayList<>();
     private Map<Integer,String> errorListMap=new HashMap<>(  );
-
     private int x;
     private int u;
     private final float FIBO = 1123581220;
@@ -50,7 +47,7 @@ public class ProgramParameters implements Runnable {
         getParameterList(parameter);
         readParameterVariables(parameterList);
         replaceProgramVariables(programList);
-        addFrame();
+        addFrameList();
         for (int i=0;i < frameList.size();i++) {
             System.out.print("id " + frameList.get(i).getId());
             System.out.print(" gCode " + frameList.get(i).getGCode());
@@ -176,7 +173,7 @@ public class ProgramParameters implements Runnable {
         }
     }
 
-    private void addFrame() {
+    private void addFrameList() {
         selectCoordinateSystem(programList);
         StringBuffer strFrame;
         boolean isHorizontalAxis = false;

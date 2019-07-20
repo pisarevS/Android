@@ -1,7 +1,6 @@
 package pisarev.com.modeling.mvp.model;
 
 import android.graphics.Canvas;
-import android.util.Log;
 
 import pisarev.com.modeling.interfaces.ViewMvp;
 
@@ -25,7 +24,6 @@ public class Draw extends BaseDraw {
         float radius = 0;
         for (int i = 0; i < index; i++) {
             checkGCode( frameList.get( i ).getGCode());
-
 
             if(data.getErrorListMap().containsKey( frameList.get( i ).getId() )){
                 myViewMvp.showError( data.getErrorListMap().get( frameList.get( i ).getId() ) );
@@ -57,8 +55,6 @@ public class Draw extends BaseDraw {
         }
         drawPoint( canvas, pointCoordinateZero, pEnd, zoom );
     }
-
-
 
 }
 

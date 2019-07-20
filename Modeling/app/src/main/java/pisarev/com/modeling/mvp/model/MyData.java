@@ -2,7 +2,6 @@ package pisarev.com.modeling.mvp.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MyData {

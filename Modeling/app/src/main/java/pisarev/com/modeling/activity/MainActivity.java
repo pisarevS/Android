@@ -120,9 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             System.exit( 0 );
             return true;
         }
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected( item );
     }
 

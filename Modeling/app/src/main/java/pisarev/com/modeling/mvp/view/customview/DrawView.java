@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -18,13 +17,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.MyData;
@@ -85,7 +81,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     }
 
     private void manager(Canvas canvas) {
-        IDraw draw = new Draw( this );
+        Draw draw = new Draw( this );
         draw.drawContour( canvas, pointCoordinateZero, zoom, index );
     }
 
@@ -155,7 +151,6 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
         App.getComponent().inject( this );
     }
-
 
     @Override
     public void showError(String error) {
