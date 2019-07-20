@@ -1,7 +1,9 @@
 package pisarev.com.modeling.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -61,6 +63,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
     @SuppressLint("SetTextI18n")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        onClick( v,event );
+        return true;
+    }
+
+    private void onClick(View v, MotionEvent event){
         switch (v.getId()) {
             case R.id.start:
                 switch (event.getAction()) {
@@ -71,7 +78,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             isResetDown = false;
                             DrawView.button = DrawView.START;
                             DrawView.index++;
-                            textViewFrame.setText(  data.getProgramListTextView().get( data.getFrameList().get( DrawView.index-1 ).getId() ) );
+                            textViewFrame.setText(  data.getProgramList().get( data.getFrameList().get( DrawView.index-1 ).getId() ) );
                             if (vibrator.hasVibrator()) {
                                 vibrator.vibrate( 20 );
                             }
@@ -87,17 +94,26 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             timer.schedule( new TimerTask() {
                                 @Override
                                 public void run() {
-                                    if (DrawView.index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown) {
+                                    if (DrawView.index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown&&DrawView.button==DrawView.START) {
                                         DrawView.index++;
                                         SecondActivity.this.runOnUiThread( new Runnable() {
                                             @Override
                                             public void run() {
-                                                textViewFrame.setText( data.getProgramListTextView().get( data.getFrameList().get( DrawView.index-1 ).getId() ) );
+                                                if(DrawView.button==DrawView.START)
+                                                    textViewFrame.setText( data.getProgramList().get( data.getFrameList().get( DrawView.index-1 ).getId() ) );
                                             }
                                         } );
                                     } else {
                                         isResetDown = false;
                                         timer.cancel();
+                                        SecondActivity.this.runOnUiThread( new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if(DrawView.button == DrawView.PAUSE){
+                                                    textViewFrame.setText( data.getProgramList().get(data.getFrameList().get( DrawView.index-1 ).getId() ) );
+                                                }
+                                            }
+                                        } );
                                     }
                                 }
                             }, 1000, 200 );
@@ -134,7 +150,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             if (vibrator.hasVibrator()) {
                                 vibrator.vibrate( 20 );
                             }
-                            data.getErrorList().clear();
                             DrawView.button = DrawView.RESET;
                             DrawView.index = 0;
                             isStartDown = false;
@@ -149,7 +164,17 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                 }
                 break;
         }
-        return true;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState( outState, outPersistentState );
+        outState.putInt( "keyButton",DrawView.button );
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState( savedInstanceState );
+        DrawView.button=savedInstanceState.getInt( "keyButton" );
+    }
 }

@@ -1,8 +1,7 @@
 package pisarev.com.modeling.mvp.model;
 
 import android.graphics.Canvas;
-
-import java.util.ArrayList;
+import android.util.Log;
 
 import pisarev.com.modeling.interfaces.ViewMvp;
 
@@ -25,29 +24,35 @@ public class Draw extends BaseDraw {
 
         float radius = 0;
         for (int i = 0; i < index; i++) {
-            checkGCode(frmeList.get( i ).getGCode());
+            checkGCode( frameList.get( i ).getGCode());
 
-            if (frmeList.get( i ).getIsCR()){
-                pEnd.setX(frmeList.get(i).getX());
-                pEnd.setZ( frmeList.get( i ).getZ());
-                radius=frmeList.get( i ).getCr();
-                isRadius=true;
+
+            if(data.getErrorListMap().containsKey( frameList.get( i ).getId() )){
+                myViewMvp.showError( data.getErrorListMap().get( frameList.get( i ).getId() ) );
+                break;
             }else {
-                pEnd.setX( frmeList.get( i ).getX() );
-                pEnd.setZ( frmeList.get( i ).getZ() );
-                isLine=true;
-            }
-            if ( isRadius &&frmeList.get( i ).isAxisContains()) {
-                drawArc( canvas, line, pointCoordinateZero, pStart, pEnd, radius, zoom, clockwise );
-                pStart.setX( pEnd.getX() );
-                pStart.setZ( pEnd.getZ() );
-                isLine=false;
-                isRadius=false;
-            }
-            if (isLine && frmeList.get( i ).isAxisContains()) {
-                drawLine( canvas, line, pointCoordinateZero, pStart, pEnd, zoom );
-                pStart.setX( pEnd.getX() );
-                pStart.setZ( pEnd.getZ() );
+                if (frameList.get( i ).getIsCR()){
+                    pEnd.setX( frameList.get(i).getX());
+                    pEnd.setZ( frameList.get( i ).getZ());
+                    radius= frameList.get( i ).getCr();
+                    isRadius=true;
+                }else {
+                    pEnd.setX( frameList.get( i ).getX() );
+                    pEnd.setZ( frameList.get( i ).getZ() );
+                    isLine=true;
+                }
+                if ( isRadius && frameList.get( i ).isAxisContains()) {
+                    drawArc( canvas, line, pointCoordinateZero, pStart, pEnd, radius, zoom, clockwise );
+                    pStart.setX( pEnd.getX() );
+                    pStart.setZ( pEnd.getZ() );
+                    isLine=false;
+                    isRadius=false;
+                }
+                if (isLine && frameList.get( i ).isAxisContains()) {
+                    drawLine( canvas, line, pointCoordinateZero, pStart, pEnd, zoom );
+                    pStart.setX( pEnd.getX() );
+                    pStart.setZ( pEnd.getZ() );
+                }
             }
         }
         drawPoint( canvas, pointCoordinateZero, pEnd, zoom );

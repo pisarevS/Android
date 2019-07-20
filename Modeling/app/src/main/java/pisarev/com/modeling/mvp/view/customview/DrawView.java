@@ -6,9 +6,11 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -39,8 +41,10 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
     public static int button;
     public final static int START = 1;
     public final static int RESET = 2;
+    public final static int PAUSE = 3;
     public static int index;
     private ScaleGestureDetector scaleGestureDetector;
+    private ArrayList<String>errorList=new ArrayList<>(  );
     @Inject
     MyData data;
 
@@ -68,9 +72,16 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
             case RESET:
                 initSystemCoordinate( canvas, true );
                 button = 0;
+                invalidate();
+                isTouch=false;
+                errorList.clear();
+                break;
+            case PAUSE:
+                manager( canvas );
+                invalidate();
                 break;
         }
-        drawSystemCoordinate( canvas, isTouch, button );
+        drawSystemCoordinate( canvas, isTouch);
     }
 
     private void manager(Canvas canvas) {
@@ -78,14 +89,17 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         draw.drawContour( canvas, pointCoordinateZero, zoom, index );
     }
 
-    private void drawSystemCoordinate(Canvas canvas, boolean isTouch, int button) {
-        if (!isTouch || button == RESET) {
+    private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
+        if (!isTouch|| button == RESET) {
             initSystemCoordinate( canvas, true );
-        } else {
-            initSystemCoordinate( canvas, false );
-            if (button == START)
-                manager( canvas );
+            invalidate();
         }
+        if (isTouch|| button == START){
+            initSystemCoordinate( canvas, false );
+            manager( canvas );
+            invalidate();
+        }
+
     }
 
     @Override
@@ -142,11 +156,16 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         App.getComponent().inject( this );
     }
 
+
     @Override
     public void showError(String error) {
-        if (!data.getErrorList().contains( error )) {
-            data.setErrorList( error );
-            Toast.makeText( getContext(), error, Toast.LENGTH_LONG ).show();
+        DrawView.button=DrawView.PAUSE;
+        if(!errorList.contains( error )){
+            errorList.add( error );
+            Toast toast= Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
+            toast.setGravity( Gravity.CENTER,0,0 );
+            toast.show();
+            Log.d(Const.TEG, "error " +error );
         }
     }
 

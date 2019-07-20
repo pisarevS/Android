@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,15 +24,15 @@ public class ProgramParameters implements Runnable {
     private ArrayList<StringBuffer> programList = new ArrayList<>();
     private ArrayList<StringBuffer> parameterList = new ArrayList<>();
     private Map<String, String> variablesList = new HashMap<>();
-    public ArrayList<Frame> frameList=new ArrayList<>();
+    private ArrayList<Frame> frameList=new ArrayList<>();
+    private Map<Integer,String> errorListMap=new HashMap<>(  );
 
     private int x;
     private int u;
-    boolean clockwise;
-    final float FIBO = 1123581220;
+    private final float FIBO = 1123581220;
 
-    String horizontalAxis;
-    String verticalAxis;
+    private String horizontalAxis;
+    private String verticalAxis;
     @Inject
     MyData data;
 
@@ -109,7 +110,7 @@ public class ProgramParameters implements Runnable {
             String line;
             while ((line = br.readLine()) != null) {
                 programList.add(new StringBuffer(line));
-                data.getProgramListTextView().add( line );
+                data.getProgramList().add( line );
             }
             br.close();
         } catch (IOException ignored) {
@@ -199,7 +200,7 @@ public class ProgramParameters implements Runnable {
                     frameList.add(frame);
                 }
             } catch (Exception e) {
-
+                errorListMap.put( i,strFrame.toString() );
             }
             try {
                 if (contains(strFrame, horizontalAxis + "=IC")) {
@@ -210,11 +211,11 @@ public class ProgramParameters implements Runnable {
                     if (tempHorizontal != FIBO) {
                         isHorizontalAxis = true;
                     } else {
-
+                        errorListMap.put( i,strFrame.toString() );
                     }
                 }
             } catch (Exception e) {
-
+                errorListMap.put( i,strFrame.toString() );
             }
             try {
                 if (contains(strFrame, verticalAxis + "=IC")) {
@@ -225,11 +226,11 @@ public class ProgramParameters implements Runnable {
                     if (tempVertical != FIBO) {
                         isVerticalAxis = true;
                     } else {
-
+                        errorListMap.put( i,strFrame.toString() );
                     }
                 }
             } catch (Exception e) {
-
+                errorListMap.put( i,strFrame.toString() );
             }
             String radiusCR = "CR=";
             try {
@@ -238,11 +239,11 @@ public class ProgramParameters implements Runnable {
                     if (tempCR != FIBO) {
                         isCR = true;
                     } else {
-
+                        errorListMap.put( i,strFrame.toString() );
                     }
                 }
             } catch (Exception e) {
-
+                errorListMap.put( i,strFrame.toString() );
             }
             if (isHorizontalAxis && isVerticalAxis && isCR) {
                 frame.setX(tempHorizontal);
@@ -267,6 +268,8 @@ public class ProgramParameters implements Runnable {
                 isVerticalAxis = false;
             }
         }
+
+        data.setErrorListMap( errorListMap );
         Set<Frame> s = new LinkedHashSet<>(frameList);
         frameList.clear();
         frameList.addAll( s );

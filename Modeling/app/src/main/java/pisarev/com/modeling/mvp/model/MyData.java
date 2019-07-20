@@ -1,15 +1,29 @@
 package pisarev.com.modeling.mvp.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class MyData  {
+public class MyData {
 
 
+    private ArrayList<String> programList = new ArrayList<>();
 
+    private Map<Integer, String> errorListMap = new HashMap<>();
 
-    private ArrayList<String>programListTextView=new ArrayList<>(  );
+    private ArrayList<Frame> frameList = new ArrayList<>();
 
-    private ArrayList<String>errorList=new ArrayList<>();
+    public MyData() {
+    }
+
+    public Map<Integer, String> getErrorListMap() {
+        return errorListMap;
+    }
+
+    public void setErrorListMap(Map<Integer, String> errorListMap) {
+        this.errorListMap = errorListMap;
+    }
 
     public ArrayList<Frame> getFrameList() {
         return frameList;
@@ -19,25 +33,12 @@ public class MyData  {
         this.frameList = frameList;
     }
 
-    private ArrayList<Frame> frameList=new ArrayList<>(  );
-
-    public MyData(){
+    public ArrayList<String> getProgramList() {
+        return programList;
     }
 
-
-    public ArrayList<String> getProgramListTextView() {
-        return programListTextView;
-    }
-
-    public void setProgramListTextView(ArrayList<String> programListTextView) {
-        this.programListTextView = programListTextView;
-    }
-
-    public ArrayList<String> getErrorList() {
-        return errorList;
-    }
-
-    public void setErrorList(String error) {
-        this.errorList.add(error);
+    public void setProgramList(ArrayList<String> programList) {
+        this.programList = programList;
     }
 }
+

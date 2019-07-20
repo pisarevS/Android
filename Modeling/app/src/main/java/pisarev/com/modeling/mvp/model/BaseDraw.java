@@ -20,15 +20,11 @@ public abstract class BaseDraw implements IDraw {
 
     private Paint paintFullLine;
     private Paint paintDottedLine;
-    private int x;
-    private int u;
+
     boolean clockwise;
-    final float FIBO = 1123581220;
     Paint line;
-    String horizontalAxis;
-    String verticalAxis;
     ArrayList<String> programList;
-    ArrayList<Frame>frmeList;
+    ArrayList<Frame> frameList;
     ViewMvp.MyViewMvp myViewMvp;
     @Inject
     MyData data;
@@ -40,8 +36,8 @@ public abstract class BaseDraw implements IDraw {
 
     private void init() {
         App.getComponent().inject( this );
-        programList = data.getProgramListTextView();
-        frmeList=data.getFrameList();
+        programList = data.getProgramList();
+        frameList =data.getFrameList();
         line = new Paint();
         paintFullLine = new Paint();
         paintFullLine.setColor( Color.GREEN );
