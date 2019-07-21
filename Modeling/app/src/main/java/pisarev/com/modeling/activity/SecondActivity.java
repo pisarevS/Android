@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,6 +18,7 @@ import java.util.TimerTask;
 
 import pisarev.com.modeling.application.App;
 
+import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.view.customview.DrawView;
 import pisarev.com.modeling.R;
@@ -58,6 +60,8 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
         DrawView.button = DrawView.RESET;
         drawView.invalidate();
         vibrator = (Vibrator) getSystemService( getApplicationContext().VIBRATOR_SERVICE );
+        if(savedInstanceState!=null)
+        DrawView.button=savedInstanceState.getInt("key");
     }
 
     @SuppressLint("SetTextI18n")
@@ -168,6 +172,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        
+        Log.d(Const.TEG," "+DrawView.button);
+        outState.putInt("key",DrawView.button);
     }
 }
