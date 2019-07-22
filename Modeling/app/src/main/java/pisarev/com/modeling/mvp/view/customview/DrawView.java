@@ -17,33 +17,42 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 
+import pisarev.com.modeling.R;
+import pisarev.com.modeling.activity.SecondActivity;
 import pisarev.com.modeling.application.App;
+import pisarev.com.modeling.interfaces.IDrawView;
+import pisarev.com.modeling.interfaces.ISecondView;
 import pisarev.com.modeling.interfaces.ViewMvp;
 import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
 import pisarev.com.modeling.mvp.model.Draw;
 
-public class DrawView extends View implements ViewMvp.MyViewMvp {
+public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
     private Paint paintCoordinateDottedLine;
+    private ISecondView secondView;
     private Point pointCoordinateZero = new Point();
     private boolean isTouch;
     private float moveX;
     private float moveZ;
     private float zoom = 3;
-    public static int button;
-    public final static int START = 1;
-    public final static int RESET = 2;
-    public final static int PAUSE = 3;
-    public static int index;
+    public int button;
+    public final int START = 1;
+    public final int RESET = 2;
+    public final int STOP = 3;
+    public int index;
     private ScaleGestureDetector scaleGestureDetector;
     private ArrayList<String>errorList=new ArrayList<>(  );
+    private boolean isSingleBlockDown = false;
+    private boolean isResetDown = false;
+    private boolean isStartDown = false;
     @Inject
     MyData data;
-
 
     public DrawView(Context context) {
         super( context );
@@ -81,7 +90,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
                 isTouch=false;
                 errorList.clear();
                 break;
-            case PAUSE:
+            case STOP:
                 manager( canvas );
                 invalidate();
                 break;
@@ -115,7 +124,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
 
     @Override
     public void showError(String error) {
-        DrawView.button=DrawView.PAUSE;
+        button=STOP;
         if(!errorList.contains( error )){
             errorList.add( error );
             Toast toast= Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
@@ -162,6 +171,83 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
             path.lineTo( pointCoordinateZero.getX(), getHeight() );
             canvas.drawPath( path, paintCoordinateDottedLine );
         }
+    }
+
+    @Override
+    public void onButtonStart(boolean isStartDown) {
+        this.isStartDown=isStartDown;
+        index=data.getFrameList().size();
+        if(data.getFrameList().size()>0){
+            button = START;
+            isResetDown = false;
+        }
+    }
+
+    @Override
+    public void onButtonCycleStart() {
+        if (isSingleBlockDown && index < data.getFrameList().size()) {
+            isResetDown = false;
+            button = START;
+            index++;
+            secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
+            if(data.getFrameList().get( index-1  ).isAxisContains()){
+                secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
+            }
+        }
+
+        if (!isSingleBlockDown && index < data.getFrameList().size() && !isStartDown) {
+            isResetDown = false;
+            isStartDown = true;
+            button = START;
+            final Timer timer = new Timer();
+            timer.schedule( new TimerTask() {
+                @Override
+                public void run() {
+                    if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown&&button==START) {
+                        index++;
+                        if(button==START) {
+                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
+                            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
+                                secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
+                            }
+                        }
+                    } else {
+                        isResetDown = false;
+                        timer.cancel();
+
+                        if(button == STOP){
+                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
+                            if(data.getFrameList().get( index-1  ).isAxisContains()){
+                                secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
+                            }
+                        }
+                    }
+                }
+            }, 1000, 200 );
+        }
+    }
+
+    @Override
+    public void onButtonSingleBlock(boolean isSingleBlockDown) {
+        this.isSingleBlockDown=isSingleBlockDown;
+        isStartDown = false;
+    }
+
+    @Override
+    public void onButtonReset( boolean isResetDown) {
+        this.isResetDown=isResetDown;
+        if (isResetDown) {
+            button = RESET;
+            index = 0;
+            isStartDown = false;
+            secondView.showFrame("");
+            secondView.showAxis("","");
+        }
+    }
+
+    @Override
+    public void getActivity(ISecondView secondView) {
+        this.secondView = secondView;
     }
 
     public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

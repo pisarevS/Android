@@ -144,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         data.getProgramList().clear();
         data.getFrameList().clear();
         data.getErrorListMap().clear();
-        DrawView.index=0;
         Thread thread=new Thread( new ProgramParameters(programFragment.getText(),parameterFragment.getText()));
         thread.start();
         Intent intent = new Intent( MainActivity.this, SecondActivity.class );
