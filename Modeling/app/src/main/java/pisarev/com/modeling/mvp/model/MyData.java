@@ -7,7 +7,7 @@ import java.util.Map;
 public class MyData {
 
 
-    private ArrayList<String> programList = new ArrayList<>();
+    private ArrayList<StringBuffer> programList = new ArrayList<>();
 
     private Map<Integer, String> errorListMap = new HashMap<>();
 
@@ -32,11 +32,11 @@ public class MyData {
         this.frameList = frameList;
     }
 
-    public ArrayList<String> getProgramList() {
+    public ArrayList<StringBuffer> getProgramList() {
         return programList;
     }
 
-    public void setProgramList(ArrayList<String> programList) {
+    public void setProgramList(ArrayList<StringBuffer> programList) {
         this.programList = programList;
     }
 }

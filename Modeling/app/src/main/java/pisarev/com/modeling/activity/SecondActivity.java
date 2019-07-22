@@ -81,11 +81,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                             DrawView.button = DrawView.START;
                             isResetDown = false;
                         }
+                        break;
+                    case MotionEvent.ACTION_UP:
                         if (vibrator.hasVibrator()) {
                             vibrator.vibrate( 20 );
                         }
-                        break;
-                    case MotionEvent.ACTION_UP:
                         buttonStart.setImageResource( R.drawable.start );
                         break;
                 }
@@ -104,13 +104,8 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                                 textViewZ.setText("Z=" +data.getFrameList().get( DrawView.index-1 ).getZ() );
                             }
                         }
-                        if (vibrator.hasVibrator()) {
-                            vibrator.vibrate( 20 );
-                        }
+
                         if (!isSingleBlockDown && DrawView.index < data.getFrameList().size() && !isStartDown) {
-                            if (vibrator.hasVibrator()) {
-                                vibrator.vibrate( 20 );
-                            }
                             isResetDown = false;
                             isStartDown = true;
                             DrawView.button = DrawView.START;
@@ -153,6 +148,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                         }
                         break;
                     case MotionEvent.ACTION_UP:
+                        if (vibrator.hasVibrator()) {
+                            vibrator.vibrate( 20 );
+                        }
                         buttonCycleStart.setImageResource( R.drawable.cycle_start );
                         break;
                 }
@@ -180,9 +178,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         if (!isResetDown) {
-                            if (vibrator.hasVibrator()) {
-                                vibrator.vibrate( 20 );
-                            }
                             DrawView.button = DrawView.RESET;
                             DrawView.index = 0;
                             isStartDown = false;
@@ -194,6 +189,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
                         buttonReset.setImageResource( R.drawable.reset_down );
                         break;
                     case MotionEvent.ACTION_UP:
+                        if (vibrator.hasVibrator()) {
+                            vibrator.vibrate( 20 );
+                        }
                         buttonReset.setImageResource( R.drawable.reset );
                         break;
                 }

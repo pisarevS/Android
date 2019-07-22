@@ -57,6 +57,15 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
     }
 
+    private void init() {
+        paintCoordinateDottedLine = new Paint();
+        paintCoordinateDottedLine.setColor( Color.GRAY );
+        paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
+        paintCoordinateDottedLine.setAntiAlias( true );
+        paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
+        App.getComponent().inject( this );
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw( canvas );
@@ -78,24 +87,6 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
                 break;
         }
         drawSystemCoordinate( canvas, isTouch);
-    }
-
-    private void manager(Canvas canvas) {
-        Draw draw = new Draw( this );
-        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
-    }
-
-    private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
-        if (!isTouch|| button == RESET) {
-            initSystemCoordinate( canvas, true );
-            invalidate();
-        }
-        if (isTouch|| button == START){
-            initSystemCoordinate( canvas, false );
-            manager( canvas );
-            invalidate();
-        }
-
     }
 
     @Override
@@ -122,6 +113,36 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
         return true;
     }
 
+    @Override
+    public void showError(String error) {
+        DrawView.button=DrawView.PAUSE;
+        if(!errorList.contains( error )){
+            errorList.add( error );
+            Toast toast= Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
+            toast.setGravity( Gravity.CENTER,0,0 );
+            toast.show();
+            Log.d(Const.TEG, "error " +error );
+        }
+    }
+
+    private void manager(Canvas canvas) {
+        Draw draw = new Draw( this );
+        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
+    }
+
+    private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
+        if (!isTouch|| button == RESET) {
+            initSystemCoordinate( canvas, true );
+            invalidate();
+        }
+        if (isTouch|| button == START){
+            initSystemCoordinate( canvas, false );
+            manager( canvas );
+            invalidate();
+        }
+
+    }
+
     private void initSystemCoordinate(Canvas canvas, boolean isInit) {
         Path path;
         if (isInit) {
@@ -140,27 +161,6 @@ public class DrawView extends View implements ViewMvp.MyViewMvp {
             path.moveTo( pointCoordinateZero.getX(), 0 );
             path.lineTo( pointCoordinateZero.getX(), getHeight() );
             canvas.drawPath( path, paintCoordinateDottedLine );
-        }
-    }
-
-    private void init() {
-        paintCoordinateDottedLine = new Paint();
-        paintCoordinateDottedLine.setColor( Color.GRAY );
-        paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
-        paintCoordinateDottedLine.setAntiAlias( true );
-        paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
-        App.getComponent().inject( this );
-    }
-
-    @Override
-    public void showError(String error) {
-        DrawView.button=DrawView.PAUSE;
-        if(!errorList.contains( error )){
-            errorList.add( error );
-            Toast toast= Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
-            toast.setGravity( Gravity.CENTER,0,0 );
-            toast.show();
-            Log.d(Const.TEG, "error " +error );
         }
     }
 

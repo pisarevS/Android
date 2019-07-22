@@ -27,7 +27,6 @@ public class ProgramParameters implements Runnable {
     private int x;
     private int u;
     private final float FIBO = 1123581220;
-
     private String horizontalAxis;
     private String verticalAxis;
     @Inject
@@ -43,11 +42,13 @@ public class ProgramParameters implements Runnable {
     @Override
     public void run() {
         initList();
-        getProgramList(program);
-        getParameterList(parameter);
+        programList.addAll( getList(program));
+        data.setProgramList( getList(program) );
+        parameterList.addAll(getList(parameter ));
         readParameterVariables(parameterList);
         replaceProgramVariables(programList);
         addFrameList();
+
         for (int i=0;i < frameList.size();i++) {
             System.out.print("id " + frameList.get(i).getId());
             System.out.print(" gCode " + frameList.get(i).getGCode());
@@ -58,7 +59,6 @@ public class ProgramParameters implements Runnable {
             }
             System.out.println();
         }
-
     }
 
     private void initList(){
@@ -101,31 +101,19 @@ public class ProgramParameters implements Runnable {
         variablesList.put("$P_TOOLR", "16");
     }
 
-    private void getProgramList(String program) {
+    private ArrayList<StringBuffer> getList(String program) {
+        ArrayList<StringBuffer> arrayList = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new StringReader(program));
             String line;
             while ((line = br.readLine()) != null) {
-                programList.add(new StringBuffer(line));
-                data.getProgramList().add( line );
+                arrayList.add( new StringBuffer(line) );
             }
             br.close();
         } catch (IOException ignored) {
 
         }
-    }
-
-    private void getParameterList(String parameter) {
-        try {
-            BufferedReader br = new BufferedReader(new StringReader(parameter));
-            String line;
-            while ((line = br.readLine()) != null) {
-                parameterList.add(new StringBuffer(line));
-            }
-            br.close();
-        } catch (IOException ignored) {
-
-        }
+        return arrayList;
     }
 
     private void readParameterVariables(ArrayList<StringBuffer> parameterList) {

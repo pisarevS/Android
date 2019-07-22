@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SectionsPageAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private ViewMvp.PresenterMainMvp presenter;
+    ParameterFragment parameterFragment;
+    ProgramFragment programFragment;
     @Inject
     MyData data;
 
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mViewPager = findViewById( R.id.container );
         mViewPager.setAdapter( mSectionsPagerAdapter );
 
+
         TabLayout tabLayout = findViewById( R.id.tabs );
 
         mViewPager.addOnPageChangeListener( new TabLayout.TabLayoutOnPageChangeListener( tabLayout ) );
@@ -61,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton fab = findViewById( R.id.fab );
         fab.setOnClickListener( this );
         App.getComponent().inject( this );
+
+        programFragment=(ProgramFragment) mSectionsPagerAdapter.getItem( 0 );
+        parameterFragment  =(ParameterFragment) mSectionsPagerAdapter.getItem( 1 );
     }
 
     @Override
@@ -125,12 +131,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void showProgram(String program) {
-       ProgramFragment.setText( program );
+        programFragment.setText(program);
     }
 
     @Override
     public void showParameter(String parameter) {
-        ParameterFragment.setText( parameter );
+        parameterFragment.setText( parameter );
     }
 
     @Override
@@ -139,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         data.getFrameList().clear();
         data.getErrorListMap().clear();
         DrawView.index=0;
-        Thread thread=new Thread( new ProgramParameters(ProgramFragment.getText(),ParameterFragment.getText()));
+        Thread thread=new Thread( new ProgramParameters(programFragment.getText(),parameterFragment.getText()));
         thread.start();
         Intent intent = new Intent( MainActivity.this, SecondActivity.class );
         startActivity( intent );

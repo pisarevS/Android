@@ -23,7 +23,8 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/single_block"
-        app:srcCompat="@drawable/reset" />
+        app:srcCompat="@drawable/reset"
+        android:contentDescription="TODO" />
 
     <ImageView
         android:id="@+id/single_block"
@@ -32,8 +33,9 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/single_block" />
+        app:layout_constraintEnd_toStartOf="@+id/cycle_start"
+        app:srcCompat="@drawable/single_block"
+        android:contentDescription="TODO" />
 
     <ImageView
         android:id="@+id/start"
@@ -43,7 +45,8 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/cycle_start"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/start" />
+        app:srcCompat="@drawable/start"
+        android:contentDescription="TODO" />
 
     <ImageView
         android:id="@+id/cycle_start"
@@ -51,10 +54,11 @@
         android:layout_height="50dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/single_block"
+        android:clickable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/cycle_start" />
+        app:srcCompat="@drawable/cycle_start"
+        android:contentDescription="TODO" />
 
     <TextView
         android:id="@+id/textViewFrame"

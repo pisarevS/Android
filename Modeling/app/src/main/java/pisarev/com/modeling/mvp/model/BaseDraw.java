@@ -20,7 +20,7 @@ public abstract class BaseDraw {
     private Paint paintDottedLine;
     boolean clockwise;
     Paint line;
-    ArrayList<String> programList;
+    ArrayList<StringBuffer> programList;
     ArrayList<Frame> frameList;
     ViewMvp.MyViewMvp myViewMvp;
     @Inject
@@ -157,9 +157,9 @@ public abstract class BaseDraw {
         canvas.drawPath( path, paint );
     }
 
-    private boolean isG17(ArrayList<String> programList) {
+    private boolean isG17(ArrayList<StringBuffer> programList) {
         for (int i = 0; i < programList.size(); i++)
-            if (programList.get( i ).contains( "G17" )) {
+            if (programList.get( i ).toString().contains( "G17" )) {
                 return true;
             }
         return false;
