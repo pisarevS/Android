@@ -22,20 +22,19 @@ import java.util.TimerTask;
 
 import javax.inject.Inject;
 
-import pisarev.com.modeling.R;
-import pisarev.com.modeling.activity.SecondActivity;
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.IDrawView;
-import pisarev.com.modeling.interfaces.ISecondView;
-import pisarev.com.modeling.interfaces.ViewMvp;
+import pisarev.com.modeling.interfaces.DrawMvp;
+import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.Const;
+import pisarev.com.modeling.mvp.model.Draw;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
-import pisarev.com.modeling.mvp.model.Draw;
 
-public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
+import static android.view.MotionEvent.*;
+
+public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMvp {
     private Paint paintCoordinateDottedLine;
-    private ISecondView secondView;
+    private DrawMvp.DrawViewMvp secondView;
     private Point pointCoordinateZero = new Point();
     private boolean isTouch;
     private float moveX;
@@ -102,7 +101,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
     public boolean onTouchEvent(MotionEvent event) {
         scaleGestureDetector.onTouchEvent( event );
         switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
+            case ACTION_DOWN:
                 float downX = event.getX();
                 float downZ = event.getY();
                 moveX = pointCoordinateZero.getX() - downX;
@@ -110,12 +109,12 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
                 isTouch = true;
                 invalidate();
                 break;
-            case MotionEvent.ACTION_MOVE:
+            case ACTION_MOVE:
                 pointCoordinateZero.setX( event.getX() + moveX );
                 pointCoordinateZero.setZ( event.getY() + moveZ );
                 invalidate();
                 break;
-            case MotionEvent.ACTION_UP:
+            case ACTION_UP:
                 invalidate();
                 break;
         }
@@ -135,7 +134,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
     }
 
     private void manager(Canvas canvas) {
-        Draw draw = new Draw( this );
+        Draw draw = new Draw( this,data );
         draw.drawContour( canvas, pointCoordinateZero, zoom, index );
     }
 
@@ -174,8 +173,8 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
     }
 
     @Override
-    public void onButtonStart(boolean isStartDown) {
-        this.isStartDown=isStartDown;
+    public void onButtonStart() {
+        isStartDown=true;
         index=data.getFrameList().size();
         if(data.getFrameList().size()>0){
             button = START;
@@ -194,7 +193,6 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
                 secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
             }
         }
-
         if (!isSingleBlockDown && index < data.getFrameList().size() && !isStartDown) {
             isResetDown = false;
             isStartDown = true;
@@ -205,16 +203,13 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
                 public void run() {
                     if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown&&button==START) {
                         index++;
-                        if(button==START) {
-                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
-                            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                                secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
-                            }
+                        secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
+                        if (data.getFrameList().get( index - 1 ).isAxisContains()) {
+                            secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
                         }
                     } else {
                         isResetDown = false;
                         timer.cancel();
-
                         if(button == STOP){
                             secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
                             if(data.getFrameList().get( index-1  ).isAxisContains()){
@@ -223,7 +218,7 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
                         }
                     }
                 }
-            }, 1000, 200 );
+            }, 0, 200 );
         }
     }
 
@@ -234,19 +229,17 @@ public class DrawView extends View implements ViewMvp.MyViewMvp, IDrawView {
     }
 
     @Override
-    public void onButtonReset( boolean isResetDown) {
-        this.isResetDown=isResetDown;
-        if (isResetDown) {
-            button = RESET;
-            index = 0;
-            isStartDown = false;
-            secondView.showFrame("");
-            secondView.showAxis("","");
-        }
+    public void onButtonReset() {
+        isResetDown=true;
+        button = RESET;
+        index = 0;
+        isStartDown = false;
+        secondView.showFrame("");
+        secondView.showAxis("","");
     }
 
     @Override
-    public void getActivity(ISecondView secondView) {
+    public void getActivity(DrawMvp.DrawViewMvp secondView) {
         this.secondView = secondView;
     }
 

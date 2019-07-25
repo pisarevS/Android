@@ -1,8 +1,8 @@
 package pisarev.com.modeling.interfaces;
 
-public interface ViewMvp {
+public interface MainMvp {
 
-    interface MainViewMvp {
+    interface ViewMvp {
         void showProgram(String program);
 
         void showParameter(String parameter);
@@ -12,9 +12,5 @@ public interface ViewMvp {
         void openProgram(String path);
 
         void openParameter(String path);
-    }
-
-    interface MyViewMvp {
-        void showError(String error);
     }
 }

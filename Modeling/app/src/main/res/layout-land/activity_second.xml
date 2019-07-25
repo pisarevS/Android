@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pisarev.com.modeling.activity.SecondActivity">
+    tools:context="pisarev.com.modeling.activity.DrawActivity">
 
     <pisarev.com.modeling.mvp.view.customview.DrawView
         android:id="@+id/myView"

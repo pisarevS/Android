@@ -14,16 +14,15 @@ import android.widget.TextView;
 
 import pisarev.com.modeling.application.App;
 
-import pisarev.com.modeling.interfaces.IDrawView;
-import pisarev.com.modeling.interfaces.ISecondView;
+import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.R;
 
 import javax.inject.Inject;
 
-public class SecondActivity extends AppCompatActivity implements View.OnTouchListener, ISecondView {
+public class DrawActivity extends AppCompatActivity implements View.OnTouchListener, DrawMvp.DrawViewMvp {
 
-    private IDrawView drawView;
+    private DrawMvp.PresenterDrawViewMvp drawView;
     private ImageView buttonStart;
     private ImageView buttonCycleStart;
     private ImageView buttonSingleBlock;
@@ -69,7 +68,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
             case R.id.start:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        drawView.onButtonStart(true);
+                        drawView.onButtonStart();
                         buttonStart.setImageResource( R.drawable.start_down );
                         break;
                     case MotionEvent.ACTION_UP:
@@ -115,7 +114,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
             case R.id.reset:
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        drawView.onButtonReset(true);
+                        drawView.onButtonReset();
                         buttonReset.setImageResource( R.drawable.reset_down );
                         break;
                     case MotionEvent.ACTION_UP:
@@ -132,18 +131,18 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState( outState, outPersistentState );
-        //outState.putInt( "keyButton",DrawView.button );
+        //outState.putInt( "keyButton",Draw.button );
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState( savedInstanceState );
-        //DrawView.button=savedInstanceState.getInt( "keyButton" );
+        //Draw.button=savedInstanceState.getInt( "keyButton" );
     }
 
     @Override
     public void showFrame(final String frame) {
-        SecondActivity.this.runOnUiThread(new Runnable() {
+        DrawActivity.this.runOnUiThread( new Runnable() {
             @Override
             public void run() {
                 textViewFrame.setText(frame);
@@ -153,7 +152,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnTouchLis
 
     @Override
     public void showAxis(final String horizontalAxis, final String verticalAxis) {
-        SecondActivity.this.runOnUiThread(new Runnable() {
+        DrawActivity.this.runOnUiThread( new Runnable() {
             @Override
             public void run() {
                 textViewX.setText(horizontalAxis );

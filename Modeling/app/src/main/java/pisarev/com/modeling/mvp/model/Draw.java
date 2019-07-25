@@ -2,12 +2,12 @@ package pisarev.com.modeling.mvp.model;
 
 import android.graphics.Canvas;
 
-import pisarev.com.modeling.interfaces.ViewMvp;
+import pisarev.com.modeling.interfaces.IDraw;
 
 public class Draw extends BaseDraw {
 
-    public Draw(ViewMvp.MyViewMvp myViewMvp) {
-        super( myViewMvp );
+    public Draw(IDraw draw,MyData data) {
+        super( draw,data );
     }
 
     @Override
@@ -26,7 +26,7 @@ public class Draw extends BaseDraw {
             checkGCode( frameList.get( i ).getGCode());
 
             if(data.getErrorListMap().containsKey( frameList.get( i ).getId() )){
-                myViewMvp.showError( data.getErrorListMap().get( frameList.get( i ).getId() ) );
+                draw.showError( data.getErrorListMap().get( frameList.get( i ).getId() ) );
                 break;
             }else {
                 if (frameList.get( i ).getIsCR()){

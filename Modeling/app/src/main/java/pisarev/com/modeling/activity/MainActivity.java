@@ -23,21 +23,20 @@ import java.io.File;
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.ViewMvp;
+import pisarev.com.modeling.interfaces.MainMvp;
 import pisarev.com.modeling.mvp.model.ProgramParameters;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;
-import pisarev.com.modeling.mvp.view.customview.DrawView;
 import pisarev.com.modeling.mvp.view.fragments.ParameterFragment;
 import pisarev.com.modeling.mvp.view.fragments.ProgramFragment;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,ViewMvp.MainViewMvp {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MainMvp.ViewMvp {
 
     private SectionsPageAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    private ViewMvp.PresenterMainMvp presenter;
+    private MainMvp.PresenterMainMvp presenter;
     ParameterFragment parameterFragment;
     ProgramFragment programFragment;
     @Inject
@@ -81,12 +80,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         presenter=new PresenterMainImpl(this );
         java.io.File sdcard = Environment.getExternalStorageDirectory();
         if (id == R.id.action_openProgram) {
-            new ChooserDialog(MainActivity.this)
+            new ChooserDialog( MainActivity.this)
                     .withStartFile(sdcard.getPath())
                     .withChosenListener(new ChooserDialog.Result() {
                         @Override
                         public void onChoosePath(String path, File pathFile) {
-                            Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
                             presenter.openProgram(path);
                         }
                     })
@@ -102,12 +101,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
         if (id == R.id.action_openParameter) {
-            new ChooserDialog(MainActivity.this)
+            new ChooserDialog( MainActivity.this)
                     .withStartFile(sdcard.getPath())
                     .withChosenListener(new ChooserDialog.Result() {
                         @Override
                         public void onChoosePath(String path, File pathFile) {
-                            Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
                             presenter.openParameter(path);
                         }
                     })
@@ -146,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         data.getErrorListMap().clear();
         Thread thread=new Thread( new ProgramParameters(programFragment.getText(),parameterFragment.getText()));
         thread.start();
-        Intent intent = new Intent( MainActivity.this, SecondActivity.class );
+        Intent intent = new Intent( MainActivity.this, DrawActivity.class );
         startActivity( intent );
     }
 

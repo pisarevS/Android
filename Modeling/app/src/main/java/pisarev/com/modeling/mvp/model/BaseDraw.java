@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.ViewMvp;
+import pisarev.com.modeling.interfaces.IDraw;
 
 public abstract class BaseDraw {
 
@@ -22,12 +22,12 @@ public abstract class BaseDraw {
     Paint line;
     ArrayList<StringBuffer> programList;
     ArrayList<Frame> frameList;
-    ViewMvp.MyViewMvp myViewMvp;
-    @Inject
+    IDraw draw;
     MyData data;
 
-    BaseDraw(ViewMvp.MyViewMvp myViewMvp) {
-        this.myViewMvp = myViewMvp;
+    BaseDraw(IDraw draw,MyData data) {
+        this.draw = draw;
+        this.data=data;
         init();
     }
 

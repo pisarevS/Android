@@ -3,8 +3,8 @@ package pisarev.com.modeling.di.component;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import pisarev.com.modeling.activity.DrawActivity;
 import pisarev.com.modeling.activity.MainActivity;
-import pisarev.com.modeling.activity.SecondActivity;
 import pisarev.com.modeling.di.module.AppModule;
 import pisarev.com.modeling.mvp.model.BaseDraw;
 import pisarev.com.modeling.mvp.model.ProgramParameters;
@@ -18,10 +18,10 @@ import pisarev.com.modeling.mvp.view.customview.DrawView;
 public interface AppComponent {
     void inject(ProgramParameters programParameters);
     void inject(File file);
-    void inject(SecondActivity secondActivity);
+    void inject(DrawActivity drawActivity);
     void inject(MainActivity mainActivity);
-    void inject(DrawView drawView);
-    void inject(BaseDraw baseDraw);
     void inject(Draw draw);
+    void inject(BaseDraw baseDraw);
+    void inject(DrawView drawView);
 
 }
