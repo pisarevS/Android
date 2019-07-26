@@ -1,15 +1,15 @@
 package pisarev.com.modeling.mvp.model;
 
 import java.util.*;
-public class Frame
-{
+
+public class Frame {
     private int id;
     private float x;
     private float z;
     private float cr;
-    private boolean isCR=false;
-    private boolean isAxisContains=false;
-    private ArrayList<String> gCode=new ArrayList<>();
+    private boolean isCR = false;
+    private boolean isAxisContains = false;
+    private ArrayList<String> gCode = new ArrayList<>();
 
     public boolean isAxisContains() {
         return isAxisContains;
@@ -19,63 +19,51 @@ public class Frame
         isAxisContains = axisContains;
     }
 
-    public void setGCode(ArrayList<String> gCode)
-    {
+    public void setGCode(ArrayList<String> gCode) {
         this.gCode = gCode;
     }
 
-    public ArrayList<String> getGCode()
-    {
+    public ArrayList<String> getGCode() {
         return gCode;
     }
 
-    public void setIsCR(boolean isCR)
-    {
+    public void setIsCR(boolean isCR) {
         this.isCR = isCR;
     }
 
-    public boolean getIsCR()
-    {
+    public boolean getIsCR() {
         return isCR;
     }
 
-    public void setId(int id)
-    {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
-    public void setX(float x)
-    {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public float getX()
-    {
+    public float getX() {
         return x;
     }
 
-    public void setZ(float z)
-    {
+    public void setZ(float z) {
         this.z = z;
     }
 
-    public float getZ()
-    {
+    public float getZ() {
         return z;
     }
 
-    public void setCr(float cr)
-    {
+    public void setCr(float cr) {
         this.cr = cr;
     }
 
-    public float getCr()
-    {
+    public float getCr() {
         return cr;
     }
 }

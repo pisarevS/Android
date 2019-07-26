@@ -15,8 +15,8 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
 
     public SectionsPageAdapter(FragmentManager fm) {
         super( fm );
-        programFragment =new ProgramFragment();
-        parameterFragment =new ParameterFragment();
+        programFragment = new ProgramFragment();
+        parameterFragment = new ParameterFragment();
     }
 
     @Override

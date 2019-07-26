@@ -2,7 +2,7 @@ package pisarev.com.modeling.mvp.model;
 
 import java.util.*;
 
-class Expression {
+public class Expression {
     //Метод возвращает true, если проверяемый символ - разделитель ("пробел" или "равно")
     private static boolean isDelimeter(char c) {
         return (" =".indexOf( c ) != -1);
@@ -36,7 +36,7 @@ class Expression {
     }
 
     //"Входной" метод класса
-    float calculate(String input) {
+    public float calculate(String input) {
         input = insertZero( input );
         String output = getExpression( input ); //Преобразовываем выражение в постфиксную запись
         return counting( output ); //Возвращаем результат
@@ -49,12 +49,12 @@ class Expression {
         } else if (input.contains( "-" ) && sb.indexOf( "-" ) != 0) {
             for (int i = 0; i < sb.length(); i++) {
                 if (sb.charAt( i ) == '-') {
-                    if (sb.charAt( i - 1 ) == '('||sb.charAt( i - 1 ) =='+'||sb.charAt( i - 1 ) =='-') {
+                    if (sb.charAt( i - 1 ) == '(' || sb.charAt( i - 1 ) == '+' || sb.charAt( i - 1 ) == '-') {
                         sb = sb.replace( i, i, "0" );
                     }
                 }
             }
-        }else if (input.contains( "+" ) && sb.indexOf( "+" ) != 0) {
+        } else if (input.contains( "+" ) && sb.indexOf( "+" ) != 0) {
             for (int i = 0; i < sb.length(); i++) {
                 if (sb.charAt( i ) == '+') {
                     if (sb.charAt( i - 1 ) == '(' || sb.charAt( i - 1 ) == '+' || sb.charAt( i - 1 ) == '-') {

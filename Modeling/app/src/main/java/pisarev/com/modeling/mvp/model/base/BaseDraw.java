@@ -1,4 +1,4 @@
-package pisarev.com.modeling.mvp.model;
+package pisarev.com.modeling.mvp.model.base;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,32 +9,31 @@ import android.graphics.RectF;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
-import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.IDraw;
+import pisarev.com.modeling.mvp.model.Frame;
+import pisarev.com.modeling.mvp.model.MyData;
+import pisarev.com.modeling.mvp.model.Point;
 
 public abstract class BaseDraw {
 
     private Paint paintFullLine;
     private Paint paintDottedLine;
-    boolean clockwise;
-    Paint line;
-    ArrayList<StringBuffer> programList;
-    ArrayList<Frame> frameList;
-    IDraw draw;
-    MyData data;
+    protected boolean clockwise;
+    protected Paint line;
+    private ArrayList<StringBuffer> programList;
+    protected ArrayList<Frame> frameList;
+    protected IDraw draw;
+    protected MyData data;
 
-    BaseDraw(IDraw draw,MyData data) {
+    protected BaseDraw(IDraw draw, MyData data) {
         this.draw = draw;
-        this.data=data;
+        this.data = data;
         init();
     }
 
     private void init() {
-        App.getComponent().inject( this );
         programList = data.getProgramList();
-        frameList =data.getFrameList();
+        frameList = data.getFrameList();
         line = new Paint();
         paintFullLine = new Paint();
         paintFullLine.setColor( Color.GREEN );
@@ -49,7 +48,7 @@ public abstract class BaseDraw {
 
     public abstract void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom, int index);
 
-    void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
+    protected void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -66,7 +65,7 @@ public abstract class BaseDraw {
         canvas.drawPath( path, paint );
     }
 
-    void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
+    protected void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -142,7 +141,7 @@ public abstract class BaseDraw {
         canvas.drawPath( path, paint );
     }
 
-    void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
+    protected void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
         float radiusPoint = 7F;
         Paint paint = new Paint();
         paint.setStyle( Paint.Style.FILL );
@@ -165,9 +164,9 @@ public abstract class BaseDraw {
         return false;
     }
 
-    void checkGCode(ArrayList<String>gCodeList){
+    protected void checkGCode(ArrayList<String> gCodeList) {
         boolean isG17 = isG17( programList );
-        for (String gCode:gCodeList) {
+        for (String gCode : gCodeList) {
             switch (gCode) {
                 case "G0":
                 case "G00":

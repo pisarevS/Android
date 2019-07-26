@@ -1,6 +1,7 @@
 package pisarev.com.modeling.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.os.Vibrator;
@@ -27,7 +28,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     private ImageView buttonCycleStart;
     private ImageView buttonSingleBlock;
     private ImageView buttonReset;
-    private TextView textViewFrame,textViewX,textViewZ;
+    private TextView textViewFrame, textViewX, textViewZ;
     private int count = 0;
     private Vibrator vibrator;
     @Inject
@@ -41,10 +42,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         App.getComponent().inject( this );
         setContentView( R.layout.activity_second );
         drawView = findViewById( R.id.myView );
-        drawView.getActivity(this);
+        drawView.getActivity( this );
+        drawView.getData( data );
+        data = null;
         textViewFrame = findViewById( R.id.textViewFrame );
-        textViewX=findViewById( R.id.textViewX );
-        textViewZ=findViewById( R.id.textViewZ );
+        textViewX = findViewById( R.id.textViewX );
+        textViewZ = findViewById( R.id.textViewZ );
         buttonStart = findViewById( R.id.start );
         buttonCycleStart = findViewById( R.id.cycle_start );
         buttonSingleBlock = findViewById( R.id.single_block );
@@ -53,17 +56,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         buttonCycleStart.setOnTouchListener( this );
         buttonSingleBlock.setOnTouchListener( this );
         buttonReset.setOnTouchListener( this );
-        vibrator = (Vibrator) getSystemService( getApplicationContext().VIBRATOR_SERVICE );
+        vibrator = (Vibrator) getSystemService( VIBRATOR_SERVICE );
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        onClick( v,event );
-        return true;
-    }
-
-    private void onClick(View v, MotionEvent event){
         switch (v.getId()) {
             case R.id.start:
                 switch (event.getAction()) {
@@ -100,13 +98,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
                         if (vibrator.hasVibrator()) {
                             vibrator.vibrate( 20 );
                         }
-                        drawView.onButtonSingleBlock(true);
+                        drawView.onButtonSingleBlock( true );
                         buttonSingleBlock.setImageResource( R.drawable.single_block_down );
                     } else {
                         if (vibrator.hasVibrator()) {
                             vibrator.vibrate( 20 );
                         }
-                        drawView.onButtonSingleBlock(false);
+                        drawView.onButtonSingleBlock( false );
                         buttonSingleBlock.setImageResource( R.drawable.single_block );
                     }
                 }
@@ -126,18 +124,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 break;
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState( outState, outPersistentState );
-        //outState.putInt( "keyButton",Draw.button );
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState( savedInstanceState );
-        //Draw.button=savedInstanceState.getInt( "keyButton" );
+        return true;
     }
 
     @Override
@@ -145,9 +132,9 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         DrawActivity.this.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                textViewFrame.setText(frame);
+                textViewFrame.setText( frame );
             }
-        });
+        } );
     }
 
     @Override
@@ -155,9 +142,9 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         DrawActivity.this.runOnUiThread( new Runnable() {
             @Override
             public void run() {
-                textViewX.setText(horizontalAxis );
+                textViewX.setText( horizontalAxis );
                 textViewZ.setText( verticalAxis );
             }
-        });
+        } );
     }
 }

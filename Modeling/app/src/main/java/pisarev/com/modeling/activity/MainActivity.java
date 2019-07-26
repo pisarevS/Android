@@ -20,12 +20,8 @@ import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
 
-import javax.inject.Inject;
-
-import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.MainMvp;
-import pisarev.com.modeling.mvp.model.ProgramParameters;
-import pisarev.com.modeling.mvp.model.MyData;
+import pisarev.com.modeling.mvp.model.Program;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;
@@ -37,10 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SectionsPageAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private MainMvp.PresenterMainMvp presenter;
-    ParameterFragment parameterFragment;
-    ProgramFragment programFragment;
-    @Inject
-    MyData data;
+    private ParameterFragment parameterFragment;
+    private ProgramFragment programFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,22 +44,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         mSectionsPagerAdapter = new SectionsPageAdapter( getSupportFragmentManager() );
-
         mViewPager = findViewById( R.id.container );
         mViewPager.setAdapter( mSectionsPagerAdapter );
-
-
         TabLayout tabLayout = findViewById( R.id.tabs );
-
         mViewPager.addOnPageChangeListener( new TabLayout.TabLayoutOnPageChangeListener( tabLayout ) );
         tabLayout.addOnTabSelectedListener( new TabLayout.ViewPagerOnTabSelectedListener( mViewPager ) );
-
         FloatingActionButton fab = findViewById( R.id.fab );
         fab.setOnClickListener( this );
-        App.getComponent().inject( this );
 
-        programFragment=(ProgramFragment) mSectionsPagerAdapter.getItem( 0 );
-        parameterFragment  =(ParameterFragment) mSectionsPagerAdapter.getItem( 1 );
+        programFragment = (ProgramFragment) mSectionsPagerAdapter.getItem( 0 );
+        parameterFragment = (ParameterFragment) mSectionsPagerAdapter.getItem( 1 );
     }
 
     @Override
@@ -77,46 +65,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        presenter=new PresenterMainImpl(this );
+        presenter = new PresenterMainImpl( this );
         java.io.File sdcard = Environment.getExternalStorageDirectory();
         if (id == R.id.action_openProgram) {
-            new ChooserDialog( MainActivity.this)
-                    .withStartFile(sdcard.getPath())
-                    .withChosenListener(new ChooserDialog.Result() {
+            new ChooserDialog( MainActivity.this )
+                    .withStartFile( sdcard.getPath() )
+                    .withChosenListener( new ChooserDialog.Result() {
                         @Override
                         public void onChoosePath(String path, File pathFile) {
-                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
-                            presenter.openProgram(path);
+                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
+                            presenter.openProgram( path );
                         }
-                    })
+                    } )
                     // to handle the back key pressed or clicked outside the dialog:
-                    .withOnCancelListener(new DialogInterface.OnCancelListener() {
+                    .withOnCancelListener( new DialogInterface.OnCancelListener() {
                         public void onCancel(DialogInterface dialog) {
-                            Log.d("CANCEL", "CANCEL");
+                            Log.d( "CANCEL", "CANCEL" );
                             dialog.cancel(); // MUST have
                         }
-                    })
+                    } )
                     .build()
                     .show();
             return true;
         }
         if (id == R.id.action_openParameter) {
-            new ChooserDialog( MainActivity.this)
-                    .withStartFile(sdcard.getPath())
-                    .withChosenListener(new ChooserDialog.Result() {
+            new ChooserDialog( MainActivity.this )
+                    .withStartFile( sdcard.getPath() )
+                    .withChosenListener( new ChooserDialog.Result() {
                         @Override
                         public void onChoosePath(String path, File pathFile) {
-                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
-                            presenter.openParameter(path);
+                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
+                            presenter.openParameter( path );
                         }
-                    })
+                    } )
                     // to handle the back key pressed or clicked outside the dialog:
-                    .withOnCancelListener(new DialogInterface.OnCancelListener() {
+                    .withOnCancelListener( new DialogInterface.OnCancelListener() {
                         public void onCancel(DialogInterface dialog) {
-                            Log.d("CANCEL", "CANCEL");
+                            Log.d( "CANCEL", "CANCEL" );
                             dialog.cancel(); // MUST have
                         }
-                    })
+                    } )
                     .build()
                     .show();
             return true;
@@ -130,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void showProgram(String program) {
-        programFragment.setText(program);
+        programFragment.setText( program );
     }
 
     @Override
@@ -140,10 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        data.getProgramList().clear();
-        data.getFrameList().clear();
-        data.getErrorListMap().clear();
-        Thread thread=new Thread( new ProgramParameters(programFragment.getText(),parameterFragment.getText()));
+        Thread thread = new Thread( new Program( programFragment.getText(), parameterFragment.getText() ) );
         thread.start();
         Intent intent = new Intent( MainActivity.this, DrawActivity.class );
         startActivity( intent );

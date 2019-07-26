@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.inject.Inject;
-
-import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.Const;
@@ -35,7 +32,7 @@ import static android.view.MotionEvent.*;
 public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMvp {
     private Paint paintCoordinateDottedLine;
     private DrawMvp.DrawViewMvp secondView;
-    private Point pointCoordinateZero = new Point();
+    private Point pointCoordinateZero;
     private boolean isTouch;
     private float moveX;
     private float moveZ;
@@ -46,12 +43,11 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     public final int STOP = 3;
     public int index;
     private ScaleGestureDetector scaleGestureDetector;
-    private ArrayList<String>errorList=new ArrayList<>(  );
+    private ArrayList<String> errorList;
     private boolean isSingleBlockDown = false;
     private boolean isResetDown = false;
     private boolean isStartDown = false;
-    @Inject
-    MyData data;
+    private MyData data;
 
     public DrawView(Context context) {
         super( context );
@@ -71,7 +67,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
         paintCoordinateDottedLine.setAntiAlias( true );
         paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
-        App.getComponent().inject( this );
+        pointCoordinateZero = new Point();
+        errorList = new ArrayList<>();
     }
 
     @Override
@@ -86,7 +83,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                 initSystemCoordinate( canvas, true );
                 button = 0;
                 invalidate();
-                isTouch=false;
+                isTouch = false;
                 errorList.clear();
                 break;
             case STOP:
@@ -94,7 +91,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                 invalidate();
                 break;
         }
-        drawSystemCoordinate( canvas, isTouch);
+        drawSystemCoordinate( canvas, isTouch );
     }
 
     @Override
@@ -123,27 +120,27 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
 
     @Override
     public void showError(String error) {
-        button=STOP;
-        if(!errorList.contains( error )){
+        button = STOP;
+        if (!errorList.contains( error )) {
             errorList.add( error );
-            Toast toast= Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
-            toast.setGravity( Gravity.CENTER,0,0 );
+            Toast toast = Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
+            toast.setGravity( Gravity.CENTER, 0, 0 );
             toast.show();
-            Log.d(Const.TEG, "error " +error );
+            Log.d( Const.TEG, "error " + error );
         }
     }
 
     private void manager(Canvas canvas) {
-        Draw draw = new Draw( this,data );
+        Draw draw = new Draw( this, data );
         draw.drawContour( canvas, pointCoordinateZero, zoom, index );
     }
 
     private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
-        if (!isTouch|| button == RESET) {
+        if (!isTouch || button == RESET) {
             initSystemCoordinate( canvas, true );
             invalidate();
         }
-        if (isTouch|| button == START){
+        if (isTouch || button == START) {
             initSystemCoordinate( canvas, false );
             manager( canvas );
             invalidate();
@@ -174,9 +171,9 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
 
     @Override
     public void onButtonStart() {
-        isStartDown=true;
-        index=data.getFrameList().size();
-        if(data.getFrameList().size()>0){
+        isStartDown = true;
+        index = data.getFrameList().size();
+        if (data.getFrameList().size() > 0) {
             button = START;
             isResetDown = false;
         }
@@ -188,9 +185,9 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             isResetDown = false;
             button = START;
             index++;
-            secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
-            if(data.getFrameList().get( index-1  ).isAxisContains()){
-                secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
+            secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
+            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
+                secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
             }
         }
         if (!isSingleBlockDown && index < data.getFrameList().size() && !isStartDown) {
@@ -201,19 +198,19 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             timer.schedule( new TimerTask() {
                 @Override
                 public void run() {
-                    if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown&&button==START) {
+                    if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown && button == START) {
                         index++;
-                        secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
+                        secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
                         if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                            secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
+                            secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
                         }
                     } else {
                         isResetDown = false;
                         timer.cancel();
-                        if(button == STOP){
-                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get( index-1 ).getId() )).toString() );
-                            if(data.getFrameList().get( index-1  ).isAxisContains()){
-                                secondView.showAxis("X=" +data.getFrameList().get( index-1 ).getX(),"Z=" +data.getFrameList().get( index-1 ).getZ());
+                        if (button == STOP) {
+                            secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
+                            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
+                                secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
                             }
                         }
                     }
@@ -224,23 +221,28 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
 
     @Override
     public void onButtonSingleBlock(boolean isSingleBlockDown) {
-        this.isSingleBlockDown=isSingleBlockDown;
+        this.isSingleBlockDown = isSingleBlockDown;
         isStartDown = false;
     }
 
     @Override
     public void onButtonReset() {
-        isResetDown=true;
+        isResetDown = true;
         button = RESET;
         index = 0;
         isStartDown = false;
-        secondView.showFrame("");
-        secondView.showAxis("","");
+        secondView.showFrame( "" );
+        secondView.showAxis( "", "" );
     }
 
     @Override
     public void getActivity(DrawMvp.DrawViewMvp secondView) {
         this.secondView = secondView;
+    }
+
+    @Override
+    public void getData(MyData data) {
+        this.data = data;
     }
 
     public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

@@ -2,9 +2,12 @@ package pisarev.com.modeling.application;
 
 import android.app.Application;
 
+
+
 import pisarev.com.modeling.di.component.AppComponent;
 import pisarev.com.modeling.di.component.DaggerAppComponent;
 import pisarev.com.modeling.di.module.AppModule;
+
 
 public class App extends Application {
 
