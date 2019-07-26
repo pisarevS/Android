@@ -9,12 +9,22 @@ import android.graphics.RectF;
 
 import java.util.ArrayList;
 
+<<<<<<< HEAD:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/base/BaseDraw.java
 import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.Frame;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
 
 public abstract class BaseDraw {
+=======
+import javax.inject.Inject;
+
+import pisarev.com.modeling.application.App;
+import pisarev.com.modeling.interfaces.ViewMvp;
+
+
+public abstract class BaseDraw  {
+>>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/BaseDraw.java
 
     private Paint paintFullLine;
     private Paint paintDottedLine;
@@ -46,9 +56,15 @@ public abstract class BaseDraw {
         paintDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
     }
 
+<<<<<<< HEAD:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/base/BaseDraw.java
     public abstract void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom, int index);
 
     protected void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
+=======
+    public abstract void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom, int index) ;
+
+    void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
+>>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/BaseDraw.java
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -65,7 +81,11 @@ public abstract class BaseDraw {
         canvas.drawPath( path, paint );
     }
 
+<<<<<<< HEAD:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/base/BaseDraw.java
     protected void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
+=======
+    void drawArc(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float radius, float zoom, boolean clockwise) {
+>>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/BaseDraw.java
         Path path = new Path();
         Point pStart = new Point( pointStart.getX(), pointStart.getZ() );
         Point pEnd = new Point( pointEnd.getX(), pointEnd.getZ() );
@@ -141,7 +161,11 @@ public abstract class BaseDraw {
         canvas.drawPath( path, paint );
     }
 
+<<<<<<< HEAD:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/base/BaseDraw.java
     protected void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
+=======
+    void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
+>>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/BaseDraw.java
         float radiusPoint = 7F;
         Paint paint = new Paint();
         paint.setStyle( Paint.Style.FILL );
@@ -184,6 +208,143 @@ public abstract class BaseDraw {
                 case "G03":
                     clockwise = !isG17;
                     break;
+<<<<<<< HEAD:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/base/BaseDraw.java
+=======
+                }
+            }
+            return expression.calculate( temp.toString() );
+        }
+        return FIBO;
+    }
+
+    boolean containsAxis(StringBuffer frame,String axis){
+        if(contains(frame, axis)){
+            int n=frame.indexOf(axis)+1;
+            char c=frame.charAt(n);
+            switch(c){
+                case '-':
+                case '=':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    void selectCoordinateSystem(ArrayList<StringBuffer> programList) {
+        for (int i = 0; i < programList.size(); i++) {
+            if (programList.get( i ).toString().contains( "X" ))
+                x++;
+            if (programList.get( i ).toString().contains( "U" ))
+                u++;
+            if (x > u) {
+                horizontalAxis = "X";
+                verticalAxis = "Z";
+            } else {
+                horizontalAxis = "U";
+                verticalAxis = "W";
+            }
+        }
+    }
+
+    void checkGCode(String frame) {
+        boolean isG17 = isG17( programList );
+        if (frame.contains( "G" )) {
+            StringBuilder G = new StringBuilder( "G" );
+            for (int i = 0; i < frame.length(); i++) {
+                char c = frame.charAt( i );
+                if (c == 'G') {
+                    for (int j = i + 1; j < frame.length(); j++) {
+                        char t = frame.charAt( j );
+                        if (isDigit( t )) {
+                            G.append( t );
+                        } else {
+                            break;
+                        }
+                    }
+                    switch (G.toString()) {
+                        case "G0":
+                        case "G00":
+                            line = paintDottedLine;
+                            break;
+                        case "G1":
+                        case "G01":
+                            line = paintFullLine;
+                            break;
+                        case "G2":
+                        case "G02":
+                            clockwise = isG17;
+                            break;
+                        case "G3":
+                        case "G03":
+                            clockwise = !isG17;
+                            break;
+                    }
+                    G = new StringBuilder( "G" );
+                }
+            }
+        }
+    }
+
+    String gCode="";
+    final String G0="G0";
+    final String G1="G1";
+    final String G2="G2";
+    final String G3="G3";
+
+    void checkGCode2(String frame) {
+        boolean isG17 = isG17( programList );
+        if (frame.contains( "G" )) {
+            StringBuilder G = new StringBuilder( "G" );
+            for (int i = 0; i < frame.length(); i++) {
+                char c = frame.charAt( i );
+                if (c == 'G') {
+                    for (int j = i + 1; j < frame.length(); j++) {
+                        char t = frame.charAt( j );
+                        if (isDigit( t )) {
+                            G.append( t );
+                        } else {
+                            break;
+                        }
+                    }
+                    switch (G.toString()) {
+                        case "G0":
+                        case "G00":
+                            gCode=G0;
+                            line = paintDottedLine;
+                            break;
+                        case "G1":
+                        case "G01":
+                            gCode=G1;
+                            line = paintFullLine;
+                            break;
+                        case "G2":
+                        case "G02":
+                            if(isG17){
+                                gCode=G2;
+                            }else gCode=G3;
+                            clockwise = isG17;
+                            break;
+                        case "G3":
+                        case "G03":
+                            if(!isG17){
+                                gCode=G3;
+                            }else gCode=G3;
+                            clockwise = !isG17;
+                            break;
+                    }
+                    G = new StringBuilder( "G" );
+                }
+>>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5:Modeling/app/src/main/java/pisarev/com/modeling/mvp/model/BaseDraw.java
             }
         }
     }
