@@ -16,13 +16,13 @@ import pisarev.com.modeling.mvp.model.base.BaseProgram;
 
 public class Program extends BaseProgram implements Runnable {
 
-    private ArrayList<StringBuffer> programList ;
+    private ArrayList<StringBuffer> programList;
     private ArrayList<StringBuffer> parameterList;
     @Inject
     MyData data;
 
     public Program(String program, String parameter) {
-        super( program,parameter);
+        super( program, parameter );
         programList = new ArrayList<>();
         parameterList = new ArrayList<>();
         App.getComponent().inject( this );
@@ -31,10 +31,14 @@ public class Program extends BaseProgram implements Runnable {
 
     @Override
     public void run() {
-        programList.addAll( getList( program ) );
         data.setProgramList( getList( program ) );
+        programList.addAll( getList( program ) );
         parameterList.addAll( getList( parameter ) );
+        removeIgnore( programList );
+        removeLockedFrame( programList );
+        gotoF( programList );
         readParameterVariables( parameterList );
+        replaceParameterVariables( variablesList );
         replaceProgramVariables( programList );
         addFrameList();
     }
@@ -67,6 +71,10 @@ public class Program extends BaseProgram implements Runnable {
                         , parameterList.get( i ).substring( parameterList.get( i ).indexOf( "=" ) + 1, parameterList.get( i ).length() ).replace( " ", "" ) );
             }
         }
+    }
+
+    @Override
+    protected void replaceParameterVariables(Map<String, String> variablesList) {
         for (Map.Entry entry : variablesList.entrySet()) {
             String key = entry.getKey().toString();
             String value = entry.getValue().toString();
@@ -82,18 +90,8 @@ public class Program extends BaseProgram implements Runnable {
 
     @Override
     protected void replaceProgramVariables(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++) {
-            for (int j = 0; j < listIgnore.size(); j++) {
-                if (programList.get( i ).toString().contains( listIgnore.get( j ) )) {
-                    programList.get( i ).delete( 0, programList.get( i ).length() );
-                }
-            }
-        }
         for (Map.Entry entry : variablesList.entrySet()) {
             for (int i = 0; i < programList.size(); i++) {
-                if (programList.get( i ).toString().contains( ";" )) {
-                    programList.get( i ).delete( programList.get( i ).indexOf( ";" ), programList.get( i ).length() );
-                }
                 if (programList.get( i ).toString().contains( entry.getKey().toString() )) {
                     String str = programList.get( i ).toString().replace( entry.getKey().toString(), entry.getValue().toString() );
                     programList.get( i ).replace( 0, programList.get( i ).length(), str );
@@ -200,6 +198,43 @@ public class Program extends BaseProgram implements Runnable {
         frameList.clear();
         frameList.addAll( s );
         data.setFrameList( frameList );
+    }
+
+    private void gotoF(ArrayList<StringBuffer> programList) {
+        String label;
+        String gotoF = "GOTOF";
+        for (int i = 0; i < programList.size(); i++) {
+            if (programList.get( i ).toString().contains( gotoF )) {
+                label = programList.get( i ).substring( programList.get( i ).indexOf( gotoF ) + gotoF.length(), programList.get( i ).length() ).replace( " ","" );
+                for(int j=i+1;j<programList.size();j++){
+                    if (!programList.get( j ).toString().contains( label+":" )) {
+                        programList.get( j ).delete( 0, programList.get( j ).length() );
+                    }else {
+                        break;
+                    }
+                }
+            }
+
+        }
+    }
+
+    private void removeIgnore(ArrayList<StringBuffer> programList) {
+        for (int i = 0; i < programList.size(); i++) {
+            for (int j = 0; j < listIgnore.size(); j++) {
+                if (programList.get( i ).toString().contains( listIgnore.get( j ) )) {
+                    programList.get( i ).delete( 0, programList.get( i ).length() );
+                }
+            }
+        }
+    }
+
+    private void removeLockedFrame(ArrayList<StringBuffer> programList) {
+        for (int i = 0; i < programList.size(); i++) {
+            if (programList.get( i ).toString().contains( ";" )) {
+                programList.get( i ).delete( programList.get( i ).indexOf( ";" ), programList.get( i ).length() );
+            }
+        }
+
     }
 
 }

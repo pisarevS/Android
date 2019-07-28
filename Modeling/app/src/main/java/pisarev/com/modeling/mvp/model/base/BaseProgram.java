@@ -33,6 +33,8 @@ public abstract class BaseProgram {
 
     protected abstract void replaceProgramVariables(ArrayList<StringBuffer> programList);
 
+    protected abstract void replaceParameterVariables(Map<String, String> variablesList);
+
     protected abstract void addFrameList();
 
     private void initLists() {

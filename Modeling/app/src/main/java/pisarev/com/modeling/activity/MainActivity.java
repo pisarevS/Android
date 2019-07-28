@@ -2,6 +2,10 @@ package pisarev.com.modeling.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.usb.UsbConstants;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +23,9 @@ import android.widget.Toast;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import pisarev.com.modeling.interfaces.MainMvp;
 import pisarev.com.modeling.mvp.model.Program;
@@ -40,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
-
+        presenter = new PresenterMainImpl( this );
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         mSectionsPagerAdapter = new SectionsPageAdapter( getSupportFragmentManager() );
@@ -54,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         programFragment = (ProgramFragment) mSectionsPagerAdapter.getItem( 0 );
         parameterFragment = (ParameterFragment) mSectionsPagerAdapter.getItem( 1 );
+
+        Map<String,UsbDevice> deviceMap=new HashMap<>(  );
+        UsbManager mUsbManager = (UsbManager)getSystemService(this.USB_SERVICE);
+        deviceMap = mUsbManager.getDeviceList();
     }
 
     @Override
@@ -65,53 +76,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        presenter = new PresenterMainImpl( this );
+
         java.io.File sdcard = Environment.getExternalStorageDirectory();
-        if (id == R.id.action_openProgram) {
-            new ChooserDialog( MainActivity.this )
-                    .withStartFile( sdcard.getPath() )
-                    .withChosenListener( new ChooserDialog.Result() {
-                        @Override
-                        public void onChoosePath(String path, File pathFile) {
-                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
-                            presenter.openProgram( path );
-                        }
-                    } )
-                    // to handle the back key pressed or clicked outside the dialog:
-                    .withOnCancelListener( new DialogInterface.OnCancelListener() {
-                        public void onCancel(DialogInterface dialog) {
-                            Log.d( "CANCEL", "CANCEL" );
-                            dialog.cancel(); // MUST have
-                        }
-                    } )
-                    .build()
-                    .show();
-            return true;
-        }
-        if (id == R.id.action_openParameter) {
-            new ChooserDialog( MainActivity.this )
-                    .withStartFile( sdcard.getPath() )
-                    .withChosenListener( new ChooserDialog.Result() {
-                        @Override
-                        public void onChoosePath(String path, File pathFile) {
-                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
-                            presenter.openParameter( path );
-                        }
-                    } )
-                    // to handle the back key pressed or clicked outside the dialog:
-                    .withOnCancelListener( new DialogInterface.OnCancelListener() {
-                        public void onCancel(DialogInterface dialog) {
-                            Log.d( "CANCEL", "CANCEL" );
-                            dialog.cancel(); // MUST have
-                        }
-                    } )
-                    .build()
-                    .show();
-            return true;
-        }
-        if (id == R.id.action_exit) {
-            System.exit( 0 );
-            return true;
+        switch (id){
+            case  R.id.action_openProgram:
+                new ChooserDialog( MainActivity.this )
+                        .withStartFile( sdcard.getPath() )
+                        .withChosenListener( new ChooserDialog.Result() {
+                            @Override
+                            public void onChoosePath(String path, File pathFile) {
+                                Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
+                                presenter.openProgram( path );
+                            }
+                        } )
+                        // to handle the back key pressed or clicked outside the dialog:
+                        .withOnCancelListener( new DialogInterface.OnCancelListener() {
+                            public void onCancel(DialogInterface dialog) {
+                                Log.d( "CANCEL", "CANCEL" );
+                                dialog.cancel(); // MUST have
+                            }
+                        } )
+                        .build()
+                        .show();
+                return true;
+            case R.id.action_openParameter:
+                new ChooserDialog( MainActivity.this )
+                        .withStartFile( sdcard.getPath() )
+                        .withChosenListener( new ChooserDialog.Result() {
+                            @Override
+                            public void onChoosePath(String path, File pathFile) {
+                                Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
+                                presenter.openParameter( path );
+                            }
+                        } )
+                        // to handle the back key pressed or clicked outside the dialog:
+                        .withOnCancelListener( new DialogInterface.OnCancelListener() {
+                            public void onCancel(DialogInterface dialog) {
+                                Log.d( "CANCEL", "CANCEL" );
+                                dialog.cancel(); // MUST have
+                            }
+                        } )
+                        .build()
+                        .show();
+                return true;
+            case R.id.action_save:
+                presenter.saveAll( programFragment.getText(),parameterFragment.getText());
+                return true;
+            case R.id.action_exit:
+                System.exit( 0 );
+                return true;
         }
         return super.onOptionsItemSelected( item );
     }

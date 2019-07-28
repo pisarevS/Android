@@ -1,6 +1,8 @@
 package pisarev.com.modeling.mvp.model;
 
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import pisarev.com.modeling.application.App;
@@ -9,32 +11,31 @@ import javax.inject.Inject;
 
 import java.io.*;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class File {
+public class MyFile {
 
     @Inject
     Context context;
 
-    public File() {
+    public MyFile() {
         App.getComponent().inject( this );
     }
 
-    public void writeFile(String text, String fileName) {
+
+    public void writeFile(String text, String path) {
+        File sdFile = new File(path);
         try {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter( new OutputStreamWriter( context.getApplicationContext().openFileOutput( fileName, MODE_PRIVATE ) ) );
+            // открываем поток для записи
+            BufferedWriter bw = new BufferedWriter(new FileWriter(sdFile));
             // пишем данные
-            bw.write( text );
+            bw.write(text);
             // закрываем поток
             bw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             Toast.makeText( context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG ).show();
             e.printStackTrace();
         }
     }
+
 
     public String readFile(String path) {
         java.io.File file = new java.io.File( path );
