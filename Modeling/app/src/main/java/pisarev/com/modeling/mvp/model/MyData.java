@@ -2,6 +2,7 @@ package pisarev.com.modeling.mvp.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MyData {
@@ -9,7 +10,7 @@ public class MyData {
 
     private ArrayList<StringBuffer> programList = new ArrayList<>();
 
-    private Map<Integer, String> errorListMap = new HashMap<>();
+    private Map<Integer, String> errorListMap = new LinkedHashMap<>();
 
     private ArrayList<Frame> frameList = new ArrayList<>();
 
