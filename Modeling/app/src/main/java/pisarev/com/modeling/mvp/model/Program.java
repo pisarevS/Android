@@ -66,8 +66,16 @@ public class Program extends BaseProgram implements Runnable {
                 parameterList.get( i ).delete( parameterList.get( i ).indexOf( ";" ), parameterList.get( i ).length() );
             }
             if (parameterList.get( i ).toString().contains( "=" )) {
+                int key=0;
+                for(int j=parameterList.get( i ).indexOf( "=" )-1 ;j>=0;j--){
+                    char c=parameterList.get(i).charAt(j);
+                    if(c==' '){
+                        key=j;
+                        break;
+                    }
+                }
                 variablesList.put(
-                        parameterList.get( i ).substring( 0, parameterList.get( i ).indexOf( "=" ) ).replace( " ", "" )
+                        parameterList.get( i ).substring( key, parameterList.get( i ).indexOf( "=" ) ).replace( " ", "" )
                         , parameterList.get( i ).substring( parameterList.get( i ).indexOf( "=" ) + 1, parameterList.get( i ).length() ).replace( " ", "" ) );
             }
         }

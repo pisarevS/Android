@@ -120,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .show();
                 return true;
             case R.id.action_save:
-                presenter.saveAll( programFragment.getText(),parameterFragment.getText());
+
+                //presenter.saveAll( programFragment.getText(),parameterFragment.getText());
                 return true;
             case R.id.action_exit:
                 System.exit( 0 );

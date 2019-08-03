@@ -2,6 +2,7 @@ package pisarev.com.modeling.mvp.model.base;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import pisarev.com.modeling.mvp.model.Expression;
@@ -39,7 +40,7 @@ public abstract class BaseProgram {
 
     private void initLists() {
         listIgnore = new ArrayList<>();
-        variablesList = new HashMap<>();
+        variablesList = new LinkedHashMap<>(  );
         frameList = new ArrayList<>();
         errorListMap = new HashMap<>();
         //ЛПО
@@ -214,7 +215,7 @@ public abstract class BaseProgram {
         return sb.indexOf( findString ) > -1;
     }
 
-    private boolean isDigit(char input) {
+    protected boolean isDigit(char input) {
         switch (input) {
             case '0':
             case '1':
