@@ -17,6 +17,7 @@ public class SQLiteData extends SQLiteOpenHelper implements ISQLiteData {
     private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_PROGRAM = "MyDataBaseProgram";
     public static final String DATABASE_PARAMETER = "MyDataBaseParameter";
+    public static final String DATABASE_PATH = "MyDataBasePath";
     private static final String TABLE_PROGRAM = "TableProgram";
     public static final String KEY_PROGRAM = "program";
 

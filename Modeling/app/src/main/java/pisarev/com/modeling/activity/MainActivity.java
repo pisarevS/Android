@@ -28,8 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.MainMvp;
 import pisarev.com.modeling.mvp.model.Const;
+import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Program;
 import pisarev.com.modeling.mvp.model.SQLiteData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
@@ -45,11 +49,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MainMvp.PresenterMainMvp presenter;
     private ParameterFragment parameterFragment;
     private ProgramFragment programFragment;
+    @Inject
+    MyData data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
+        App.getComponent().inject( this );
         presenter = new PresenterMainImpl( this );
         Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
@@ -94,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             public void onChoosePath(String path, File pathFile) {
                                 Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
                                 presenter.openProgram( path );
+                                Map<String,String> stringStringMap=new HashMap<>(  );
+                                stringStringMap.put( SQLiteData.KEY_PROGRAM,path );
+                                new SQLiteData( getApplication(),SQLiteData.DATABASE_PATH ).setProgramText(stringStringMap);
                             }
                         } )
                         // to handle the back key pressed or clicked outside the dialog:
