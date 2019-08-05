@@ -7,6 +7,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import pisarev.com.modeling.interfaces.MainMvp;
+import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.Program;
+import pisarev.com.modeling.mvp.model.SQLiteData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
 import pisarev.com.modeling.adapter.SectionsPageAdapter;
@@ -65,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Map<String,UsbDevice> deviceMap=new HashMap<>(  );
         UsbManager mUsbManager = (UsbManager)getSystemService(this.USB_SERVICE);
         deviceMap = mUsbManager.getDeviceList();
+
+
+
+
     }
 
     @Override
@@ -119,11 +126,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .build()
                         .show();
                 return true;
-            case R.id.action_save:
-
-                //presenter.saveAll( programFragment.getText(),parameterFragment.getText());
-                return true;
             case R.id.action_exit:
+                new SQLiteData( this,SQLiteData.DATABASE_PROGRAM ).deleteProgramText();
+                new SQLiteData( this,SQLiteData.DATABASE_PARAMETER ).deleteProgramText();
                 System.exit( 0 );
                 return true;
         }
@@ -142,10 +147,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Thread thread = new Thread( new Program( programFragment.getText(), parameterFragment.getText() ) );
-        thread.start();
         Intent intent = new Intent( MainActivity.this, DrawActivity.class );
         startActivity( intent );
     }
+
+
 
 }

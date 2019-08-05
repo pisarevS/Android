@@ -21,6 +21,7 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+
         if (position == 0) {
             return programFragment;
         }

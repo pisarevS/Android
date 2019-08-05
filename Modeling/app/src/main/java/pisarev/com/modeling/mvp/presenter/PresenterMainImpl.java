@@ -11,7 +11,6 @@ public class PresenterMainImpl implements MainMvp.PresenterMainMvp {
 
     private MainMvp.ViewMvp viewMvp;
     private MyFile myFile;
-    private String pathProgram,pathParameter;
 
     public PresenterMainImpl(MainMvp.ViewMvp viewMvp) {
         this.viewMvp = viewMvp;
@@ -20,20 +19,16 @@ public class PresenterMainImpl implements MainMvp.PresenterMainMvp {
 
     @Override
     public void openProgram(String path) {
-        this.pathProgram=path;
         viewMvp.showProgram( myFile.readFile( path ) );
     }
 
     @Override
     public void openParameter(String path) {
-        this.pathParameter=path;
         viewMvp.showParameter( myFile.readFile( path ) );
     }
 
     @Override
-    public void saveAll(String program,String parameter) {
-        myFile.writeFile( program,pathProgram );
-       // myFile.writeFile( parameter,pathParameter );
+    public void saveAll(String program,String path) {
     }
 
 }

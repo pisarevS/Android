@@ -1,6 +1,8 @@
 package pisarev.com.modeling.mvp.view.customview;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -123,9 +125,18 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         button = STOP;
         if (!errorList.contains( error )) {
             errorList.add( error );
-            Toast toast = Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
-            toast.setGravity( Gravity.CENTER, 0, 0 );
-            toast.show();
+            AlertDialog.Builder builder=new AlertDialog.Builder( getContext());
+            builder.setTitle( "Error" )
+                    .setMessage( error )
+                    .setCancelable( false )
+                    .setNegativeButton( "OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    } );
+            AlertDialog alertDialog=builder.create();
+            alertDialog.show();
             Log.d( Const.TEG, "error " + error );
         }
     }

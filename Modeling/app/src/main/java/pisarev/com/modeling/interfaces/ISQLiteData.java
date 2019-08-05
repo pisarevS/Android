@@ -1,8 +1,9 @@
 package pisarev.com.modeling.interfaces;
 
+import java.util.Map;
+
 public interface ISQLiteData {
-    void setProgramText(String text);
-    void setParameterText(String text);
-    String getProgramText();
-    String getParameterText();
+    void setProgramText(Map<String,String> programs);
+    Map<String,String> getProgramText();
+    void deleteProgramText();
 }
