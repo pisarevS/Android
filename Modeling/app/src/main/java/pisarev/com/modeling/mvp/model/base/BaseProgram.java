@@ -1,5 +1,7 @@
 package pisarev.com.modeling.mvp.model.base;
 
+import android.annotation.SuppressLint;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,8 +23,9 @@ public abstract class BaseProgram {
     protected ArrayList<Frame> frameList;
     protected Map<Integer, String> errorListMap;
     protected final float FIBO = 1123581220;
+    private String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18"};
 
-    protected BaseProgram(String program, String parameter){
+    protected BaseProgram(String program, String parameter) {
         this.program = program;
         this.parameter = parameter;
         initLists();
@@ -38,72 +41,79 @@ public abstract class BaseProgram {
 
     protected abstract void addFrameList();
 
+    @SuppressLint("UseSparseArrays")
     private void initLists() {
         listIgnore = new ArrayList<>();
-<<<<<<< HEAD
         variablesList = new LinkedHashMap<>();
-=======
-        variablesList = new LinkedHashMap<>(  );
->>>>>>> b58f9b7cb5f04436c9632cc898be9aaa041cfef8
+        variablesList = new LinkedHashMap<>();
         frameList = new ArrayList<>();
         errorListMap = new HashMap<>();
         //ЛПО
-        listIgnore.add( "G58 X=0 Z=N_CHUCK_HEIGHT_Z_S1[N_CHUCK_JAWS]" );
-        listIgnore.add( "G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1" );
-        listIgnore.add( "G59 X=N_WP_ZP_X_S1" );
-        listIgnore.add( "G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1" );
-        listIgnore.add( "G58 X=0 Z=N_CHUCK_HEIGHT_Z_S2[N_CHUCK_JAWS]" );
-        listIgnore.add( "G59 X=N_WP_ZP_X_S2 Z=N_WP_ZP_Z_S2" );
-        listIgnore.add( "G58 U=0 W=N_CHUCK_HEIGHT_W_S1[N_CHUCK_JAWS]" );
-        listIgnore.add( "G59 U=N_WP_ZP_U_S1 W=N_WP_ZP_W_S1" );
-        listIgnore.add( "G58 U=0 W=N_CHUCK_HEIGHT_W_S2[N_CHUCK_JAWS]" );
-        listIgnore.add( "G59 U=N_WP_ZP_U_S2 W=N_WP_ZP_W_S2" );
+        listIgnore.add("G58 X=0 Z=N_CHUCK_HEIGHT_Z_S1[N_CHUCK_JAWS]");
+        listIgnore.add("G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1");
+        listIgnore.add("G59 X=N_WP_ZP_X_S1");
+        listIgnore.add("G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1");
+        listIgnore.add("G58 X=0 Z=N_CHUCK_HEIGHT_Z_S2[N_CHUCK_JAWS]");
+        listIgnore.add("G59 X=N_WP_ZP_X_S2 Z=N_WP_ZP_Z_S2");
+        listIgnore.add("G58 U=0 W=N_CHUCK_HEIGHT_W_S1[N_CHUCK_JAWS]");
+        listIgnore.add("G59 U=N_WP_ZP_U_S1 W=N_WP_ZP_W_S1");
+        listIgnore.add("G58 U=0 W=N_CHUCK_HEIGHT_W_S2[N_CHUCK_JAWS]");
+        listIgnore.add("G59 U=N_WP_ZP_U_S2 W=N_WP_ZP_W_S2");
         //ЛПО2
-        listIgnore.add( "N_ZERO_O(54,X1,0,\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S1[0],\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,X1,WP_ZP_X1_S1,\"FI\")" );
-        listIgnore.add( "N_ZERO_O(54,Z1,WP_ZP_Z1_S1,\"FI\")" );
+        listIgnore.add("N_ZERO_O(54,X1,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S1[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X1,WP_ZP_X1_S1,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z1,WP_ZP_Z1_S1,\"FI\")");
 
-        listIgnore.add( "N_ZERO_O(54,X1,0,\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S2[0],\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,X1,WP_ZP_X1_S2,\"FI\")" );
-        listIgnore.add( "N_ZERO_O(54,Z1,WP_ZP_Z1_S2,\"FI\")" );
+        listIgnore.add("N_ZERO_O(54,X1,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S2[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X1,WP_ZP_X1_S2,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z1,WP_ZP_Z1_S2,\"FI\")");
 
-        listIgnore.add( "N_ZERO_O(54,X2,0,\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S1[0],\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,X2,WP_ZP_X2_S1,\"FI\")" );
-        listIgnore.add( "N_ZERO_O(54,Z2,WP_ZP_Z2_S1,\"FI\")" );
+        listIgnore.add("N_ZERO_O(54,X2,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S1[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X2,WP_ZP_X2_S1,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z2,WP_ZP_Z2_S1,\"FI\")");
 
-        listIgnore.add( "N_ZERO_O(54,X2,0,\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S2[0],\"TR\")" );
-        listIgnore.add( "N_ZERO_O(54,X2,WP_ZP_X2_S2,\"FI\")" );
-        listIgnore.add( "N_ZERO_O(54,Z2,WP_ZP_Z2_S2,\"FI\")" );
+        listIgnore.add("N_ZERO_O(54,X2,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S2[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X2,WP_ZP_X2_S2,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z2,WP_ZP_Z2_S2,\"FI\")");
 
-        variablesList.put( "N_GANTRYPOS_X", "650" );
-        variablesList.put( "N_GANTRYPOS_Z", "250" );
-        variablesList.put( "N_GANTRYPOS_U", "650" );
-        variablesList.put( "N_GANTRYPOS_W", "250" );
-        variablesList.put( "$P_TOOLR", "16" );
+        variablesList.put("N_GANTRYPOS_X", "650");
+        variablesList.put("N_GANTRYPOS_Z", "250");
+        variablesList.put("N_GANTRYPOS_U", "650");
+        variablesList.put("N_GANTRYPOS_W", "250");
+        variablesList.put("$P_TOOLR", "16");
+    }
+
+    private boolean isGCode(String g) {
+        for (String gCode : gCodes) {
+            if (g.equals(gCode)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected ArrayList<String> searchGCog(String frame) {
         ArrayList<String> gCodeList = new ArrayList<>();
-        StringBuilder G = new StringBuilder( "G" );
-        if (frame.contains( "G" )) {
-
+        StringBuilder g = new StringBuilder("G");
+        if (frame.contains("G")) {
             for (int i = 0; i < frame.length(); i++) {
-                char c = frame.charAt( i );
+                char c = frame.charAt(i);
                 if (c == 'G') {
                     for (int j = i + 1; j < frame.length(); j++) {
-                        char t = frame.charAt( j );
-                        if (isDigit( t )) {
-                            G.append( t );
+                        char t = frame.charAt(j);
+                        if (isDigit(t)) {
+                            g.append(t);
                         } else {
-                            gCodeList.add( G.toString() );
+                            if (isGCode(g.toString()))
+                                gCodeList.add(g.toString());
                             break;
                         }
                     }
-                    G = new StringBuilder( "G" );
+                    g = new StringBuilder("G");
                 }
             }
         }
@@ -113,26 +123,26 @@ public abstract class BaseProgram {
     protected float coordinateSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuffer temp = new StringBuffer();
-        int n = frame.indexOf( axis );
+        int n = frame.indexOf(axis);
 
-        if (isDigit( frame.charAt( n + axis.length() ) ) || frame.charAt( n + axis.length() ) == '-' || frame.charAt( n + axis.length() ) == '+') {
+        if (isDigit(frame.charAt(n + axis.length())) || frame.charAt(n + axis.length()) == '-' || frame.charAt(n + axis.length()) == '+') {
             for (int i = n + axis.length(); i < frame.length(); i++) {
-                if (readUp( frame.charAt( i ) )) {
-                    temp.append( frame.charAt( i ) );
+                if (readUp(frame.charAt(i))) {
+                    temp.append(frame.charAt(i));
                 } else {
                     break;
                 }
             }
-            return Float.parseFloat( temp.toString() );
-        } else if (frame.charAt( n + axis.length() ) == '=') {
+            return Float.parseFloat(temp.toString());
+        } else if (frame.charAt(n + axis.length()) == '=') {
             for (int i = n + axis.length() + 1; i < frame.length(); i++) {
-                if (readUp( frame.charAt( i ) )) {
-                    temp.append( frame.charAt( i ) );
+                if (readUp(frame.charAt(i))) {
+                    temp.append(frame.charAt(i));
                 } else {
                     break;
                 }
             }
-            return expression.calculate( temp.toString() );
+            return expression.calculate(temp.toString());
         }
         return FIBO;
     }
@@ -140,25 +150,25 @@ public abstract class BaseProgram {
     protected float incrementSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuilder temp = new StringBuilder();
-        int n = frame.indexOf( axis );
+        int n = frame.indexOf(axis);
 
-        if (frame.charAt( n + axis.length() ) == '(') {
+        if (frame.charAt(n + axis.length()) == '(') {
             for (int i = n + axis.length(); i < frame.length(); i++) {
-                if (readUp( frame.charAt( i ) )) {
-                    temp.append( frame.charAt( i ) );
+                if (readUp(frame.charAt(i))) {
+                    temp.append(frame.charAt(i));
                 } else {
                     break;
                 }
             }
-            return expression.calculate( temp.toString() );
+            return expression.calculate(temp.toString());
         }
-        return Float.parseFloat( temp.toString() );
+        return Float.parseFloat(temp.toString());
     }
 
     protected boolean containsAxis(StringBuffer frame, String axis) {
-        if (contains( frame, axis )) {
-            int n = frame.indexOf( axis ) + 1;
-            char c = frame.charAt( n );
+        if (contains(frame, axis)) {
+            int n = frame.indexOf(axis) + 1;
+            char c = frame.charAt(n);
             switch (c) {
                 case '-':
                 case '=':
@@ -180,9 +190,9 @@ public abstract class BaseProgram {
 
     protected void selectCoordinateSystem(ArrayList<StringBuffer> programList) {
         for (int i = 0; i < programList.size(); i++) {
-            if (programList.get( i ).toString().contains( "X" ))
+            if (programList.get(i).toString().contains("X"))
                 x++;
-            if (programList.get( i ).toString().contains( "U" ))
+            if (programList.get(i).toString().contains("U"))
                 u++;
             if (x > u) {
                 horizontalAxis = "X";
@@ -216,7 +226,7 @@ public abstract class BaseProgram {
     }
 
     protected boolean contains(StringBuffer sb, String findString) {
-        return sb.indexOf( findString ) > -1;
+        return sb.indexOf(findString) > -1;
     }
 
     protected boolean isDigit(char input) {

@@ -52,53 +52,53 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private MyData data;
 
     public DrawView(Context context) {
-        super( context );
+        super(context);
         init();
-        scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     public DrawView(Context context, @Nullable AttributeSet attrs) {
-        super( context, attrs );
+        super(context, attrs);
         init();
-        scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     private void init() {
         paintCoordinateDottedLine = new Paint();
-        paintCoordinateDottedLine.setColor( Color.GRAY );
-        paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
-        paintCoordinateDottedLine.setAntiAlias( true );
-        paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
+        paintCoordinateDottedLine.setColor(Color.LTGRAY);
+        paintCoordinateDottedLine.setStyle(Paint.Style.STROKE);
+        paintCoordinateDottedLine.setAntiAlias(true);
+        paintCoordinateDottedLine.setPathEffect(new DashPathEffect(new float[]{20f, 10f}, 0f));
         pointCoordinateZero = new Point();
         errorList = new ArrayList<>();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw( canvas );
+        super.onDraw(canvas);
         switch (button) {
             case START:
-                manager( canvas );
+                manager(canvas);
                 invalidate();
                 break;
             case RESET:
-                initSystemCoordinate( canvas, true );
+                initSystemCoordinate(canvas, true);
                 button = 0;
                 invalidate();
                 isTouch = false;
                 errorList.clear();
                 break;
             case STOP:
-                manager( canvas );
+                manager(canvas);
                 invalidate();
                 break;
         }
-        drawSystemCoordinate( canvas, isTouch );
+        drawSystemCoordinate(canvas, isTouch);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        scaleGestureDetector.onTouchEvent( event );
+        scaleGestureDetector.onTouchEvent(event);
         switch (event.getAction()) {
             case ACTION_DOWN:
                 float downX = event.getX();
@@ -109,8 +109,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                 invalidate();
                 break;
             case ACTION_MOVE:
-                pointCoordinateZero.setX( event.getX() + moveX );
-                pointCoordinateZero.setZ( event.getY() + moveZ );
+                pointCoordinateZero.setX(event.getX() + moveX);
+                pointCoordinateZero.setZ(event.getY() + moveZ);
                 invalidate();
                 break;
             case ACTION_UP:
@@ -123,37 +123,37 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     @Override
     public void showError(String error) {
         button = STOP;
-        if (!errorList.contains( error )) {
-            errorList.add( error );
-            AlertDialog.Builder builder=new AlertDialog.Builder( getContext());
-            builder.setTitle( "Error" )
-                    .setMessage( error )
-                    .setCancelable( false )
-                    .setNegativeButton( "OK", new DialogInterface.OnClickListener() {
+        if (!errorList.contains(error)) {
+            errorList.add(error);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Error")
+                    .setMessage(error)
+                    .setCancelable(false)
+                    .setNegativeButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
                         }
-                    } );
-            AlertDialog alertDialog=builder.create();
+                    });
+            AlertDialog alertDialog = builder.create();
             alertDialog.show();
-            Log.d( Const.TEG, "error " + error );
+            Log.d(Const.TEG, "error " + error);
         }
     }
 
     private void manager(Canvas canvas) {
-        Draw draw = new Draw( this, data );
-        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
+        Draw draw = new Draw(this, data);
+        draw.drawContour(canvas, pointCoordinateZero, zoom, index);
     }
 
     private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
         if (!isTouch || button == RESET) {
-            initSystemCoordinate( canvas, true );
+            initSystemCoordinate(canvas, true);
             invalidate();
         }
         if (isTouch || button == START) {
-            initSystemCoordinate( canvas, false );
-            manager( canvas );
+            initSystemCoordinate(canvas, false);
+            manager(canvas);
             invalidate();
         }
 
@@ -163,20 +163,20 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         Path path;
         if (isInit) {
             path = new Path();
-            pointCoordinateZero.setX( getWidth() >> 1 );
-            pointCoordinateZero.setZ( getHeight() >> 1 );
-            path.moveTo( 0, pointCoordinateZero.getZ() );
-            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
-            path.moveTo( pointCoordinateZero.getX(), 0 );
-            path.lineTo( pointCoordinateZero.getX(), getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
+            pointCoordinateZero.setX(getWidth() >> 1);
+            pointCoordinateZero.setZ(getHeight() >> 1);
+            path.moveTo(0, pointCoordinateZero.getZ());
+            path.lineTo(getWidth(), pointCoordinateZero.getZ());
+            path.moveTo(pointCoordinateZero.getX(), 0);
+            path.lineTo(pointCoordinateZero.getX(), getHeight());
+            canvas.drawPath(path, paintCoordinateDottedLine);
         } else {
             path = new Path();
-            path.moveTo( 0, pointCoordinateZero.getZ() );
-            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
-            path.moveTo( pointCoordinateZero.getX(), 0 );
-            path.lineTo( pointCoordinateZero.getX(), getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
+            path.moveTo(0, pointCoordinateZero.getZ());
+            path.lineTo(getWidth(), pointCoordinateZero.getZ());
+            path.moveTo(pointCoordinateZero.getX(), 0);
+            path.lineTo(pointCoordinateZero.getX(), getHeight());
+            canvas.drawPath(path, paintCoordinateDottedLine);
         }
     }
 
@@ -196,9 +196,9 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             isResetDown = false;
             button = START;
             index++;
-            secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
-            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
+            secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+            if (data.getFrameList().get(index - 1).isAxisContains()) {
+                secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
             }
         }
         if (!isSingleBlockDown && index < data.getFrameList().size() && !isStartDown) {
@@ -206,27 +206,27 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             isStartDown = true;
             button = START;
             final Timer timer = new Timer();
-            timer.schedule( new TimerTask() {
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown && button == START) {
                         index++;
-                        secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
-                        if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                            secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
+                        secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+                        if (data.getFrameList().get(index - 1).isAxisContains()) {
+                            secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
                         }
                     } else {
                         isResetDown = false;
                         timer.cancel();
                         if (button == STOP) {
-                            secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
-                            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                                secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
+                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+                            if (data.getFrameList().get(index - 1).isAxisContains()) {
+                                secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
                             }
                         }
                     }
                 }
-            }, 0, 200 );
+            }, 0, 200);
         }
     }
 
@@ -242,8 +242,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         button = RESET;
         index = 0;
         isStartDown = false;
-        secondView.showFrame( "" );
-        secondView.showAxis( "", "" );
+        secondView.showFrame("");
+        secondView.showAxis("", "");
     }
 
     @Override

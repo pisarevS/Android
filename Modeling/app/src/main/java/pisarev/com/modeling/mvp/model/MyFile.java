@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 
-
 import pisarev.com.modeling.application.App;
 
 import javax.inject.Inject;
@@ -19,7 +18,7 @@ public class MyFile {
     Context context;
 
     public MyFile() {
-        App.getComponent().inject( this );
+        App.getComponent().inject(this);
     }
 
     public boolean isExternalStorageWritable() {
@@ -41,26 +40,26 @@ public class MyFile {
             // закрываем поток
             bw.close();
         } catch (IOException e) {
-            Toast.makeText( context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG ).show();
+            Toast.makeText(context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
 
 
     public String readFile(String path) {
-        java.io.File file = new java.io.File( path );
+        java.io.File file = new java.io.File(path);
         StringBuffer text = new StringBuffer();
 
         try {
-            BufferedReader br = new BufferedReader( new FileReader( file ) );
+            BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
             while ((line = br.readLine()) != null) {
-                text.append( line );
-                text.append( "\n" );
+                text.append(line);
+                text.append("\n");
             }
             br.close();
         } catch (IOException e) {
-            Toast.makeText( context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG ).show();
+            Toast.makeText(context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
         return text.toString();
     }

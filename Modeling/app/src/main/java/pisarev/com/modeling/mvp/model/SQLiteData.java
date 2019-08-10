@@ -21,40 +21,40 @@ public class SQLiteData extends SQLiteOpenHelper implements ISQLiteData {
     private static final String TABLE_PROGRAM = "TableProgram";
     public static final String KEY_PROGRAM = "program";
 
-    public SQLiteData(@Nullable Context context,String base) {
-        super( context, base, null, DATABASE_VERSION );
+    public SQLiteData(@Nullable Context context, String base) {
+        super(context, base, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL( "CREATE TABlE " + TABLE_PROGRAM + "("
-                + KEY_PROGRAM + " text)" );
+        db.execSQL("CREATE TABlE " + TABLE_PROGRAM + "("
+                + KEY_PROGRAM + " text)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL( "DROP TABLE IF EXISTS " + TABLE_PROGRAM );
-        onCreate( db );
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROGRAM);
+        onCreate(db);
     }
 
     @Override
     public void setProgramText(Map<String, String> programs) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_PROGRAM, programs.get( KEY_PROGRAM ));
-        db.insert( TABLE_PROGRAM, null, values );
+        values.put(KEY_PROGRAM, programs.get(KEY_PROGRAM));
+        db.insert(TABLE_PROGRAM, null, values);
         db.close();
     }
 
     @Override
     public Map<String, String> getProgramText() {
-        Map<String,String>programs=new HashMap<>(  );
+        Map<String, String> programs = new HashMap<>();
         String selectQuery = "SELECT  * FROM " + TABLE_PROGRAM;
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery( selectQuery, null );
+        Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                programs.put( KEY_PROGRAM,cursor.getString( 0 ) );
+                programs.put(KEY_PROGRAM, cursor.getString(0));
             } while (cursor.moveToNext());
         }
         return programs;
@@ -63,7 +63,7 @@ public class SQLiteData extends SQLiteOpenHelper implements ISQLiteData {
     @Override
     public void deleteProgramText() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete( TABLE_PROGRAM,null,null );
+        db.delete(TABLE_PROGRAM, null, null);
     }
 
 

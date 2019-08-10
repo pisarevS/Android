@@ -13,6 +13,6 @@ public interface MainMvp {
 
         void openParameter(String path);
 
-        void saveAll(String program,String path);
+        void saveAll(String program, String path);
     }
 }

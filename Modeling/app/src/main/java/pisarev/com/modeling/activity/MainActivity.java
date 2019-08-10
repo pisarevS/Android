@@ -54,36 +54,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_main );
-        App.getComponent().inject( this );
-        presenter = new PresenterMainImpl( this );
-        Toolbar toolbar = findViewById( R.id.toolbar );
-        setSupportActionBar( toolbar );
-        mSectionsPagerAdapter = new SectionsPageAdapter( getSupportFragmentManager() );
-        mViewPager = findViewById( R.id.container );
-        mViewPager.setAdapter( mSectionsPagerAdapter );
-        TabLayout tabLayout = findViewById( R.id.tabs );
-        mViewPager.addOnPageChangeListener( new TabLayout.TabLayoutOnPageChangeListener( tabLayout ) );
-        tabLayout.addOnTabSelectedListener( new TabLayout.ViewPagerOnTabSelectedListener( mViewPager ) );
-        FloatingActionButton fab = findViewById( R.id.fab );
-        fab.setOnClickListener( this );
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        App.getComponent().inject(this);
+        presenter = new PresenterMainImpl(this);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mSectionsPagerAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+        mViewPager = findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        TabLayout tabLayout = findViewById(R.id.tabs);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(this);
 
-        programFragment = (ProgramFragment) mSectionsPagerAdapter.getItem( 0 );
-        parameterFragment = (ParameterFragment) mSectionsPagerAdapter.getItem( 1 );
+        programFragment = (ProgramFragment) mSectionsPagerAdapter.getItem(0);
+        parameterFragment = (ParameterFragment) mSectionsPagerAdapter.getItem(1);
 
-        Map<String,UsbDevice> deviceMap=new HashMap<>(  );
-        UsbManager mUsbManager = (UsbManager)getSystemService(this.USB_SERVICE);
+        Map<String, UsbDevice> deviceMap = new HashMap<>();
+        UsbManager mUsbManager = (UsbManager) getSystemService(this.USB_SERVICE);
         deviceMap = mUsbManager.getDeviceList();
-
-
 
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate( R.menu.menu_main, menu );
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -92,75 +90,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         java.io.File sdcard = Environment.getExternalStorageDirectory();
-        switch (id){
-            case  R.id.action_openProgram:
-                new ChooserDialog( MainActivity.this )
-                        .withStartFile( sdcard.getPath() )
-                        .withChosenListener( new ChooserDialog.Result() {
+        switch (id) {
+            case R.id.action_openProgram:
+                new ChooserDialog(MainActivity.this)
+                        .withStartFile(sdcard.getPath())
+                        .withChosenListener(new ChooserDialog.Result() {
                             @Override
                             public void onChoosePath(String path, File pathFile) {
-                                Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
-                                presenter.openProgram( path );
-                                Map<String,String> stringStringMap=new HashMap<>(  );
-                                stringStringMap.put( SQLiteData.KEY_PROGRAM,path );
-                                new SQLiteData( getApplication(),SQLiteData.DATABASE_PATH ).setProgramText(stringStringMap);
+                                Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                                presenter.openProgram(path);
+                                Map<String, String> stringStringMap = new HashMap<>();
+                                stringStringMap.put(SQLiteData.KEY_PROGRAM, path);
+                                new SQLiteData(getApplication(), SQLiteData.DATABASE_PATH).setProgramText(stringStringMap);
                             }
-                        } )
+                        })
                         // to handle the back key pressed or clicked outside the dialog:
-                        .withOnCancelListener( new DialogInterface.OnCancelListener() {
+                        .withOnCancelListener(new DialogInterface.OnCancelListener() {
                             public void onCancel(DialogInterface dialog) {
-                                Log.d( "CANCEL", "CANCEL" );
+                                Log.d("CANCEL", "CANCEL");
                                 dialog.cancel(); // MUST have
                             }
-                        } )
+                        })
                         .build()
                         .show();
                 return true;
             case R.id.action_openParameter:
-                new ChooserDialog( MainActivity.this )
-                        .withStartFile( sdcard.getPath() )
-                        .withChosenListener( new ChooserDialog.Result() {
+                new ChooserDialog(MainActivity.this)
+                        .withStartFile(sdcard.getPath())
+                        .withChosenListener(new ChooserDialog.Result() {
                             @Override
                             public void onChoosePath(String path, File pathFile) {
-                                Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
-                                presenter.openParameter( path );
+                                Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
+                                presenter.openParameter(path);
                             }
-                        } )
+                        })
                         // to handle the back key pressed or clicked outside the dialog:
-                        .withOnCancelListener( new DialogInterface.OnCancelListener() {
+                        .withOnCancelListener(new DialogInterface.OnCancelListener() {
                             public void onCancel(DialogInterface dialog) {
-                                Log.d( "CANCEL", "CANCEL" );
+                                Log.d("CANCEL", "CANCEL");
                                 dialog.cancel(); // MUST have
                             }
-                        } )
+                        })
                         .build()
                         .show();
                 return true;
             case R.id.action_exit:
-                new SQLiteData( this,SQLiteData.DATABASE_PROGRAM ).deleteProgramText();
-                new SQLiteData( this,SQLiteData.DATABASE_PARAMETER ).deleteProgramText();
-                System.exit( 0 );
+                new SQLiteData(this, SQLiteData.DATABASE_PROGRAM).deleteProgramText();
+                new SQLiteData(this, SQLiteData.DATABASE_PARAMETER).deleteProgramText();
+                System.exit(0);
                 return true;
         }
-        return super.onOptionsItemSelected( item );
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void showProgram(String program) {
-        programFragment.setText( program );
+        programFragment.setText(program);
     }
 
     @Override
     public void showParameter(String parameter) {
-        parameterFragment.setText( parameter );
+        parameterFragment.setText(parameter);
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent( MainActivity.this, DrawActivity.class );
-        startActivity( intent );
+        Intent intent = new Intent(MainActivity.this, DrawActivity.class);
+        startActivity(intent);
     }
-
 
 
 }
