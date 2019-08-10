@@ -1,17 +1,46 @@
 package pisarev.com.modeling.mvp.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class MyData  {
+public class MyData {
 
 
-    private ArrayList<StringBuffer>programList=new ArrayList<>(  );
+    private ArrayList<StringBuffer> programList = new ArrayList<>();
 
-    private ArrayList<String>programListTextView=new ArrayList<>(  );
+    private Map<Integer, String> errorListMap = new LinkedHashMap<>();
 
-    private ArrayList<String>errorList=new ArrayList<>();
+    private ArrayList<Frame> frameList = new ArrayList<>();
 
-    public MyData(){
+    private String pathProgram;
+
+    public MyData() {
+    }
+
+    public String getPathProgram() {
+        return pathProgram;
+    }
+
+    public void setPathProgram(String pathProgram) {
+        this.pathProgram = pathProgram;
+    }
+
+    public Map<Integer, String> getErrorListMap() {
+        return errorListMap;
+    }
+
+    public void setErrorListMap(Map<Integer, String> errorListMap) {
+        this.errorListMap = errorListMap;
+    }
+
+    public ArrayList<Frame> getFrameList() {
+        return frameList;
+    }
+
+    public void setFrameList(ArrayList<Frame> frameList) {
+        this.frameList = frameList;
     }
 
     public ArrayList<StringBuffer> getProgramList() {
@@ -21,20 +50,5 @@ public class MyData  {
     public void setProgramList(ArrayList<StringBuffer> programList) {
         this.programList = programList;
     }
-
-    public ArrayList<String> getProgramListTextView() {
-        return programListTextView;
-    }
-
-    public void setProgramListTextView(ArrayList<String> programListTextView) {
-        this.programListTextView = programListTextView;
-    }
-
-    public ArrayList<String> getErrorList() {
-        return errorList;
-    }
-
-    public void setErrorList(String error) {
-        this.errorList.add(error);
-    }
 }
+

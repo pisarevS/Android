@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Modeling</string>
+    <string name="app_name">CNC modeling</string>
     <string name="buttonStart_name">START</string>
     <string name="buttonReset_name">RESET</string>
     <string name="title_activity_main">MainActivity</string>
@@ -8,5 +8,6 @@
     <string name="action_settings">Settings</string>
     <string name="action_openProgram">Open Program</string>
     <string name="action_openParameter">Open Parameter</string>
+    <string name="action_save">Save</string>
     <string name="action_exit">Exit</string>
 </resources>

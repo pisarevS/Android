@@ -1,26 +1,30 @@
 package pisarev.com.modeling.mvp.presenter;
 
-import pisarev.com.modeling.interfaces.ViewMvp;
-import pisarev.com.modeling.mvp.model.File;
+import pisarev.com.modeling.interfaces.MainMvp;
+import pisarev.com.modeling.mvp.model.MyFile;
 
-public class PresenterMainImpl implements ViewMvp.PresenterMainMvp {
+public class PresenterMainImpl implements MainMvp.PresenterMainMvp {
 
-    private ViewMvp.MainViewMvp mainViewMvp;
-    private File file;
+    private MainMvp.ViewMvp viewMvp;
+    private MyFile myFile;
 
-    public PresenterMainImpl(ViewMvp.MainViewMvp mainViewMvp) {
-        this.mainViewMvp = mainViewMvp;
-        file = new File();
+    public PresenterMainImpl(MainMvp.ViewMvp viewMvp) {
+        this.viewMvp = viewMvp;
+        myFile = new MyFile();
     }
 
     @Override
     public void openProgram(String path) {
-        mainViewMvp.showProgram( file.readFile( path ) );
+        viewMvp.showProgram(myFile.readFile(path));
     }
 
     @Override
     public void openParameter(String path) {
-        mainViewMvp.showParameter( file.readFile( path ) );
+        viewMvp.showParameter(myFile.readFile(path));
+    }
+
+    @Override
+    public void saveAll(String program, String path) {
     }
 
 }

@@ -10,17 +10,23 @@ import pisarev.com.modeling.mvp.view.fragments.ProgramFragment;
 
 public class SectionsPageAdapter extends FragmentPagerAdapter {
 
+    private ProgramFragment programFragment;
+    private ParameterFragment parameterFragment;
+
     public SectionsPageAdapter(FragmentManager fm) {
-        super( fm );
+        super(fm);
+        programFragment = new ProgramFragment();
+        parameterFragment = new ParameterFragment();
     }
 
     @Override
     public Fragment getItem(int position) {
+
         if (position == 0) {
-            return new ProgramFragment();
+            return programFragment;
         }
         if (position == 1) {
-            return new ParameterFragment();
+            return parameterFragment;
         }
         return new Fragment();
     }
