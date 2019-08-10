@@ -5,6 +5,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+
+
 import pisarev.com.modeling.application.App;
 
 import javax.inject.Inject;
@@ -18,6 +20,14 @@ public class MyFile {
 
     public MyFile() {
         App.getComponent().inject( this );
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 
 

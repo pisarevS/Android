@@ -1,9 +1,7 @@
 package pisarev.com.modeling.activity;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -18,6 +16,8 @@ import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.R;
+import pisarev.com.modeling.mvp.model.Program;
+import pisarev.com.modeling.mvp.model.SQLiteData;
 
 import javax.inject.Inject;
 
@@ -40,7 +40,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
         super.onCreate( savedInstanceState );
         App.getComponent().inject( this );
-        setContentView( R.layout.activity_second );
+        setContentView( R.layout.activity_draw );
         drawView = findViewById( R.id.myView );
         drawView.getActivity( this );
         drawView.getData( data );
@@ -57,6 +57,10 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         buttonSingleBlock.setOnTouchListener( this );
         buttonReset.setOnTouchListener( this );
         vibrator = (Vibrator) getSystemService( VIBRATOR_SERVICE );
+        Thread thread = new Thread( new Program(
+                new SQLiteData( this,SQLiteData.DATABASE_PROGRAM ).getProgramText().get( SQLiteData.KEY_PROGRAM ),
+                new SQLiteData( this,SQLiteData.DATABASE_PARAMETER ).getProgramText().get( SQLiteData.KEY_PROGRAM ) ) );
+        thread.start();
     }
 
     @SuppressLint("SetTextI18n")

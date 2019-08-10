@@ -1,5 +1,8 @@
 package pisarev.com.modeling.mvp.model;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -18,8 +21,11 @@ public class Program extends BaseProgram implements Runnable {
 
     private ArrayList<StringBuffer> programList;
     private ArrayList<StringBuffer> parameterList;
+    private String call = "CALL";
     @Inject
     MyData data;
+    @Inject
+    Context context;
 
     public Program(String program, String parameter) {
         super( program, parameter );
@@ -33,10 +39,13 @@ public class Program extends BaseProgram implements Runnable {
     public void run() {
         data.setProgramList( getList( program ) );
         programList.addAll( getList( program ) );
-        parameterList.addAll( getList( parameter ) );
         removeIgnore( programList );
         removeLockedFrame( programList );
         gotoF( programList );
+        if (containsCall( programList ) || parameter.equals( "" )) {
+            parameter = getSubprogram( programList, new SQLiteData( context, SQLiteData.DATABASE_PATH ).getProgramText().get( SQLiteData.KEY_PROGRAM ) );
+        }
+        parameterList.addAll( getList( parameter ) );
         readParameterVariables( parameterList );
         replaceParameterVariables( variablesList );
         replaceProgramVariables( programList );
@@ -66,8 +75,16 @@ public class Program extends BaseProgram implements Runnable {
                 parameterList.get( i ).delete( parameterList.get( i ).indexOf( ";" ), parameterList.get( i ).length() );
             }
             if (parameterList.get( i ).toString().contains( "=" )) {
+                int key = 0;
+                for (int j = parameterList.get( i ).indexOf( "=" ) - 1; j >= 0; j--) {
+                    char c = parameterList.get( i ).charAt( j );
+                    if (c == ' ') {
+                        key = j;
+                        break;
+                    }
+                }
                 variablesList.put(
-                        parameterList.get( i ).substring( 0, parameterList.get( i ).indexOf( "=" ) ).replace( " ", "" )
+                        parameterList.get( i ).substring( key, parameterList.get( i ).indexOf( "=" ) ).replace( " ", "" )
                         , parameterList.get( i ).substring( parameterList.get( i ).indexOf( "=" ) + 1, parameterList.get( i ).length() ).replace( " ", "" ) );
             }
         }
@@ -205,16 +222,15 @@ public class Program extends BaseProgram implements Runnable {
         String gotoF = "GOTOF";
         for (int i = 0; i < programList.size(); i++) {
             if (programList.get( i ).toString().contains( gotoF )) {
-                label = programList.get( i ).substring( programList.get( i ).indexOf( gotoF ) + gotoF.length(), programList.get( i ).length() ).replace( " ","" );
-                for(int j=i+1;j<programList.size();j++){
-                    if (!programList.get( j ).toString().contains( label+":" )) {
+                label = programList.get( i ).substring( programList.get( i ).indexOf( gotoF ) + gotoF.length(), programList.get( i ).length() ).replace( " ", "" );
+                for (int j = i + 1; j < programList.size(); j++) {
+                    if (!programList.get( j ).toString().contains( label + ":" )) {
                         programList.get( j ).delete( 0, programList.get( j ).length() );
-                    }else {
+                    } else {
                         break;
                     }
                 }
             }
-
         }
     }
 
@@ -235,6 +251,51 @@ public class Program extends BaseProgram implements Runnable {
             }
         }
 
+    }
+
+    private String getSubprogram(ArrayList<StringBuffer> programList, String path) {
+        int index = 0;
+        for (int i = path.length() - 1; i >= 0; i--) {
+            char c = path.charAt( i );
+            if (c == '/') {
+                index = i;
+                break;
+            }
+        }
+        path = path.substring( 0, index );
+        MyFile myFile = new MyFile();
+        Log.d( Const.TEG, path + "/" + getFileName( programList ) );
+        return myFile.readFile( path + "/" + getFileName( programList ) );
+    }
+
+    private String getFileName(ArrayList<StringBuffer> programList) {
+        String fileName = "";
+        String call = "CALL";
+        for (int i = 0; i < programList.size(); i++) {
+            if (programList.get( i ).toString().contains( call )) {
+                String temp = programList.get( i ).toString().replaceAll( "\"", "" );
+                for (int j = temp.indexOf( call ) + call.length(); j < temp.length(); j++) {
+                    char c = temp.charAt( j );
+                    fileName += c;
+                }
+            }
+        }
+        fileName = fileName.replace( " ", "" );
+        if (fileName.contains( "_SPF" )) {
+            fileName = fileName.replace( "_SPF", ".SPF" );
+        } else {
+            fileName = fileName + ".SPF";
+        }
+        return fileName;
+    }
+
+    private boolean containsCall(ArrayList<StringBuffer> programList) {
+        for (int i = 0; i < programList.size(); i++) {
+            if (programList.get( i ).toString().contains( call )) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

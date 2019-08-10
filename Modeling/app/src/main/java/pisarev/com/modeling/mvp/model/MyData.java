@@ -14,7 +14,17 @@ public class MyData {
 
     private ArrayList<Frame> frameList = new ArrayList<>();
 
+    private String pathProgram;
+
     public MyData() {
+    }
+
+    public String getPathProgram() {
+        return pathProgram;
+    }
+
+    public void setPathProgram(String pathProgram) {
+        this.pathProgram = pathProgram;
     }
 
     public Map<Integer, String> getErrorListMap() {

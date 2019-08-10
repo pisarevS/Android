@@ -40,7 +40,11 @@ public abstract class BaseProgram {
 
     private void initLists() {
         listIgnore = new ArrayList<>();
+<<<<<<< HEAD
         variablesList = new LinkedHashMap<>();
+=======
+        variablesList = new LinkedHashMap<>(  );
+>>>>>>> b58f9b7cb5f04436c9632cc898be9aaa041cfef8
         frameList = new ArrayList<>();
         errorListMap = new HashMap<>();
         //ЛПО
