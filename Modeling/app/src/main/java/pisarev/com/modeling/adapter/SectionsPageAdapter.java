@@ -14,13 +14,14 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
     private ParameterFragment parameterFragment;
 
     public SectionsPageAdapter(FragmentManager fm) {
-        super( fm );
+        super(fm);
         programFragment = new ProgramFragment();
         parameterFragment = new ParameterFragment();
     }
 
     @Override
     public Fragment getItem(int position) {
+
         if (position == 0) {
             return programFragment;
         }

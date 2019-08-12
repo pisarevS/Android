@@ -12,5 +12,7 @@ public interface MainMvp {
         void openProgram(String path);
 
         void openParameter(String path);
+
+        void saveAll(String program, String path);
     }
 }

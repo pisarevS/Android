@@ -1,6 +1,8 @@
 package pisarev.com.modeling.mvp.view.customview;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -8,10 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-<<<<<<< HEAD
 import android.util.Log;
-=======
->>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -19,7 +18,6 @@ import android.view.View;
 
 import android.widget.Toast;
 
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,12 +26,6 @@ import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.Draw;
-=======
-import javax.inject.Inject;
-
-import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.ViewMvp;
->>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
 
@@ -47,7 +39,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private float moveX;
     private float moveZ;
     private float zoom = 3;
-<<<<<<< HEAD
     public int button;
     public final int START = 1;
     public final int RESET = 2;
@@ -59,116 +50,55 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private boolean isResetDown = false;
     private boolean isStartDown = false;
     private MyData data;
-=======
-    public static int button;
-    public final static int START = 1;
-    public final static int RESET = 2;
-    public final static int PAUSE = 3;
-    public static int index;
-    private ScaleGestureDetector scaleGestureDetector;
-    private Draw draw;
-    @Inject
-    MyData data;
->>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5
 
     public DrawView(Context context) {
-        super( context );
-        init(context);
+        super(context);
+        init();
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     public DrawView(Context context, @Nullable AttributeSet attrs) {
-        super( context, attrs );
-        init(context);
-    }
-
-    private void init(Context context) {
-        scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
-        paintCoordinateDottedLine = new Paint();
-        paintCoordinateDottedLine.setColor( Color.GRAY );
-        paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
-        paintCoordinateDottedLine.setAntiAlias( true );
-        paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
-        App.getComponent().inject( this );
-        draw = new Draw( this );
-    }
-
-    private void initSystemCoordinate(Canvas canvas, boolean isInit) {
-        Path path;
-        if (isInit) {
-            path = new Path();
-            pointCoordinateZero.setX( getWidth() >> 1 );
-            pointCoordinateZero.setZ( getHeight() >> 1 );
-            path.moveTo( 0, pointCoordinateZero.getZ() );
-            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
-            path.moveTo( pointCoordinateZero.getX(), 0 );
-            path.lineTo( pointCoordinateZero.getX(), getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
-        } else {
-            path = new Path();
-            path.moveTo( 0, pointCoordinateZero.getZ() );
-            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
-            path.moveTo( pointCoordinateZero.getX(), 0 );
-            path.lineTo( pointCoordinateZero.getX(), getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
-        }
-    }
-
-    private void drawSystemCoordinate(Canvas canvas, boolean isTouch, int button) {
-        if (!isTouch || button == RESET) {
-            initSystemCoordinate( canvas, true );
-        } else {
-            initSystemCoordinate( canvas, false );
-            if (button == START)
-                manager( canvas );
-        }
+        super(context, attrs);
+        init();
+        scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
     private void init() {
         paintCoordinateDottedLine = new Paint();
-        paintCoordinateDottedLine.setColor( Color.GRAY );
-        paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
-        paintCoordinateDottedLine.setAntiAlias( true );
-        paintCoordinateDottedLine.setPathEffect( new DashPathEffect( new float[]{20f, 10f}, 0f ) );
+        paintCoordinateDottedLine.setColor(Color.LTGRAY);
+        paintCoordinateDottedLine.setStyle(Paint.Style.STROKE);
+        paintCoordinateDottedLine.setAntiAlias(true);
+        paintCoordinateDottedLine.setPathEffect(new DashPathEffect(new float[]{20f, 10f}, 0f));
         pointCoordinateZero = new Point();
         errorList = new ArrayList<>();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw( canvas );
+        super.onDraw(canvas);
         switch (button) {
             case START:
-                manager( canvas );
+                manager(canvas);
                 invalidate();
                 break;
             case RESET:
-                initSystemCoordinate( canvas, true );
+                initSystemCoordinate(canvas, true);
                 button = 0;
                 invalidate();
                 isTouch = false;
                 errorList.clear();
                 break;
-<<<<<<< HEAD
             case STOP:
-                manager( canvas );
+                manager(canvas);
                 invalidate();
                 break;
         }
-        drawSystemCoordinate( canvas, isTouch );
-=======
-            case PAUSE:
-                manager( canvas );
-                invalidate();
-                break;
-
-        }
-        drawSystemCoordinate( canvas, isTouch, button );
->>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5
+        drawSystemCoordinate(canvas, isTouch);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        scaleGestureDetector.onTouchEvent( event );
+        scaleGestureDetector.onTouchEvent(event);
         switch (event.getAction()) {
             case ACTION_DOWN:
                 float downX = event.getX();
@@ -179,8 +109,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                 invalidate();
                 break;
             case ACTION_MOVE:
-                pointCoordinateZero.setX( event.getX() + moveX );
-                pointCoordinateZero.setZ( event.getY() + moveZ );
+                pointCoordinateZero.setX(event.getX() + moveX);
+                pointCoordinateZero.setZ(event.getY() + moveZ);
                 invalidate();
                 break;
             case ACTION_UP:
@@ -190,32 +120,40 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         return true;
     }
 
-<<<<<<< HEAD
     @Override
     public void showError(String error) {
         button = STOP;
-        if (!errorList.contains( error )) {
-            errorList.add( error );
-            Toast toast = Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
-            toast.setGravity( Gravity.CENTER, 0, 0 );
-            toast.show();
-            Log.d( Const.TEG, "error " + error );
+        if (!errorList.contains(error)) {
+            errorList.add(error);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Error")
+                    .setMessage(error)
+                    .setCancelable(false)
+                    .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            Log.d(Const.TEG, "error " + error);
         }
     }
 
     private void manager(Canvas canvas) {
-        Draw draw = new Draw( this, data );
-        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
+        Draw draw = new Draw(this, data);
+        draw.drawContour(canvas, pointCoordinateZero, zoom, index);
     }
 
     private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
         if (!isTouch || button == RESET) {
-            initSystemCoordinate( canvas, true );
+            initSystemCoordinate(canvas, true);
             invalidate();
         }
         if (isTouch || button == START) {
-            initSystemCoordinate( canvas, false );
-            manager( canvas );
+            initSystemCoordinate(canvas, false);
+            manager(canvas);
             invalidate();
         }
 
@@ -225,20 +163,20 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         Path path;
         if (isInit) {
             path = new Path();
-            pointCoordinateZero.setX( getWidth() >> 1 );
-            pointCoordinateZero.setZ( getHeight() >> 1 );
-            path.moveTo( 0, pointCoordinateZero.getZ() );
-            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
-            path.moveTo( pointCoordinateZero.getX(), 0 );
-            path.lineTo( pointCoordinateZero.getX(), getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
+            pointCoordinateZero.setX(getWidth() >> 1);
+            pointCoordinateZero.setZ(getHeight() >> 1);
+            path.moveTo(0, pointCoordinateZero.getZ());
+            path.lineTo(getWidth(), pointCoordinateZero.getZ());
+            path.moveTo(pointCoordinateZero.getX(), 0);
+            path.lineTo(pointCoordinateZero.getX(), getHeight());
+            canvas.drawPath(path, paintCoordinateDottedLine);
         } else {
             path = new Path();
-            path.moveTo( 0, pointCoordinateZero.getZ() );
-            path.lineTo( getWidth(), pointCoordinateZero.getZ() );
-            path.moveTo( pointCoordinateZero.getX(), 0 );
-            path.lineTo( pointCoordinateZero.getX(), getHeight() );
-            canvas.drawPath( path, paintCoordinateDottedLine );
+            path.moveTo(0, pointCoordinateZero.getZ());
+            path.lineTo(getWidth(), pointCoordinateZero.getZ());
+            path.moveTo(pointCoordinateZero.getX(), 0);
+            path.lineTo(pointCoordinateZero.getX(), getHeight());
+            canvas.drawPath(path, paintCoordinateDottedLine);
         }
     }
 
@@ -258,9 +196,9 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             isResetDown = false;
             button = START;
             index++;
-            secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
-            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
+            secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+            if (data.getFrameList().get(index - 1).isAxisContains()) {
+                secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
             }
         }
         if (!isSingleBlockDown && index < data.getFrameList().size() && !isStartDown) {
@@ -268,41 +206,27 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             isStartDown = true;
             button = START;
             final Timer timer = new Timer();
-            timer.schedule( new TimerTask() {
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown && button == START) {
                         index++;
-                        secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
-                        if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                            secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
+                        secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+                        if (data.getFrameList().get(index - 1).isAxisContains()) {
+                            secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
                         }
                     } else {
                         isResetDown = false;
                         timer.cancel();
                         if (button == STOP) {
-                            secondView.showFrame( (data.getProgramList().get( data.getFrameList().get( index - 1 ).getId() )).toString() );
-                            if (data.getFrameList().get( index - 1 ).isAxisContains()) {
-                                secondView.showAxis( "X=" + data.getFrameList().get( index - 1 ).getX(), "Z=" + data.getFrameList().get( index - 1 ).getZ() );
+                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+                            if (data.getFrameList().get(index - 1).isAxisContains()) {
+                                secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
                             }
                         }
                     }
                 }
-            }, 0, 200 );
-=======
-    private void manager(Canvas canvas) {
-        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
-    }
-
-    @Override
-    public void showError(String error) {
-        DrawView.button=DrawView.PAUSE;
-        if (!data.getErrorList().contains( error )) {
-            data.setErrorList( error );
-            Toast toast= Toast.makeText( getContext(), error, Toast.LENGTH_LONG );
-            toast.setGravity(Gravity.CENTER,0,0);
-            toast.show();
->>>>>>> b469e35f2e1080e66554d0301c51fb0b9b3081e5
+            }, 0, 200);
         }
     }
 
@@ -318,8 +242,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         button = RESET;
         index = 0;
         isStartDown = false;
-        secondView.showFrame( "" );
-        secondView.showAxis( "", "" );
+        secondView.showFrame("");
+        secondView.showAxis("", "");
     }
 
     @Override

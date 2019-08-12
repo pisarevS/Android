@@ -5,12 +5,12 @@ import java.util.*;
 public class Expression {
     //Метод возвращает true, если проверяемый символ - разделитель ("пробел" или "равно")
     private static boolean isDelimeter(char c) {
-        return (" =".indexOf( c ) != -1);
+        return (" =".indexOf(c) != -1);
     }
 
     //Метод возвращает true, если проверяемый символ - оператор
     private static boolean isOperator(char с) {
-        return ("+-/*^()".indexOf( с ) != -1);
+        return ("+-/*^()".indexOf(с) != -1);
     }
 
     //Метод возвращает приоритет оператора
@@ -37,28 +37,28 @@ public class Expression {
 
     //"Входной" метод класса
     public float calculate(String input) {
-        input = insertZero( input );
-        String output = getExpression( input ); //Преобразовываем выражение в постфиксную запись
-        return counting( output ); //Возвращаем результат
+        input = insertZero(input);
+        String output = getExpression(input); //Преобразовываем выражение в постфиксную запись
+        return counting(output); //Возвращаем результат
     }
 
     private String insertZero(String input) {
-        StringBuilder sb = new StringBuilder( input );
-        if (input.contains( "-" ) && sb.charAt( 0 ) == '-') {
-            sb = sb.replace( 0, 0, "0" );
-        } else if (input.contains( "-" ) && sb.indexOf( "-" ) != 0) {
+        StringBuilder sb = new StringBuilder(input);
+        if (input.contains("-") && sb.charAt(0) == '-') {
+            sb = sb.replace(0, 0, "0");
+        } else if (input.contains("-") && sb.indexOf("-") != 0) {
             for (int i = 0; i < sb.length(); i++) {
-                if (sb.charAt( i ) == '-') {
-                    if (sb.charAt( i - 1 ) == '(' || sb.charAt( i - 1 ) == '+' || sb.charAt( i - 1 ) == '-') {
-                        sb = sb.replace( i, i, "0" );
+                if (sb.charAt(i) == '-') {
+                    if (sb.charAt(i - 1) == '(' || sb.charAt(i - 1) == '+' || sb.charAt(i - 1) == '-') {
+                        sb = sb.replace(i, i, "0");
                     }
                 }
             }
-        } else if (input.contains( "+" ) && sb.indexOf( "+" ) != 0) {
+        } else if (input.contains("+") && sb.indexOf("+") != 0) {
             for (int i = 0; i < sb.length(); i++) {
-                if (sb.charAt( i ) == '+') {
-                    if (sb.charAt( i - 1 ) == '(' || sb.charAt( i - 1 ) == '+' || sb.charAt( i - 1 ) == '-') {
-                        sb = sb.replace( i, i, "0" );
+                if (sb.charAt(i) == '+') {
+                    if (sb.charAt(i - 1) == '(' || sb.charAt(i - 1) == '+' || sb.charAt(i - 1) == '-') {
+                        sb = sb.replace(i, i, "0");
                     }
                 }
             }
@@ -74,52 +74,52 @@ public class Expression {
         for (int i = 0; i < inputArr.length; i++) //Для каждого символа в входной строке
         {
             //Разделители пропускаем
-            if (isDelimeter( inputArr[i] ))
+            if (isDelimeter(inputArr[i]))
                 continue; //Переходим к следующему символу
 
             //Если символ - цифра, то считываем все число
-            if (Character.isDigit( inputArr[i] )) //Если цифра
+            if (Character.isDigit(inputArr[i])) //Если цифра
             {
                 //Читаем до разделителя или оператора, что бы получить число
-                while (!isDelimeter( inputArr[i] ) && !isOperator( inputArr[i] )) {
-                    output.append( inputArr[i] ); //Добавляем каждую цифру числа к нашей строке
+                while (!isDelimeter(inputArr[i]) && !isOperator(inputArr[i])) {
+                    output.append(inputArr[i]); //Добавляем каждую цифру числа к нашей строке
                     i++; //Переходим к следующему символу
 
                     if (i == inputArr.length) break; //Если символ - последний, то выходим из цикла
                 }
 
-                output.append( " " ); //Дописываем после числа пробел в строку с выражением
+                output.append(" "); //Дописываем после числа пробел в строку с выражением
                 i--; //Возвращаемся на один символ назад, к символу перед разделителем
             }
 
             //Если символ - оператор
-            if (isOperator( inputArr[i] )) //Если оператор
+            if (isOperator(inputArr[i])) //Если оператор
             {
                 if (inputArr[i] == '(') //Если символ - открывающая скобка
-                    operStack.push( inputArr[i] ); //Записываем её в стек
+                    operStack.push(inputArr[i]); //Записываем её в стек
                 else if (inputArr[i] == ')') //Если символ - закрывающая скобка
                 {
                     //Выписываем все операторы до открывающей скобки в строку
                     char s = operStack.pop();
 
                     while (s != '(') {
-                        output.append( s ).append( " " );
+                        output.append(s).append(" ");
                         s = operStack.pop();
                     }
                 } else //Если любой другой оператор
                 {
                     if (operStack.size() > 0) //Если в стеке есть элементы
-                        if (getPriority( inputArr[i] ) <= getPriority( operStack.peek() )) //И если приоритет нашего оператора меньше и
+                        if (getPriority(inputArr[i]) <= getPriority(operStack.peek())) //И если приоритет нашего оператора меньше и
                             //ли равен приоритету оператора на вершине стека
-                            output.append( operStack.pop() ).append( " " ); //То добавляем последний оператор из стека в строку с выражением
+                            output.append(operStack.pop()).append(" "); //То добавляем последний оператор из стека в строку с выражением
 
-                    operStack.push( inputArr[i] ); //Если стек пуст, или же приоритет оператора выше - добавляем операторов на вершину стека
+                    operStack.push(inputArr[i]); //Если стек пуст, или же приоритет оператора выше - добавляем операторов на вершину стека
                 }
             }
         }
         //Когда прошли по всем символам, выкидываем из стека все оставшиеся там операторы в строку
         while (operStack.size() > 0)
-            output.append( operStack.pop() ).append( " " );
+            output.append(operStack.pop()).append(" ");
         return output.toString(); //Возвращаем выражение в постфиксной записи
     }
 
@@ -130,17 +130,17 @@ public class Expression {
         for (int i = 0; i < input.length(); i++) //Для каждого символа в строке
         {
             //Если символ - цифра, то читаем все число и записываем на вершину стека
-            if (Character.isDigit( inputArr[i] )) {
+            if (Character.isDigit(inputArr[i])) {
                 StringBuilder a = new StringBuilder();
-                while (!isDelimeter( inputArr[i] ) && !isOperator( inputArr[i] )) //Пока не разделитель
+                while (!isDelimeter(inputArr[i]) && !isOperator(inputArr[i])) //Пока не разделитель
                 {
-                    a.append( inputArr[i] ); //Добавляем
+                    a.append(inputArr[i]); //Добавляем
                     i++;
                     if (i == input.length()) break;
                 }
-                temp.push( Float.parseFloat( a.toString() ) ); //Записываем в стек
+                temp.push(Float.parseFloat(a.toString())); //Записываем в стек
                 i--;
-            } else if (isOperator( inputArr[i] )) //Если символ - оператор
+            } else if (isOperator(inputArr[i])) //Если символ - оператор
             {
                 //Берем два последних значения из стека
                 float a = temp.pop();
@@ -160,10 +160,10 @@ public class Expression {
                         result = b / a;
                         break;
                     case '^':
-                        result = (float) Math.pow( b, a );
+                        result = (float) Math.pow(b, a);
                         break;
                 }
-                temp.push( result ); //Результат вычисления записываем обратно в стек
+                temp.push(result); //Результат вычисления записываем обратно в стек
             }
         }
         return temp.peek(); //Забираем результат всех вычислений из стека и возвращаем его
