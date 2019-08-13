@@ -123,26 +123,21 @@ public abstract class BaseProgram {
     protected float coordinateSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuffer temp = new StringBuffer();
-        int n = frame.indexOf(axis);
-
-        if (isDigit(frame.charAt(n + axis.length())) || frame.charAt(n + axis.length()) == '-' || frame.charAt(n + axis.length()) == '+') {
-            for (int i = n + axis.length(); i < frame.length(); i++) {
-                if (readUp(frame.charAt(i))) {
-                    temp.append(frame.charAt(i));
-                } else {
-                    break;
-                }
+        for (int i = frame.indexOf( axis ) + axis.length(); i < frame.length(); i++) {
+            if (readUp( frame.charAt( i ) )) {
+                temp.append( frame.charAt( i ) );
+            } else {
+                break;
             }
-            return Float.parseFloat(temp.toString());
-        } else if (frame.charAt(n + axis.length()) == '=') {
-            for (int i = n + axis.length() + 1; i < frame.length(); i++) {
-                if (readUp(frame.charAt(i))) {
-                    temp.append(frame.charAt(i));
-                } else {
-                    break;
-                }
-            }
+        }
+        if(temp.toString().contains("=")){
+            int index=temp.indexOf("=");
+            temp=temp.replace(index,index+1,"");
+        }
+        if(isSymbol(temp)){
             return expression.calculate(temp.toString());
+        }else if(!isSymbol(temp)){
+            return Float.parseFloat( temp.toString() );
         }
         return FIBO;
     }
@@ -244,6 +239,37 @@ public abstract class BaseProgram {
                 return true;
         }
         return false;
+    }
+
+    private boolean isSymbol(StringBuffer text){
+        if(text.toString().contains("+"))return true;
+        if(text.toString().contains("-"))return true;
+        if(text.toString().contains("*"))return true;
+        if(text.toString().contains("/"))return true;
+        if(text.toString().contains("("))return true;
+        if(text.toString().contains(")"))return true;
+        return false;
+    }
+
+    protected String getFileName(ArrayList<StringBuffer> programList) {
+        String fileName = "";
+        String call = "CALL";
+        for (int i = 0; i < programList.size(); i++) {
+            if (programList.get(i).toString().contains(call)) {
+                String temp = programList.get(i).toString().replaceAll("\"", "");
+                for (int j = temp.indexOf(call) + call.length(); j < temp.length(); j++) {
+                    char c = temp.charAt(j);
+                    fileName += c;
+                }
+            }
+        }
+        fileName = fileName.replace(" ", "");
+        if (fileName.contains("_SPF")) {
+            fileName = fileName.replace("_SPF", ".SPF");
+        } else {
+            fileName = fileName + ".SPF";
+        }
+        return fileName;
     }
 
 }

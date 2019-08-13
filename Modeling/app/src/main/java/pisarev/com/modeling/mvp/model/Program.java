@@ -43,7 +43,7 @@ public class Program extends BaseProgram implements Runnable {
         removeLockedFrame(programList);
         gotoF(programList);
         if (containsCall(programList) || parameter.equals("")) {
-            parameter = getSubprogram(programList, new SQLiteData(context, SQLiteData.DATABASE_PATH).getProgramText().get(SQLiteData.KEY_PROGRAM));
+            parameter = getSubroutine(programList, new SQLiteData(context, SQLiteData.DATABASE_PATH).getProgramText().get(SQLiteData.KEY_PROGRAM));
         }
         parameterList.addAll(getList(parameter));
         readParameterVariables(parameterList);
@@ -253,7 +253,7 @@ public class Program extends BaseProgram implements Runnable {
 
     }
 
-    private String getSubprogram(ArrayList<StringBuffer> programList, String path) {
+    private String getSubroutine(ArrayList<StringBuffer> programList, String path) {
         int index = 0;
         for (int i = path.length() - 1; i >= 0; i--) {
             char c = path.charAt(i);
@@ -266,27 +266,6 @@ public class Program extends BaseProgram implements Runnable {
         MyFile myFile = new MyFile();
         Log.d(Const.TEG, path + "/" + getFileName(programList));
         return myFile.readFile(path + "/" + getFileName(programList));
-    }
-
-    private String getFileName(ArrayList<StringBuffer> programList) {
-        String fileName = "";
-        String call = "CALL";
-        for (int i = 0; i < programList.size(); i++) {
-            if (programList.get(i).toString().contains(call)) {
-                String temp = programList.get(i).toString().replaceAll("\"", "");
-                for (int j = temp.indexOf(call) + call.length(); j < temp.length(); j++) {
-                    char c = temp.charAt(j);
-                    fileName += c;
-                }
-            }
-        }
-        fileName = fileName.replace(" ", "");
-        if (fileName.contains("_SPF")) {
-            fileName = fileName.replace("_SPF", ".SPF");
-        } else {
-            fileName = fileName + ".SPF";
-        }
-        return fileName;
     }
 
     private boolean containsCall(ArrayList<StringBuffer> programList) {
