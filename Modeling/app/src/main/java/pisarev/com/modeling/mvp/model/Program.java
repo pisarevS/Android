@@ -42,7 +42,7 @@ public class Program extends BaseProgram implements Runnable {
         removeIgnore(programList);
         removeLockedFrame(programList);
         gotoF(programList);
-        if (containsCall(programList) || parameter.equals("")) {
+        if (containsCall(programList) && parameter.equals("")) {
             parameter = getSubroutine(programList, new SQLiteData(context, SQLiteData.DATABASE_PATH).getProgramText().get(SQLiteData.KEY_PROGRAM));
         }
         parameterList.addAll(getList(parameter));
