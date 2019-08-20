@@ -21,7 +21,7 @@ public class Program extends BaseProgram implements Runnable {
 
     private ArrayList<StringBuffer> programList;
     private ArrayList<StringBuffer> parameterList;
-    private String call = "CALL";
+    private String[] defs={"DEF REAL","DEF INT"};
     @Inject
     MyData data;
     @Inject
@@ -42,9 +42,10 @@ public class Program extends BaseProgram implements Runnable {
         removeIgnore(programList);
         removeLockedFrame(programList);
         gotoF(programList);
-        if (containsCall(programList) && parameter.equals("")) {
+        if(containsDef( programList ))
+            searchDef( programList );
+        if (containsCall(programList) && parameter.equals(""))
             parameter = getSubroutine(programList, new SQLiteData(context, SQLiteData.DATABASE_PATH).getProgramText().get(SQLiteData.KEY_PROGRAM));
-        }
         parameterList.addAll(getList(parameter));
         readParameterVariables(parameterList);
         replaceParameterVariables(variablesList);
@@ -270,11 +271,35 @@ public class Program extends BaseProgram implements Runnable {
 
     private boolean containsCall(ArrayList<StringBuffer> programList) {
         for (int i = 0; i < programList.size(); i++) {
-            if (programList.get(i).toString().contains(call)) {
+            String call = "CALL";
+            if (programList.get(i).toString().contains( call )) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean containsDef(ArrayList<StringBuffer> programList){
+        for (int i = 0; i < programList.size(); i++) {
+            for (String def: defs) {
+                if( programList.get( i ).toString().contains( def ))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private void searchDef(ArrayList<StringBuffer> programList){
+        for (int i = 0; i < programList.size(); i++) {
+            for (String def: defs) {
+               if(programList.get( i ).toString().contains( def )){
+                   int n=programList.get( i ).indexOf( def )+ def.length();
+                   String key=programList.get( i ).substring( n,programList.get( i ).indexOf( "=" ) ).replace( " ","" );
+                   String value=programList.get(i).substring(programList.get(i).indexOf("=") + 1, programList.get(i).length()).replace(" ", "");
+                   variablesList.put( key,value );
+               }
+            }
+        }
     }
 
 }
