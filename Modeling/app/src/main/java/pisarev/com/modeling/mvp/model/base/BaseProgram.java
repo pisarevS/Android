@@ -250,26 +250,4 @@ public abstract class BaseProgram {
         if(text.toString().contains(")"))return true;
         return false;
     }
-
-    protected String getFileName(ArrayList<StringBuffer> programList) {
-        String fileName = "";
-        String call = "CALL";
-        for (int i = 0; i < programList.size(); i++) {
-            if (programList.get(i).toString().contains(call)) {
-                String temp = programList.get(i).toString().replaceAll("\"", "");
-                for (int j = temp.indexOf(call) + call.length(); j < temp.length(); j++) {
-                    char c = temp.charAt(j);
-                    fileName += c;
-                }
-            }
-        }
-        fileName = fileName.replace(" ", "");
-        if (fileName.contains("_SPF")) {
-            fileName = fileName.replace("_SPF", ".SPF");
-        } else {
-            fileName = fileName + ".SPF";
-        }
-        return fileName;
-    }
-
 }

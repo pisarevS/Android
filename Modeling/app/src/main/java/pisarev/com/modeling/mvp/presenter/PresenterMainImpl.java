@@ -19,11 +19,6 @@ public class PresenterMainImpl implements MainMvp.PresenterMainMvp {
     }
 
     @Override
-    public void openParameter(String path) {
-        viewMvp.showParameter(myFile.readFile(path));
-    }
-
-    @Override
     public void saveAll(String program, String path) {
     }
 

@@ -50,6 +50,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private boolean isResetDown = false;
     private boolean isStartDown = false;
     private MyData data;
+    private int zoomCoordinateSystem;
 
     public DrawView(Context context) {
         super(context);

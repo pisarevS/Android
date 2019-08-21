@@ -9,11 +9,6 @@
         android:title="@string/action_openProgram"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_openParameter"
-        android:orderInCategory="100"
-        android:title="@string/action_openParameter"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_exit"
         android:orderInCategory="100"
         android:title="@string/action_exit"
