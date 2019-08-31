@@ -215,6 +215,7 @@ public abstract class BaseProgram {
             case 'L':
             case 'O':
             case 'H':
+            case 'R':
                 return false;
         }
         return true;
