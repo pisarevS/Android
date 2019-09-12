@@ -23,6 +23,7 @@ public class Program extends BaseProgram implements Runnable {
     private ArrayList<StringBuffer> programList;
     private ArrayList<StringBuffer> parameterList;
     private String[] defs = {"DEF REAL", "DEF INT"};
+    private String offn="OFFN=";
     @Inject
     MyData data;
     @Inject
@@ -51,6 +52,9 @@ public class Program extends BaseProgram implements Runnable {
         replaceParameterVariables( variablesList );
         replaceProgramVariables( programList );
         addFrameList();
+        for (int i=0;i<frameList.size();i++){
+            frameList.get(i).toString();
+        }
     }
 
     @Override
@@ -134,6 +138,16 @@ public class Program extends BaseProgram implements Runnable {
             Frame frame = new Frame();
 
             try {
+                if (contains( strFrame, offn )) {
+                    frame.setOffn(searchOffn(strFrame));
+                    frame.setId( i );
+                    frameList.add( frame );
+                }
+            } catch (Exception e) {
+                errorListMap.put( i, strFrame.toString() );
+            }
+
+            try {
                 if (contains( strFrame, "G" )) {
                     tempGCode = searchGCog( strFrame.toString() );
                     frame.setGCode( tempGCode );
@@ -145,6 +159,7 @@ public class Program extends BaseProgram implements Runnable {
             } catch (Exception e) {
                 errorListMap.put( i, strFrame.toString() );
             }
+
             try {
                 if (contains( strFrame, horizontalAxis + "=IC" )) {
                     tempHorizontal = tempHorizontal + incrementSearch( strFrame, horizontalAxis + "=IC" );
@@ -160,6 +175,7 @@ public class Program extends BaseProgram implements Runnable {
             } catch (Exception e) {
                 errorListMap.put( i, strFrame.toString() );
             }
+
             try {
                 if (contains( strFrame, verticalAxis + "=IC" )) {
                     tempVertical = tempVertical + incrementSearch( strFrame, verticalAxis + "=IC" );
@@ -175,6 +191,7 @@ public class Program extends BaseProgram implements Runnable {
             } catch (Exception e) {
                 errorListMap.put( i, strFrame.toString() );
             }
+
             String radiusCR = "CR=";
             try {
                 if (contains( strFrame, radiusCR )) {
@@ -188,6 +205,7 @@ public class Program extends BaseProgram implements Runnable {
             } catch (Exception e) {
                 errorListMap.put( i, strFrame.toString() );
             }
+
             if (isHorizontalAxis && isVerticalAxis && isCR) {
                 frame.setX( tempHorizontal );
                 frame.setZ( tempVertical );
@@ -290,5 +308,12 @@ public class Program extends BaseProgram implements Runnable {
             }
         }
         return "";
+    }
+
+    private float searchOffn(StringBuffer frame){
+        Expression expression = new Expression();
+        int n=frame.indexOf(offn);
+        String temp=frame.substring(n+offn.length(),frame.length());
+        return expression.calculate(temp);
     }
 }

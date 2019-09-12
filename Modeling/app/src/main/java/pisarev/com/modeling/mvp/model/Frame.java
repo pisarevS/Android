@@ -1,5 +1,7 @@
 package pisarev.com.modeling.mvp.model;
 
+import android.util.Log;
+
 import java.util.*;
 
 public class Frame {
@@ -7,6 +9,16 @@ public class Frame {
     private float x;
     private float z;
     private float cr;
+
+    public float getOffn() {
+        return offn;
+    }
+
+    public void setOffn(float offn) {
+        this.offn = offn;
+    }
+
+    private float offn;
     private boolean isCR = false;
     private boolean isAxisContains = false;
     private ArrayList<String> gCode = new ArrayList<>();
@@ -65,5 +77,11 @@ public class Frame {
 
     public float getCr() {
         return cr;
+    }
+
+    @Override
+    public String toString() {
+        String frame=id+" "+gCode+" "+x+" "+z+" "+cr+" "+offn;
+        return frame;
     }
 }
