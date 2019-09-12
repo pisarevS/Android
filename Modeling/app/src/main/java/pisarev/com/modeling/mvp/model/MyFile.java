@@ -40,7 +40,7 @@ public class MyFile {
             // закрываем поток
             bw.close();
         } catch (IOException e) {
-            Toast.makeText(context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d(Const.TEG,e.getMessage());
             e.printStackTrace();
         }
     }
@@ -59,7 +59,7 @@ public class MyFile {
             }
             br.close();
         } catch (IOException e) {
-            Toast.makeText(context.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d(Const.TEG,e.getMessage());
         }
         return text.toString();
     }
