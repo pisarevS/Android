@@ -2,9 +2,7 @@ package pisarev.com.modeling.mvp.view.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pisarev.com.modeling.R;
-import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.SQLiteData;
 
 public class ProgramFragment extends Fragment {
@@ -39,7 +36,6 @@ public class ProgramFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(Const.TEG, "onDestroy()  ProgramFragment");
         Map<String, String> stringMap = new HashMap<>();
         stringMap.put(SQLiteData.KEY_PROGRAM, editText.getText().toString());
         sqLiteData.deleteProgramText();
@@ -49,7 +45,6 @@ public class ProgramFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(Const.TEG, "onPause()  ProgramFragment");
         Map<String, String> stringMap = new HashMap<>();
         stringMap.put(SQLiteData.KEY_PROGRAM, editText.getText().toString());
         sqLiteData.deleteProgramText();

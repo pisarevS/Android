@@ -1,6 +1,5 @@
 package pisarev.com.modeling.activity;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +33,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     @Inject
     MyData data;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -57,13 +55,10 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         buttonSingleBlock.setOnTouchListener(this);
         buttonReset.setOnTouchListener(this);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        Thread thread = new Thread(new Program(
-                new SQLiteData(this, SQLiteData.DATABASE_PROGRAM).getProgramText().get(SQLiteData.KEY_PROGRAM),
-                new SQLiteData(this, SQLiteData.DATABASE_PARAMETER).getProgramText().get(SQLiteData.KEY_PROGRAM)));
+        Thread thread = new Thread(new Program(new SQLiteData(this, SQLiteData.DATABASE_PROGRAM).getProgramText().get(SQLiteData.KEY_PROGRAM)));
         thread.start();
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()) {

@@ -12,7 +12,7 @@ import pisarev.com.modeling.mvp.model.MyData;
 @Module
 public class AppModule {
 
-    App app;
+    private App app;
 
     public AppModule(App app) {
         this.app = app;

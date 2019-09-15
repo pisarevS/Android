@@ -1,7 +1,5 @@
 package pisarev.com.modeling.mvp.model.base;
 
-import android.annotation.SuppressLint;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,9 +23,8 @@ public abstract class BaseProgram {
     protected final float FIBO = 1123581220;
     private String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18"};
 
-    protected BaseProgram(String program, String parameter) {
+    protected BaseProgram(String program) {
         this.program = program;
-        this.parameter = parameter;
         initLists();
     }
 
@@ -41,7 +38,6 @@ public abstract class BaseProgram {
 
     protected abstract void addFrameList();
 
-    @SuppressLint("UseSparseArrays")
     private void initLists() {
         listIgnore = new ArrayList<>();
         variablesList = new LinkedHashMap<>();
@@ -122,21 +118,21 @@ public abstract class BaseProgram {
     protected float coordinateSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuffer temp = new StringBuffer();
-        for (int i = frame.indexOf( axis ) + axis.length(); i < frame.length(); i++) {
-            if (readUp( frame.charAt( i ) )) {
-                temp.append( frame.charAt( i ) );
+        for (int i = frame.indexOf(axis) + axis.length(); i < frame.length(); i++) {
+            if (readUp(frame.charAt(i))) {
+                temp.append(frame.charAt(i));
             } else {
                 break;
             }
         }
-        if(temp.toString().contains("=")){
-            int index=temp.indexOf("=");
-            temp=temp.replace(index,index+1,"");
+        if (temp.toString().contains("=")) {
+            int index = temp.indexOf("=");
+            temp = temp.replace(index, index + 1, "");
         }
-        if(isSymbol(temp)){
+        if (isSymbol(temp)) {
             return expression.calculate(temp.toString());
-        }else if(!isSymbol(temp)){
-            return Float.parseFloat( temp.toString() );
+        } else if (!isSymbol(temp)) {
+            return Float.parseFloat(temp.toString());
         }
         return FIBO;
     }
@@ -241,13 +237,13 @@ public abstract class BaseProgram {
         return false;
     }
 
-    private boolean isSymbol(StringBuffer text){
-        if(text.toString().contains("+"))return true;
-        if(text.toString().contains("-"))return true;
-        if(text.toString().contains("*"))return true;
-        if(text.toString().contains("/"))return true;
-        if(text.toString().contains("("))return true;
-        if(text.toString().contains(")"))return true;
+    private boolean isSymbol(StringBuffer text) {
+        if (text.toString().contains("+")) return true;
+        if (text.toString().contains("-")) return true;
+        if (text.toString().contains("*")) return true;
+        if (text.toString().contains("/")) return true;
+        if (text.toString().contains("(")) return true;
+        if (text.toString().contains(")")) return true;
         return false;
     }
 }

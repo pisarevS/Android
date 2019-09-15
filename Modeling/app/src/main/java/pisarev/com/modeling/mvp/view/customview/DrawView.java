@@ -21,7 +21,6 @@ import java.util.TimerTask;
 
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.IDraw;
-import pisarev.com.modeling.mvp.model.Const;
 import pisarev.com.modeling.mvp.model.Draw;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
@@ -46,8 +45,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private boolean isSingleBlockDown = false;
     private boolean isResetDown = false;
     private boolean isStartDown = false;
+    private final String TEG = getClass().getName();
     private MyData data;
-    private int zoomCoordinateSystem;
 
     public DrawView(Context context) {
         super(context);
@@ -132,7 +131,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                     });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
-            Log.d(Const.TEG, "error " + error);
+            Log.d(TEG, "error " + error);
         }
     }
 

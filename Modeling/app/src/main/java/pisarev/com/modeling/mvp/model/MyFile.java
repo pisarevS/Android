@@ -5,6 +5,8 @@ import java.io.*;
 
 public class MyFile {
 
+    private final String TEG = getClass().getName();
+
     public void writeFile(String text, String path) {
         File sdFile = new File(path);
         try {
@@ -15,11 +17,10 @@ public class MyFile {
             // закрываем поток
             bw.close();
         } catch (IOException e) {
-            Log.d(Const.TEG,e.getMessage());
+            Log.d(TEG,e.getMessage());
             e.printStackTrace();
         }
     }
-
 
     public String readFile(String path) {
         java.io.File file = new java.io.File(path);
@@ -34,7 +35,7 @@ public class MyFile {
             }
             br.close();
         } catch (IOException e) {
-            Log.d(Const.TEG,e.getMessage());
+            Log.d(TEG,e.getMessage());
         }
         return text.toString();
     }
