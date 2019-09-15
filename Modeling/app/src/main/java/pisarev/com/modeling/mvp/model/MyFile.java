@@ -1,34 +1,9 @@
 package pisarev.com.modeling.mvp.model;
 
-import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
-
-
-import pisarev.com.modeling.application.App;
-
-import javax.inject.Inject;
-
 import java.io.*;
 
 public class MyFile {
-
-    @Inject
-    Context context;
-
-    public MyFile() {
-        App.getComponent().inject(this);
-    }
-
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
 
     public void writeFile(String text, String path) {
         File sdFile = new File(path);

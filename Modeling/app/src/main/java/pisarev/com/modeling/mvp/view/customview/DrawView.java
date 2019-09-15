@@ -11,12 +11,9 @@ import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -33,7 +30,7 @@ import static android.view.MotionEvent.*;
 
 public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMvp {
     private Paint paintCoordinateDottedLine;
-    private DrawMvp.DrawViewMvp secondView;
+    private DrawMvp.DrawViewMvp drawActivity;
     private Point pointCoordinateZero;
     private boolean isTouch;
     private float moveX;
@@ -50,6 +47,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private boolean isResetDown = false;
     private boolean isStartDown = false;
     private MyData data;
+    private int zoomCoordinateSystem;
 
     public DrawView(Context context) {
         super(context);
@@ -78,6 +76,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         super.onDraw(canvas);
         switch (button) {
             case START:
+            case STOP:
                 manager(canvas);
                 invalidate();
                 break;
@@ -87,10 +86,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                 invalidate();
                 isTouch = false;
                 errorList.clear();
-                break;
-            case STOP:
-                manager(canvas);
-                invalidate();
                 break;
         }
         drawSystemCoordinate(canvas, isTouch);
@@ -196,9 +191,9 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             isResetDown = false;
             button = START;
             index++;
-            secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+            drawActivity.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
             if (data.getFrameList().get(index - 1).isAxisContains()) {
-                secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
+                drawActivity.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
             }
         }
         if (!isSingleBlockDown && index < data.getFrameList().size() && !isStartDown) {
@@ -211,17 +206,17 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
                 public void run() {
                     if (index < data.getFrameList().size() && !isSingleBlockDown && !isResetDown && button == START) {
                         index++;
-                        secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+                        drawActivity.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
                         if (data.getFrameList().get(index - 1).isAxisContains()) {
-                            secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
+                            drawActivity.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
                         }
                     } else {
                         isResetDown = false;
                         timer.cancel();
                         if (button == STOP) {
-                            secondView.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
+                            drawActivity.showFrame((data.getProgramList().get(data.getFrameList().get(index - 1).getId())).toString());
                             if (data.getFrameList().get(index - 1).isAxisContains()) {
-                                secondView.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
+                                drawActivity.showAxis("X=" + data.getFrameList().get(index - 1).getX(), "Z=" + data.getFrameList().get(index - 1).getZ());
                             }
                         }
                     }
@@ -242,13 +237,13 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         button = RESET;
         index = 0;
         isStartDown = false;
-        secondView.showFrame("");
-        secondView.showAxis("", "");
+        drawActivity.showFrame("");
+        drawActivity.showAxis("", "");
     }
 
     @Override
     public void getActivity(DrawMvp.DrawViewMvp secondView) {
-        this.secondView = secondView;
+        this.drawActivity = secondView;
     }
 
     @Override

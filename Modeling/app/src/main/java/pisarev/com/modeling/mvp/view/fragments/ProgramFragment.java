@@ -40,19 +40,19 @@ public class ProgramFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d(Const.TEG, "onDestroy()  ProgramFragment");
-        Map<String, String> stringStringMap = new HashMap<>();
-        stringStringMap.put(SQLiteData.KEY_PROGRAM, editText.getText().toString());
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put(SQLiteData.KEY_PROGRAM, editText.getText().toString());
         sqLiteData.deleteProgramText();
-        sqLiteData.setProgramText(stringStringMap);
+        sqLiteData.setProgramText(stringMap);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         Log.d(Const.TEG, "onPause()  ProgramFragment");
-        Map<String, String> stringStringMap = new HashMap<>();
-        stringStringMap.put(SQLiteData.KEY_PROGRAM, editText.getText().toString());
+        Map<String, String> stringMap = new HashMap<>();
+        stringMap.put(SQLiteData.KEY_PROGRAM, editText.getText().toString());
         sqLiteData.deleteProgramText();
-        sqLiteData.setProgramText(stringStringMap);
+        sqLiteData.setProgramText(stringMap);
     }
 }
