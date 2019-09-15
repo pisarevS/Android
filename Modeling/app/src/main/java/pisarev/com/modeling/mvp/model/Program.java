@@ -53,7 +53,7 @@ public class Program extends BaseProgram implements Runnable {
         replaceProgramVariables( programList );
         addFrameList();
         for (int i=0;i<frameList.size();i++){
-            frameList.get(i).toString();
+            Log.d(Const.TEG,frameList.get(i).toString());
         }
     }
 
@@ -131,7 +131,6 @@ public class Program extends BaseProgram implements Runnable {
         float tempHorizontal = 650;
         float tempVertical = 250;
         float tempCR = 0;
-        ArrayList<String> tempGCode;
         boolean isCR = false;
         for (int i = 0; i < programList.size(); i++) {
             strFrame = programList.get( i );
@@ -141,6 +140,8 @@ public class Program extends BaseProgram implements Runnable {
                 if (contains( strFrame, offn )) {
                     frame.setOffn(searchOffn(strFrame));
                     frame.setId( i );
+                    frame.setX( tempHorizontal );
+                    frame.setZ( tempVertical );
                     frameList.add( frame );
                 }
             } catch (Exception e) {
@@ -149,8 +150,7 @@ public class Program extends BaseProgram implements Runnable {
 
             try {
                 if (contains( strFrame, "G" )) {
-                    tempGCode = searchGCog( strFrame.toString() );
-                    frame.setGCode( tempGCode );
+                    frame.setGCode( searchGCog( strFrame.toString() ) );
                     frame.setId( i );
                     frame.setX( tempHorizontal );
                     frame.setZ( tempVertical );
@@ -206,7 +206,7 @@ public class Program extends BaseProgram implements Runnable {
                 errorListMap.put( i, strFrame.toString() );
             }
 
-            if (isHorizontalAxis && isVerticalAxis && isCR) {
+            if (isCR) {
                 frame.setX( tempHorizontal );
                 frame.setZ( tempVertical );
                 frame.setCr( tempCR );

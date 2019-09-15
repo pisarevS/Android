@@ -16,8 +16,6 @@ import pisarev.com.modeling.mvp.model.Program;
 public interface AppComponent {
     void inject(Program program);
 
-    void inject(MyFile myFile);
-
     void inject(DrawActivity drawActivity);
 
     void inject(MainActivity mainActivity);

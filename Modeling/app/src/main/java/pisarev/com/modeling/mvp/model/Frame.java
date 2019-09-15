@@ -9,6 +9,13 @@ public class Frame {
     private float x;
     private float z;
     private float cr;
+    private float offn;
+    private boolean isCR = false;
+    private boolean isAxisContains = false;
+    private ArrayList<String> gCode = new ArrayList<>();
+    public boolean isAxisContains() {
+        return isAxisContains;
+    }
 
     public float getOffn() {
         return offn;
@@ -16,15 +23,6 @@ public class Frame {
 
     public void setOffn(float offn) {
         this.offn = offn;
-    }
-
-    private float offn;
-    private boolean isCR = false;
-    private boolean isAxisContains = false;
-    private ArrayList<String> gCode = new ArrayList<>();
-
-    public boolean isAxisContains() {
-        return isAxisContains;
     }
 
     public void setAxisContains(boolean axisContains) {

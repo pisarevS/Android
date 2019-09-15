@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         UsbManager mUsbManager = (UsbManager) getSystemService(this.USB_SERVICE);
         deviceMap = mUsbManager.getDeviceList();
 
-
     }
 
     @Override
@@ -85,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             public void onChoosePath(String path, File pathFile) {
                                 Toast.makeText(MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT).show();
                                 presenter.openProgram(path);
-                                Map<String, String> stringStringMap = new HashMap<>();
-                                stringStringMap.put(SQLiteData.KEY_PROGRAM, path);
-                                new SQLiteData(getApplication(), SQLiteData.DATABASE_PATH).setProgramText(stringStringMap);
+                                Map<String, String> stringMap = new HashMap<>();
+                                stringMap.put(SQLiteData.KEY_PROGRAM, path);
+                                new SQLiteData(getApplication(), SQLiteData.DATABASE_PATH).setProgramText(stringMap);
                             }
                         })
                         // to handle the back key pressed or clicked outside the dialog:
