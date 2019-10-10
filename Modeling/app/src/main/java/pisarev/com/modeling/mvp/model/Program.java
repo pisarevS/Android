@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import pisarev.com.modeling.application.App;
+import pisarev.com.modeling.interfaces.MainMvp;
 import pisarev.com.modeling.mvp.model.base.BaseProgram;
 
 public class Program extends BaseProgram implements Runnable {
@@ -37,13 +38,42 @@ public class Program extends BaseProgram implements Runnable {
         data.getFrameList().clear();
     }
 
+    public Program(boolean isConvert,String program, MainMvp.ViewMvp viewMvp){
+        super(isConvert,program,viewMvp);
+        programList = new ArrayList<>();
+        parameterList = new ArrayList<>();
+        App.getComponent().inject(this);
+        data.getFrameList().clear();
+    }
+
+
     @Override
     public void run() {
-        data.setProgramList(getList(program));
+        if(isConvert){
+            viewMvp.showConvert( convert() );
+        }else {
+            data.setProgramList(getList(program));
+            programList.addAll(getList(program));
+            removeIgnore(programList);
+            removeLockedFrame(programList);
+            gotoF(programList);
+            if (containsDef(programList))
+                searchDef(programList);
+            parameter = getParameter(new SQLiteData(context, SQLiteData.DATABASE_PATH).getProgramText().get(SQLiteData.KEY_PROGRAM));
+            parameterList.addAll(getList(parameter));
+            readParameterVariables(parameterList);
+            replaceParameterVariables(variablesList);
+            replaceProgramVariables(programList);
+            addFrameList();
+            for (int i = 0; i < frameList.size(); i++) {
+                Log.d(TEG, frameList.get(i).toString());
+            }
+        }
+
+    }
+
+    private String convert(){
         programList.addAll(getList(program));
-        removeIgnore(programList);
-        removeLockedFrame(programList);
-        gotoF(programList);
         if (containsDef(programList))
             searchDef(programList);
         parameter = getParameter(new SQLiteData(context, SQLiteData.DATABASE_PATH).getProgramText().get(SQLiteData.KEY_PROGRAM));
@@ -51,9 +81,73 @@ public class Program extends BaseProgram implements Runnable {
         readParameterVariables(parameterList);
         replaceParameterVariables(variablesList);
         replaceProgramVariables(programList);
-        addFrameList();
-        for (int i = 0; i < frameList.size(); i++) {
-            Log.d(TEG, frameList.get(i).toString());
+        deleteVariables();
+        StringBuilder temp= new StringBuilder();
+        for (StringBuffer text:programList) {
+            temp.append( text ).append( "\n" );
+        }
+        return temp.toString();
+    }
+
+    private void deleteVariables() {
+        selectCoordinateSystem( programList );
+        StringBuffer strFrame;
+        float tempHorizontal = 650;
+        float tempVertical = 250;
+        for (int i = 0; i < programList.size(); i++) {
+            strFrame = programList.get( i );
+
+            try {
+                if (contains( strFrame, horizontalAxis + "=IC" )) {
+                    tempHorizontal = tempHorizontal + incrementSearch( strFrame, horizontalAxis + "=IC" );
+                    String strHorizontal=incrementSearchStr(strFrame,horizontalAxis + "=IC");
+
+                    int startIndex=programList.get(i).indexOf(strHorizontal)-2;
+                    int endIndex=programList.get(i).indexOf(strHorizontal)+strHorizontal.length();
+                    programList.get(i).replace(startIndex,endIndex,tempHorizontal+" ");
+
+
+                } else if (containsAxis( strFrame, horizontalAxis )) {
+                    tempHorizontal = coordinateSearch( strFrame, horizontalAxis );
+                    String strHorizontal=coordinateSearchStr(strFrame,horizontalAxis);
+
+                    if (tempHorizontal != FIBO) {
+                        int startIndex=programList.get(i).indexOf(strHorizontal);
+                        int endIndex=programList.get(i).indexOf(strHorizontal)+strHorizontal.length();
+                        programList.get(i).replace(startIndex,endIndex,tempHorizontal+" ");
+                    } else {
+                        errorListMap.put( i, strFrame.toString() );
+                    }
+                }
+            } catch (Exception e) {
+                errorListMap.put( i, strFrame.toString() );
+            }
+
+            try {
+                if (contains( strFrame, verticalAxis + "=IC" )) {
+                    tempVertical = tempVertical + incrementSearch( strFrame, verticalAxis + "=IC" );
+                    String strVertical=incrementSearchStr(strFrame,verticalAxis + "=IC");
+                    int startIndex=programList.get(i).indexOf(strVertical)-2;
+                    int endIndex=programList.get(i).indexOf(strVertical)+strVertical.length();
+                    programList.get(i).replace(startIndex,endIndex,tempVertical+" ");
+
+                } else if (containsAxis( strFrame, verticalAxis )) {
+                    tempVertical = coordinateSearch( strFrame, verticalAxis );
+                    String strVertical=coordinateSearchStr(strFrame,verticalAxis);
+
+
+                    if (tempVertical != FIBO) {
+                        int startIndex=programList.get(i).indexOf(strVertical);
+                        int endIndex=programList.get(i).indexOf(strVertical)+strVertical.length();
+                        programList.get(i).replace(startIndex,endIndex,tempVertical+" ");
+
+                    } else {
+                        errorListMap.put( i, strFrame.toString() );
+                    }
+                }
+            } catch (Exception e) {
+                errorListMap.put( i, strFrame.toString() );
+            }
         }
     }
 
@@ -122,6 +216,19 @@ public class Program extends BaseProgram implements Runnable {
         }
     }
 
+    private boolean activedRadius(ArrayList<String> gCode){
+        for (String code:gCode) {
+            switch (code){
+                case "G2":
+                case "G02":
+                case "G3":
+                case "G03":
+                    return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected void addFrameList() {
         selectCoordinateSystem(programList);
@@ -132,6 +239,7 @@ public class Program extends BaseProgram implements Runnable {
         float tempVertical = 250;
         float tempCR = 0;
         boolean isCR = false;
+        boolean isRadius=false;
         for (int i = 0; i < programList.size(); i++) {
             strFrame = programList.get(i);
             Frame frame = new Frame();
@@ -150,11 +258,14 @@ public class Program extends BaseProgram implements Runnable {
 
             try {
                 if (contains(strFrame, "G")) {
-                    frame.setGCode(searchGCog(strFrame.toString()));
+                    ArrayList<String> gCode=searchGCog(strFrame.toString());
+                    isRadius=activedRadius( searchGCog(strFrame.toString()) );
+                    frame.setGCode(gCode);
                     frame.setId(i);
                     frame.setX(tempHorizontal);
                     frame.setZ(tempVertical);
                     frameList.add(frame);
+
                 }
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
@@ -194,13 +305,15 @@ public class Program extends BaseProgram implements Runnable {
 
             String radiusCR = "CR=";
             try {
-                if (contains(strFrame, radiusCR)) {
+                if (contains(strFrame, radiusCR)&&isRadius) {
                     tempCR = coordinateSearch(strFrame, radiusCR);
                     if (tempCR != FIBO) {
                         isCR = true;
-                    } else {
-                        errorListMap.put(i, strFrame.toString());
                     }
+                }else if(contains(strFrame, radiusCR)&&!isRadius){
+                    errorListMap.put(i, strFrame.toString());
+                }else if(!contains(strFrame, radiusCR)&&isRadius){
+                    errorListMap.put(i, strFrame.toString());
                 }
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());

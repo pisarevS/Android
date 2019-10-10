@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import pisarev.com.modeling.interfaces.MainMvp;
 import pisarev.com.modeling.mvp.model.Expression;
 import pisarev.com.modeling.mvp.model.Frame;
 
@@ -22,9 +23,18 @@ public abstract class BaseProgram {
     protected Map<Integer, String> errorListMap;
     protected final float FIBO = 1123581220;
     private String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18"};
+    protected MainMvp.ViewMvp viewMvp;
+    protected boolean isConvert;
 
     protected BaseProgram(String program) {
         this.program = program;
+        initLists();
+    }
+
+    protected  BaseProgram(boolean isConvert,String program, MainMvp.ViewMvp viewMvp){
+        this.program = program;
+        this.viewMvp=viewMvp;
+        this.isConvert=isConvert;
         initLists();
     }
 
@@ -153,6 +163,40 @@ public abstract class BaseProgram {
             return expression.calculate(temp.toString());
         }
         return Float.parseFloat(temp.toString());
+    }
+
+    protected String incrementSearchStr(StringBuffer frame, String axis) {
+        StringBuilder temp = new StringBuilder();
+        int n = frame.indexOf( axis );
+
+        if (frame.charAt( n + axis.length() ) == '(') {
+            for (int i = n + axis.length(); i < frame.length(); i++) {
+                if (readUp( frame.charAt( i ) )) {
+                    temp.append( frame.charAt( i ) );
+                } else {
+                    break;
+                }
+            }
+        }
+        return temp.toString();
+    }
+
+    protected String coordinateSearchStr(StringBuffer frame, String axis) {
+        StringBuffer temp = new StringBuffer();
+        int n = frame.indexOf( axis );
+
+        for (int i = n + axis.length(); i < frame.length(); i++) {
+            if (readUp( frame.charAt( i ) )) {
+                temp.append( frame.charAt( i ) );
+            } else {
+                break;
+            }
+        }
+        if(temp.toString().contains("=")){
+            int index=temp.indexOf("=");
+            temp=temp.replace(index,index+1,"");
+        }
+        return temp.toString();
     }
 
     protected boolean containsAxis(StringBuffer frame, String axis) {
