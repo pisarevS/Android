@@ -37,21 +37,9 @@ public class Program extends BaseProgram implements Runnable {
         App.getComponent().inject(this);
         data.getFrameList().clear();
     }
-
-    public Program(boolean isConvert,String program, MainMvp.ViewMvp viewMvp){
-        super(isConvert,program,viewMvp);
-        programList = new ArrayList<>();
-        parameterList = new ArrayList<>();
-        App.getComponent().inject(this);
-        data.getFrameList().clear();
-    }
-
-
+    
     @Override
     public void run() {
-        if(isConvert){
-            viewMvp.showConvert( convert() );
-        }else {
             data.setProgramList(getList(program));
             programList.addAll(getList(program));
             removeIgnore(programList);
@@ -68,8 +56,6 @@ public class Program extends BaseProgram implements Runnable {
             for (int i = 0; i < frameList.size(); i++) {
                 Log.d(TEG, frameList.get(i).toString());
             }
-        }
-
     }
 
     private String convert(){
