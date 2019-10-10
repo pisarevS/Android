@@ -50,4 +50,6 @@ public class ProgramFragment extends Fragment {
         sqLiteData.deleteProgramText();
         sqLiteData.setProgramText(stringMap);
     }
+
+
 }

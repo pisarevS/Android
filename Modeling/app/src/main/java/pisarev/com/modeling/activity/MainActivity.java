@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pisarev.com.modeling.interfaces.MainMvp;
+import pisarev.com.modeling.mvp.model.Program;
 import pisarev.com.modeling.mvp.model.SQLiteData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private MainMvp.PresenterMainMvp presenter;
     private ProgramFragment programFragment;
+    private String program;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .build()
                         .show();
                 return true;
+            case R.id.convert:
+                Thread thread = new Thread(new Program(true,new SQLiteData(this, SQLiteData.DATABASE_PROGRAM).getProgramText().get(SQLiteData.KEY_PROGRAM),this));
+                thread.start();
+                programFragment.setText(program);
+                return true;
             case R.id.action_exit:
                 new SQLiteData(this, SQLiteData.DATABASE_PROGRAM).deleteProgramText();
                 new SQLiteData(this, SQLiteData.DATABASE_PARAMETER).deleteProgramText();
@@ -95,6 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void showProgram(String program) {
         programFragment.setText(program);
+    }
+
+    public void showConvert(String text) {
+        program=text;
     }
 
     @Override
