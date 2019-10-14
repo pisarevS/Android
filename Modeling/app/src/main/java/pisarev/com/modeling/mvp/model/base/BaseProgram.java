@@ -290,4 +290,17 @@ public abstract class BaseProgram {
         if (text.toString().contains(")")) return true;
         return false;
     }
+
+    protected boolean activatedRadius(ArrayList<String> gCode){
+        for (String code:gCode) {
+            switch (code){
+                case "G2":
+                case "G02":
+                case "G3":
+                case "G03":
+                    return true;
+            }
+        }
+        return false;
+    }
 }

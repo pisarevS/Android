@@ -69,7 +69,6 @@ public class Program extends BaseProgram implements Runnable {
                 Log.d(TEG, frameList.get(i).toString());
             }
         }
-
     }
 
     private String convert(){
@@ -216,19 +215,6 @@ public class Program extends BaseProgram implements Runnable {
         }
     }
 
-    private boolean activedRadius(ArrayList<String> gCode){
-        for (String code:gCode) {
-            switch (code){
-                case "G2":
-                case "G02":
-                case "G3":
-                case "G03":
-                    return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     protected void addFrameList() {
         selectCoordinateSystem(programList);
@@ -240,6 +226,7 @@ public class Program extends BaseProgram implements Runnable {
         float tempCR = 0;
         boolean isCR = false;
         boolean isRadius=false;
+        boolean isOffn=false;
         for (int i = 0; i < programList.size(); i++) {
             strFrame = programList.get(i);
             Frame frame = new Frame();
@@ -251,6 +238,7 @@ public class Program extends BaseProgram implements Runnable {
                     frame.setX(tempHorizontal);
                     frame.setZ(tempVertical);
                     frameList.add(frame);
+                    isOffn=true;
                 }
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
@@ -259,7 +247,7 @@ public class Program extends BaseProgram implements Runnable {
             try {
                 if (contains(strFrame, "G")) {
                     ArrayList<String> gCode=searchGCog(strFrame.toString());
-                    isRadius=activedRadius( searchGCog(strFrame.toString()) );
+                    isRadius= activatedRadius( searchGCog(strFrame.toString()) );
                     frame.setGCode(gCode);
                     frame.setId(i);
                     frame.setX(tempHorizontal);
@@ -305,14 +293,14 @@ public class Program extends BaseProgram implements Runnable {
 
             String radiusCR = "CR=";
             try {
-                if (contains(strFrame, radiusCR)&&isRadius) {
+                if (contains(strFrame, radiusCR)&&isRadius&&!isOffn) {
                     tempCR = coordinateSearch(strFrame, radiusCR);
                     if (tempCR != FIBO) {
                         isCR = true;
                     }
                 }else if(contains(strFrame, radiusCR)&&!isRadius){
                     errorListMap.put(i, strFrame.toString());
-                }else if(!contains(strFrame, radiusCR)&&isRadius){
+                }else if(!contains(strFrame, radiusCR)&&isRadius&&!isOffn){
                     errorListMap.put(i, strFrame.toString());
                 }
             } catch (Exception e) {
@@ -330,6 +318,7 @@ public class Program extends BaseProgram implements Runnable {
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
                 isCR = false;
+                isOffn=false;
             }
 
             if (isHorizontalAxis || isVerticalAxis) {
@@ -340,6 +329,7 @@ public class Program extends BaseProgram implements Runnable {
                 frameList.add(frame);
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
+                isOffn=false;
             }
         }
         data.setErrorListMap(errorListMap);
