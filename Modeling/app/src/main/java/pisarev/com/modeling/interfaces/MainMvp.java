@@ -5,7 +5,7 @@ public interface MainMvp {
     interface ViewMvp {
         void showProgram(String program);
 
-        void showConvert(String text);
+        void showConvert(String program);
     }
 
     interface PresenterMainMvp {
