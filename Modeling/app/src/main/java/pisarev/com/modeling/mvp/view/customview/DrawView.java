@@ -24,7 +24,8 @@ import javax.inject.Inject;
 import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.IDraw;
-import pisarev.com.modeling.mvp.model.Draw;
+import pisarev.com.modeling.mvp.model.DrawHorizontalTurning;
+import pisarev.com.modeling.mvp.model.DrawVerticalTurning;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
 
@@ -142,8 +143,10 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     }
 
     private void manager(Canvas canvas) {
-        Draw draw = new Draw( this, data );
-        draw.drawContour( canvas, pointCoordinateZero, zoom, index );
+        DrawVerticalTurning drawVerticalTurning = new DrawVerticalTurning( this, data );
+        drawVerticalTurning.drawContour( canvas, pointCoordinateZero, zoom, index );
+        //DrawHorizontalTurning drawHorizontalTurning = new DrawHorizontalTurning(  this, data );
+        //drawHorizontalTurning.drawContour( canvas, pointCoordinateZero, zoom, index );
     }
 
     private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
