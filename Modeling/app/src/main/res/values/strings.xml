@@ -9,5 +9,7 @@
     <string name="action_openProgram">Open Program</string>
     <string name="action_save">Save</string>
     <string name="convert">Convert</string>
+    <string name="setting">Setting</string>
     <string name="action_exit">Exit</string>
+    <string name="title_activity_setting">Settings</string>
 </resources>

@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } )
                         .build()
                         .show();
+            case R.id.setting:
+                Intent intent = new Intent( MainActivity.this, SettingsActivity.class );
+                startActivity( intent );
                 return true;
             case R.id.action_exit:
                 new SQLiteData( this, SQLiteData.DATABASE_PROGRAM ).deleteProgramText();
