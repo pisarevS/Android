@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } )
                         .build()
                         .show();
+                return true;
             case R.id.setting:
                 Intent intent = new Intent( MainActivity.this, SettingsActivity.class );
                 startActivity( intent );

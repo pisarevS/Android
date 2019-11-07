@@ -3,11 +3,13 @@ package pisarev.com.modeling.mvp.view.customview;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -50,6 +52,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private boolean isResetDown = false;
     private boolean isStartDown = false;
     private final String TEG = getClass().getName();
+    private SharedPreferences myPreferences;
     @Inject
     MyData data;
 
@@ -58,6 +61,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         init();
         scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
         App.getComponent().inject( this );
+        myPreferences= PreferenceManager.getDefaultSharedPreferences( context);
     }
 
     public DrawView(Context context, @Nullable AttributeSet attrs) {
@@ -65,6 +69,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         init();
         scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
         App.getComponent().inject( this );
+        myPreferences= PreferenceManager.getDefaultSharedPreferences( context );
     }
 
     private void init() {
@@ -143,10 +148,13 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     }
 
     private void manager(Canvas canvas) {
-        DrawVerticalTurning drawVerticalTurning = new DrawVerticalTurning( this, data );
-        drawVerticalTurning.drawContour( canvas, pointCoordinateZero, zoom, index );
-        //DrawHorizontalTurning drawHorizontalTurning = new DrawHorizontalTurning(  this, data );
-        //drawHorizontalTurning.drawContour( canvas, pointCoordinateZero, zoom, index );
+        if(myPreferences.getBoolean( "RADIOBUTTON",false )){
+            DrawVerticalTurning drawVerticalTurning = new DrawVerticalTurning( this, data );
+            drawVerticalTurning.drawContour( canvas, pointCoordinateZero, zoom, index );
+        }else {
+            DrawHorizontalTurning drawHorizontalTurning = new DrawHorizontalTurning(  this, data );
+            drawHorizontalTurning.drawContour( canvas, pointCoordinateZero, zoom, index );
+        }
     }
 
     private void drawSystemCoordinate(Canvas canvas, boolean isTouch) {
