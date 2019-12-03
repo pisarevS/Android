@@ -278,7 +278,6 @@ public abstract class BaseProgram {
                     return true;
             }
         }
-        }
         return false;
     }
 }
