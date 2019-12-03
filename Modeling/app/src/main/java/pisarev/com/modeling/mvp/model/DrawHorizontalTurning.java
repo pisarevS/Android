@@ -5,9 +5,9 @@ import android.graphics.Canvas;
 import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.base.BaseDraw;
 
-public class Draw extends BaseDraw {
+public class DrawHorizontalTurning extends BaseDraw {
 
-    public Draw(IDraw draw, MyData data) {
+    public DrawHorizontalTurning(IDraw draw, MyData data) {
         super(draw, data);
     }
 
@@ -31,17 +31,17 @@ public class Draw extends BaseDraw {
                 break;
             } else {
                 if (frameList.get(i).getIsCR()) {
-                    pEnd.setX(frameList.get(i).getX());
-                    pEnd.setZ(frameList.get(i).getZ());
+                    pEnd.setX(frameList.get(i).getZ());
+                    pEnd.setZ(frameList.get(i).getX());
                     radius = frameList.get(i).getCr();
                     isRadius = true;
                 } else {
-                    pEnd.setX(frameList.get(i).getX());
-                    pEnd.setZ(frameList.get(i).getZ());
+                    pEnd.setX(frameList.get(i).getZ());
+                    pEnd.setZ(frameList.get(i).getX());
                     isLine = true;
                 }
                 if (isRadius && frameList.get(i).isAxisContains()) {
-                    drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, zoom, clockwise);
+                    drawArc(canvas, line, pointCoordinateZero, pStart, pEnd, radius, zoom, !clockwise);
                     pStart.setX(pEnd.getX());
                     pStart.setZ(pEnd.getZ());
                     isLine = false;
@@ -56,6 +56,4 @@ public class Draw extends BaseDraw {
         }
         drawPoint(canvas, pointCoordinateZero, pEnd, zoom);
     }
-
 }
-

@@ -28,6 +28,16 @@ public abstract class BaseProgram {
         initLists();
     }
 
+<<<<<<< HEAD
+    protected BaseProgram(boolean isConvert, String program, MainMvp.ViewMvp viewMvp) {
+        this.program = program;
+        this.viewMvp = viewMvp;
+        this.isConvert = isConvert;
+        initLists();
+    }
+
+=======
+>>>>>>> temp
     protected abstract void readParameterVariables(ArrayList<StringBuffer> parameterList);
 
     protected abstract ArrayList<StringBuffer> getList(String program);
@@ -140,6 +150,7 @@ public abstract class BaseProgram {
     protected float incrementSearch(StringBuffer frame, String axis) {
         Expression expression = new Expression();
         StringBuilder temp = new StringBuilder();
+<<<<<<< HEAD
         int n = frame.indexOf( axis );
 
         if (frame.charAt( n + axis.length() ) == '(') {
@@ -153,6 +164,47 @@ public abstract class BaseProgram {
             return expression.calculate( temp.toString() );
         }
         return Float.parseFloat( temp.toString() );
+    }
+
+    protected String incrementSearchStr(StringBuffer frame, String axis) {
+        StringBuilder temp = new StringBuilder();
+=======
+>>>>>>> temp
+        int n = frame.indexOf( axis );
+
+        if (frame.charAt( n + axis.length() ) == '(') {
+            for (int i = n + axis.length(); i < frame.length(); i++) {
+                if (readUp( frame.charAt( i ) )) {
+                    temp.append( frame.charAt( i ) );
+                } else {
+                    break;
+                }
+            }
+            return expression.calculate( temp.toString() );
+        }
+<<<<<<< HEAD
+        return temp.toString();
+    }
+
+    protected String coordinateSearchStr(StringBuffer frame, String axis) {
+        StringBuffer temp = new StringBuffer();
+        int n = frame.indexOf( axis );
+
+        for (int i = n + axis.length(); i < frame.length(); i++) {
+            if (readUp( frame.charAt( i ) )) {
+                temp.append( frame.charAt( i ) );
+            } else {
+                break;
+            }
+        }
+        if (temp.toString().contains( "=" )) {
+            int index = temp.indexOf( "=" );
+            temp = temp.replace( index, index + 1, "" );
+        }
+        return temp.toString();
+=======
+        return Float.parseFloat( temp.toString() );
+>>>>>>> temp
     }
 
     protected boolean containsAxis(StringBuffer frame, String axis) {
@@ -218,6 +270,8 @@ public abstract class BaseProgram {
 
     protected boolean contains(StringBuffer sb, String findString) {
         return sb.indexOf( findString ) > -1;
+<<<<<<< HEAD
+=======
     }
 
     protected boolean containsGCode(StringBuffer sb) {
@@ -240,6 +294,7 @@ public abstract class BaseProgram {
         if (sb.indexOf( "G3" ) > -1)
             return true;
         return sb.indexOf( "G03" ) > -1;
+>>>>>>> temp
     }
 
     protected boolean isDigit(char input) {
@@ -265,7 +320,12 @@ public abstract class BaseProgram {
         if (text.toString().contains( "*" )) return true;
         if (text.toString().contains( "/" )) return true;
         if (text.toString().contains( "(" )) return true;
+<<<<<<< HEAD
+        if (text.toString().contains( ")" )) return true;
+        return false;
+=======
         return text.toString().contains( ")" );
+>>>>>>> temp
     }
 
     protected boolean activatedRadius(ArrayList<String> gCode) {
@@ -277,7 +337,6 @@ public abstract class BaseProgram {
                 case "G03":
                     return true;
             }
-        }
         }
         return false;
     }
