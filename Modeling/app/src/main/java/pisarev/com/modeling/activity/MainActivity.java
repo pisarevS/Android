@@ -102,8 +102,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent( MainActivity.this, DrawActivity.class );
-        startActivity( intent );
+        if(!editText.getText().toString().equals( "" )) {
+            Intent intent = new Intent( MainActivity.this, DrawActivity.class );
+            startActivity( intent );
+        }else {
+            Toast.makeText( this,"the field is empty",Toast.LENGTH_LONG ).show();
+        }
     }
 
     @Override
