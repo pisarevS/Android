@@ -24,8 +24,8 @@ public class DrawHorizontalTurning extends BaseDraw {
 
         float radius = 0;
         for (int i = 0; i < index; i++) {
+            isG17 = isG17(frameList.get(i).getGCode());
             checkGCode(frameList.get(i).getGCode());
-
             if (data.getErrorListMap().containsKey(frameList.get(i).getId())) {
                 draw.showError(data.getErrorListMap().get(frameList.get(i).getId()));
                 break;

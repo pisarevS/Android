@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.Frame;
@@ -20,10 +21,11 @@ public abstract class BaseDraw {
     private Paint paintDottedLine;
     protected boolean clockwise;
     protected Paint line;
-    private ArrayList<StringBuffer> programList;
-    protected ArrayList<Frame> frameList;
+    private List<StringBuffer> programList;
+    protected List<Frame> frameList;
     protected IDraw draw;
     protected MyData data;
+    protected boolean isG17;
 
     protected BaseDraw(IDraw draw, MyData data) {
         this.draw = draw;
@@ -156,16 +158,14 @@ public abstract class BaseDraw {
         canvas.drawPath(path, paint);
     }
 
-    private boolean isG17(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++)
-            if (programList.get(i).toString().contains("G17")) {
-                return true;
-            }
+    protected boolean isG17(List<String> gCodes) {
+        for (String gCode:gCodes) {
+            return gCode.contains("G17");
+        }
         return false;
     }
 
-    protected void checkGCode(ArrayList<String> gCodeList) {
-        boolean isG17 = isG17(programList);
+    protected void checkGCode(List<String> gCodeList) {
         for (String gCode : gCodeList) {
             switch (gCode) {
                 case "G0":

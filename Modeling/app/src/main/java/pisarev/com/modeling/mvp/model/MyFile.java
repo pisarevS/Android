@@ -1,7 +1,13 @@
 package pisarev.com.modeling.mvp.model;
 
+import android.os.Build;
 import android.util.Log;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MyFile {
 
@@ -38,5 +44,26 @@ public class MyFile {
             Log.d(TEG,e.getMessage());
         }
         return text.toString();
+    }
+
+    public static List<StringBuffer> getParameter(File path) {
+        File folder = new File(path.getParent());
+        File[] listOfFiles = folder.listFiles();
+        assert listOfFiles != null;
+        for (File listOfFile : listOfFiles) {
+            if (listOfFile.isFile()) {
+                if (listOfFile.getName().contains("PAR")) {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            return  Files.lines(Paths.get(listOfFile.getPath())).map(StringBuffer::new).collect(Collectors.toList());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return new ArrayList<>();
+                    }
+                }
+            }
+        }
+        return new ArrayList<>();
     }
 }

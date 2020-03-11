@@ -1,5 +1,7 @@
 package pisarev.com.modeling.interfaces;
 
+import pisarev.com.modeling.mvp.model.MyData;
+
 public interface DrawMvp {
 
     interface PresenterDrawViewMvp {
@@ -11,9 +13,11 @@ public interface DrawMvp {
 
         void onButtonReset();
 
-        void getActivity(DrawViewMvp secondView);
+        void setActivity(DrawViewMvp secondView);
 
-        void getIndex(int index);
+        void setIndex(int index);
+
+        void setData(MyData data);
     }
 
     interface DrawViewMvp {

@@ -35,13 +35,13 @@ public class Expression {
     }
 
     //"Входной" метод класса
-    public float calculate(String input) {
+    public static float calculate(String input) {
         input = insertZero(input);
         String output = getExpression(input); //Преобразовываем выражение в постфиксную запись
         return counting(output); //Возвращаем результат
     }
 
-    private String insertZero(String input) {
+    private static String insertZero(String input) {
         StringBuilder sb = new StringBuilder(input);
         if (input.contains("-") && sb.charAt(0) == '-') {
             sb = sb.replace(0, 0, "0");

@@ -1,66 +1,106 @@
 package pisarev.com.modeling.mvp.model;
 
-import android.content.Context;
-import android.util.Log;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import pisarev.com.modeling.interfaces.Callback;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+public class Program implements Runnable {
 
-import pisarev.com.modeling.application.App;
-import pisarev.com.modeling.interfaces.MainMvp;
-import pisarev.com.modeling.mvp.model.base.BaseProgram;
-
-public class Program extends BaseProgram implements Runnable {
-
-    private ArrayList<StringBuffer> programList;
-    private ArrayList<StringBuffer> parameterList;
+    private List<StringBuffer> programList;
     private String[] defs = {"DEF REAL", "DEF INT"};
-    private String offn = "OFFN=";
-    private final String TEG = getClass().getName();
-    @Inject
-    MyData data;
-    @Inject
-    Context context;
+    private MyData data = new MyData();
+    private Callback callback;
+    private int x;
+    private int u;
+    private String horizontalAxis;
+    private String verticalAxis;
+    private String program;
+    private ArrayList<String> listIgnore;
+    private Map<String, String> variablesList;
+    private ArrayList<Frame> frameList;
+    private Map<Integer, String> errorListMap;
+    private final float FIBO = 1123581220;
+    private String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18"};
 
-    public Program(String program) {
-        super( program );
-        programList = new ArrayList<>();
-        parameterList = new ArrayList<>();
-        App.getComponent().inject( this );
-        data.getFrameList().clear();
+    public Program(String program, Map<String, String> variablesList, Callback callback) {
+        this.program = program;
+        this.variablesList = variablesList;
+        this.callback = callback;
+        initLists();
     }
 
+    private void initLists() {
+        listIgnore = new ArrayList<>();
+        frameList = new ArrayList<>();
+        errorListMap = new HashMap<>();
+        //ЛПО
+        listIgnore.add("G58 X=0 Z=N_CHUCK_HEIGHT_Z_S1[N_CHUCK_JAWS]");
+        listIgnore.add("G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1");
+        listIgnore.add("G59 X=N_WP_ZP_X_S1");
+        listIgnore.add("G59 X=N_WP_ZP_X_S1 Z=N_WP_ZP_Z_S1");
+        listIgnore.add("G58 X=0 Z=N_CHUCK_HEIGHT_Z_S2[N_CHUCK_JAWS]");
+        listIgnore.add("G59 X=N_WP_ZP_X_S2 Z=N_WP_ZP_Z_S2");
+        listIgnore.add("G58 U=0 W=N_CHUCK_HEIGHT_W_S1[N_CHUCK_JAWS]");
+        listIgnore.add("G59 U=N_WP_ZP_U_S1 W=N_WP_ZP_W_S1");
+        listIgnore.add("G58 U=0 W=N_CHUCK_HEIGHT_W_S2[N_CHUCK_JAWS]");
+        listIgnore.add("G59 U=N_WP_ZP_U_S2 W=N_WP_ZP_W_S2");
+        //ЛПО2
+        listIgnore.add("N_ZERO_O(54,X1,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S1[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X1,WP_ZP_X1_S1,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z1,WP_ZP_Z1_S1,\"FI\")");
+
+        listIgnore.add("N_ZERO_O(54,X1,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z1,CHUCK_HEIGHT_Z1_S2[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X1,WP_ZP_X1_S2,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z1,WP_ZP_Z1_S2,\"FI\")");
+
+        listIgnore.add("N_ZERO_O(54,X2,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S1[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X2,WP_ZP_X2_S1,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z2,WP_ZP_Z2_S1,\"FI\")");
+
+        listIgnore.add("N_ZERO_O(54,X2,0,\"TR\")");
+        listIgnore.add("N_ZERO_O(54,Z2,CHUCK_HEIGHT_Z2_S2[0],\"TR\")");
+        listIgnore.add("N_ZERO_O(54,X2,WP_ZP_X2_S2,\"FI\")");
+        listIgnore.add("N_ZERO_O(54,Z2,WP_ZP_Z2_S2,\"FI\")");
+
+        variablesList.put("N_GANTRYPOS_X", "650");
+        variablesList.put("N_GANTRYPOS_Z", "250");
+        variablesList.put("N_GANTRYPOS_U", "650");
+        variablesList.put("N_GANTRYPOS_W", "250");
+        variablesList.put("$P_TOOLR", "16");
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void run() {
-        data.setProgramList( getList( program ) );
-        programList.addAll( getList( program ) );
-        removeIgnore( programList );
-        removeLockedFrame( programList );
-        gotoF( programList );
-        if (containsDef( programList ))
-            searchDef( programList );
-        parameter = getParameter( new SQLiteData( context, SQLiteData.DATABASE_PATH ).getProgramText().get( SQLiteData.KEY_PROGRAM ) );
-        parameterList.addAll( getList( parameter ) );
-        readParameterVariables( parameterList );
-        replaceParameterVariables( variablesList );
-        replaceProgramVariables( programList );
+        replaceParameterVariables(variablesList);
+        data.setProgramList(Arrays.stream(program.split("\n")).map(StringBuffer::new).collect(Collectors.toList()));
+
+        programList = Arrays.stream(program.split("\n"))
+                .map(StringBuffer::new)
+                .peek(this::removeLockedFrame)
+                .peek(this::removeIgnore)
+                .peek(this::addDefVariables)
+                .peek(this::addRVariables)
+                .peek(this::initVariables)
+                .peek(this::replaceProgramVariables)
+                .collect(Collectors.toList());
+
+        gotoF(programList);
         addFrameList();
-        for (int i = 0; i < frameList.size(); i++) {
-            Log.d( TEG, frameList.get( i ).toString() );
-        }
+        callback.callingBack(data);
     }
 
-    @Override
-    protected void addFrameList() {
-        selectCoordinateSystem( programList );
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void addFrameList() {
+        selectCoordinateSystem(programList);
         StringBuffer strFrame;
         boolean isHorizontalAxis = false;
         boolean isVerticalAxis = false;
@@ -69,192 +109,151 @@ public class Program extends BaseProgram implements Runnable {
         float tempCR = 0;
         boolean isCR = false;
         boolean isRadius = false;
-        boolean isOffn = false;
         for (int i = 0; i < programList.size(); i++) {
-            strFrame = programList.get( i );
+            strFrame = programList.get(i);
             Frame frame = new Frame();
 
             try {
-                if (contains( strFrame, offn )) {
-                    frame.setOffn( searchOffn( strFrame ) );
-                    frame.setId( i );
-                    frame.setX( tempHorizontal );
-                    frame.setZ( tempVertical );
-                    frameList.add( frame );
-                    isOffn = true;
+                if (containsGCode(strFrame)) {
+                    List<String> gCode = searchGCog(strFrame.toString());
+                    isRadius = activatedRadius(gCode);
+                    frame.setGCode(gCode);
+                    frame.setId(i);
+                    frame.setX(tempHorizontal);
+                    frame.setZ(tempVertical);
+                    frameList.add(frame);
                 }
             } catch (Exception e) {
-                errorListMap.put( i, strFrame.toString() );
+                errorListMap.put(i, strFrame.toString());
             }
 
             try {
-                if (containsGCode( strFrame)) {
-                    ArrayList<String> gCode = searchGCog( strFrame.toString() );
-                    isRadius = activatedRadius( gCode );
-                    frame.setGCode( gCode );
-                    frame.setId( i );
-                    frame.setX( tempHorizontal );
-                    frame.setZ( tempVertical );
-                    frameList.add( frame );
-                }
-            } catch (Exception e) {
-                errorListMap.put( i, strFrame.toString() );
-            }
-
-            try {
-                if (contains( strFrame, horizontalAxis + "=IC" )) {
-                    tempHorizontal = tempHorizontal + incrementSearch( strFrame, horizontalAxis + "=IC" );
+                if (contains(strFrame, horizontalAxis + "=IC")) {
+                    tempHorizontal = tempHorizontal + incrementSearch(strFrame, horizontalAxis + "=IC");
                     isHorizontalAxis = true;
-                } else if (containsAxis( strFrame, horizontalAxis )) {
-                    tempHorizontal = coordinateSearch( strFrame, horizontalAxis );
+                } else if (containsAxis(strFrame, horizontalAxis)) {
+                    tempHorizontal = coordinateSearch(strFrame, horizontalAxis);
                     if (tempHorizontal != FIBO) {
                         isHorizontalAxis = true;
                     } else {
-                        errorListMap.put( i, strFrame.toString() );
+                        errorListMap.put(i, strFrame.toString());
                     }
                 }
             } catch (Exception e) {
-                errorListMap.put( i, strFrame.toString() );
+                errorListMap.put(i, strFrame.toString());
             }
 
             try {
-                if (contains( strFrame, verticalAxis + "=IC" )) {
-                    tempVertical = tempVertical + incrementSearch( strFrame, verticalAxis + "=IC" );
+                if (contains(strFrame, verticalAxis + "=IC")) {
+                    tempVertical = tempVertical + incrementSearch(strFrame, verticalAxis + "=IC");
                     isVerticalAxis = true;
-                } else if (containsAxis( strFrame, verticalAxis )) {
-                    tempVertical = coordinateSearch( strFrame, verticalAxis );
+                } else if (containsAxis(strFrame, verticalAxis)) {
+                    tempVertical = coordinateSearch(strFrame, verticalAxis);
                     if (tempVertical != FIBO) {
                         isVerticalAxis = true;
                     } else {
-                        errorListMap.put( i, strFrame.toString() );
+                        errorListMap.put(i, strFrame.toString());
                     }
                 }
             } catch (Exception e) {
-                errorListMap.put( i, strFrame.toString() );
+                errorListMap.put(i, strFrame.toString());
             }
 
             String radiusCR = "CR=";
             try {
-                if (contains( strFrame, radiusCR ) && isRadius && !isOffn) {
-                    tempCR = coordinateSearch( strFrame, radiusCR );
+                if (contains(strFrame, radiusCR) && isRadius) {
+                    tempCR = coordinateSearch(strFrame, radiusCR);
                     if (tempCR != FIBO) {
                         isCR = true;
                     }
-                } else if (contains( strFrame, radiusCR ) && !isRadius && !isOffn) {
-                    errorListMap.put( i, strFrame.toString() );
-                } else if (!contains( strFrame, radiusCR ) && isRadius && !isOffn) {
-                    errorListMap.put( i, strFrame.toString() );
                 }
             } catch (Exception e) {
-                errorListMap.put( i, strFrame.toString() );
+                errorListMap.put(i, strFrame.toString());
             }
 
             if (isCR) {
-                frame.setX( tempHorizontal );
-                frame.setZ( tempVertical );
-                frame.setCr( tempCR );
-                frame.setIsCR( true );
-                frame.setAxisContains( true );
-                frame.setId( i );
-                frameList.add( frame );
+                frame.setX(tempHorizontal);
+                frame.setZ(tempVertical);
+                frame.setCr(tempCR);
+                frame.setIsCR(true);
+                frame.setAxisContains(true);
+                frame.setId(i);
+                frameList.add(frame);
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
                 isCR = false;
-                isOffn = false;
             }
 
             if (isHorizontalAxis || isVerticalAxis) {
-                frame.setX( tempHorizontal );
-                frame.setZ( tempVertical );
-                frame.setAxisContains( true );
-                frame.setId( i );
-                frameList.add( frame );
+                frame.setX(tempHorizontal);
+                frame.setZ(tempVertical);
+                frame.setAxisContains(true);
+                frame.setId(i);
+                frameList.add(frame);
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
-                isOffn = false;
             }
         }
-        data.setErrorListMap( errorListMap );
-        Set<Frame> s = new LinkedHashSet<>( frameList );
+        data.setErrorListMap(errorListMap);
+        Set<Frame> s = new LinkedHashSet<>(frameList);
         frameList.clear();
-        frameList.addAll( s );
-        data.setFrameList( frameList );
+        frameList.addAll(s);
+        data.setFrameList(frameList);
     }
 
-    @Override
-    protected ArrayList<StringBuffer> getList(String program) {
-        ArrayList<StringBuffer> arrayList = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader( new StringReader( program ) );
-            String line;
-            while ((line = br.readLine()) != null) {
-                arrayList.add( new StringBuffer( line ) );
-            }
-            br.close();
-        } catch (IOException ignored) {
-
-        }
-        return arrayList;
+    private void removeLockedFrame(StringBuffer frame) {
+        if (frame.toString().contains(";")) frame.delete(frame.indexOf(";"), frame.length());
     }
 
-    @Override
-    protected void readParameterVariables(ArrayList<StringBuffer> parameterList) {
-        for (int i = 0; i < parameterList.size(); i++) {
-            if (parameterList.get( i ).toString().contains( ";" )) {
-                parameterList.get( i ).delete( parameterList.get( i ).indexOf( ";" ), parameterList.get( i ).length() );
-            }
-            if (parameterList.get( i ).toString().contains( "=" )) {
-                int key = 0;
-                for (int j = parameterList.get( i ).indexOf( "=" ) - 1; j >= 0; j--) {
-                    char c = parameterList.get( i ).charAt( j );
-                    if (c == ' ') {
-                        key = j;
-                        break;
-                    }
-                }
-                variablesList.put(
-                        parameterList.get( i ).substring( key, parameterList.get( i ).indexOf( "=" ) ).replace( " ", "" )
-                        , parameterList.get( i ).substring( parameterList.get( i ).indexOf( "=" ) + 1, parameterList.get( i ).length() ).replace( " ", "" ) );
-            }
-        }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void removeIgnore(StringBuffer frame) {
+        listIgnore.forEach(ignore -> {
+            if (frame.toString().contains(ignore)) frame.delete(0, frame.length());
+        });
     }
 
-    @Override
-    protected void replaceParameterVariables(Map<String, String> variablesList) {
-        for (Map.Entry entry : variablesList.entrySet()) {
-            String key = entry.getKey().toString();
-            String value = entry.getValue().toString();
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void replaceParameterVariables(Map<String, String> variablesList) {
+        variablesList.forEach((key, value1) -> {
+            String value = value1;
             for (String keys : variablesList.keySet()) {
-                if (value.contains( keys )) {
-                    value = value.replace( keys, variablesList.get( keys ) );
-                    variablesList.put( key, value );
+                if (value.contains(keys)) {
+                    value = value.replace(keys, variablesList.get(keys));
+                    variablesList.put(key, value);
                 }
             }
-        }
+        });
     }
 
-    @Override
-    protected void replaceProgramVariables(ArrayList<StringBuffer> programList) {
-        for (Map.Entry entry : variablesList.entrySet()) {
-            for (int i = 0; i < programList.size(); i++) {
-                if (programList.get( i ).toString().contains( entry.getKey().toString() )) {
-                    String str = programList.get( i ).toString().replace( entry.getKey().toString(), entry.getValue().toString() );
-                    programList.get( i ).replace( 0, programList.get( i ).length(), str );
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void replaceProgramVariables(StringBuffer frame) {
+        variablesList.forEach((key, value) -> {
+            if (frame.toString().contains(key)) {
+                String value1 = value;
+                if (isSymbol(value1)) {
+                    double newValve = 0;
+                    try {
+                        newValve = Expression.calculate(value1);
+                    } catch (EmptyStackException e) {
+                        e.printStackTrace();
+                    }
+                    value1 = String.valueOf(newValve);
                 }
+                String str = frame.toString().replace(key, value1);
+                frame.replace(0, frame.length(), str);
             }
-        }
+        });
     }
 
-    private void gotoF(ArrayList<StringBuffer> programList) {
+    private void gotoF(List<StringBuffer> programList) {
         String label;
         String gotoF = "GOTOF";
         for (int i = 0; i < programList.size(); i++) {
-            if (programList.get( i ).toString().contains( gotoF )) {
-                label = programList.get( i ).substring( programList.get( i ).indexOf( gotoF ) + gotoF.length(), programList.get( i ).length() ).replace( " ", "" );
+            if (programList.get(i).toString().contains(gotoF)) {
+                label = programList.get(i).substring(programList.get(i).indexOf(gotoF) + gotoF.length(), programList.get(i).length()).replace(" ", "");
                 for (int j = i + 1; j < programList.size(); j++) {
-                    if (!programList.get( j ).toString().contains( label + ":" )) {
-                        programList.get( j ).delete( 0, programList.get( j ).length() );
+                    if (!programList.get(j).toString().contains(label + ":")) {
+                        programList.get(j).delete(0, programList.get(j).length());
                     } else {
                         break;
                     }
@@ -263,67 +262,232 @@ public class Program extends BaseProgram implements Runnable {
         }
     }
 
-    private void removeIgnore(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++) {
-            for (int j = 0; j < listIgnore.size(); j++) {
-                if (programList.get( i ).toString().contains( listIgnore.get( j ) )) {
-                    programList.get( i ).delete( 0, programList.get( i ).length() );
+    private void addDefVariables(StringBuffer frame) {
+        for (String def : defs) {
+            if (frame.toString().contains(def)) {
+                frame.delete(0, frame.indexOf(def) + def.length());
+                String[] arrStr = frame.toString().split(",");
+                for (String str : arrStr) {
+                    if (str.contains("=")) {
+                        String[] arrVar = str.split("=");
+                        variablesList.put(arrVar[0].replace(" ", ""), arrVar[1].replace(" ", ""));
+                    } else {
+                        variablesList.put(str.replace(" ", ""), "");
+                    }
                 }
             }
         }
     }
 
-    private void removeLockedFrame(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++) {
-            if (programList.get( i ).toString().contains( ";" )) {
-                programList.get( i ).delete( programList.get( i ).indexOf( ";" ), programList.get( i ).length() );
-            }
+    private void addRVariables(StringBuffer frame) {
+        Pattern pattern = Pattern.compile("R(\\d+)" + "=");
+        Matcher matcher = pattern.matcher(frame);
+        while (matcher.find()) {
+            variablesList.put(matcher.group().replace("=", ""), "");
         }
-
     }
 
-    private boolean containsDef(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++) {
-            for (String def : defs) {
-                if (programList.get( i ).toString().contains( def ) && programList.get( i ).toString().contains( "=" ))
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void initVariables(StringBuffer frame) {
+        for (String def : defs) {
+            if (frame.indexOf(def) == -1) {
+                variablesList.forEach((key, value) -> {
+                    if (frame.toString().contains(key + "=")) {
+                        String[] arrStr = frame.toString().split(" ");
+                        for (String str : arrStr) {
+                            if (str.contains("=")) {
+                                String[] arrVar = str.split("=");
+                                variablesList.put(arrVar[0].replace(" ", ""), arrVar[1].replace(" ", ""));
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        replaceParameterVariables(variablesList);
+    }
+
+    private boolean isGCode(String g) {
+        for (String gCode : gCodes) {
+            if (g.equals(gCode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ArrayList<String> searchGCog(String frame) {
+        ArrayList<String> gCodeList = new ArrayList<>();
+        StringBuilder g = new StringBuilder("G");
+        if (frame.contains("G")) {
+            for (int i = 0; i < frame.length(); i++) {
+                char c = frame.charAt(i);
+                if (c == 'G') {
+                    for (int j = i + 1; j < frame.length(); j++) {
+                        char t = frame.charAt(j);
+                        if (isDigit(t)) {
+                            g.append(t);
+                        } else {
+                            if (isGCode(g.toString()))
+                                gCodeList.add(g.toString());
+                            break;
+                        }
+                    }
+                    g = new StringBuilder("G");
+                }
+            }
+        }
+        return gCodeList;
+    }
+
+    private float coordinateSearch(StringBuffer frame, String axis) throws Exception {
+        StringBuilder temp = new StringBuilder();
+        for (int i = frame.indexOf(axis) + axis.length(); i < frame.length(); i++) {
+            if (readUp(frame.charAt(i))) {
+                temp.append(frame.charAt(i));
+            } else {
+                break;
+            }
+        }
+        if (isSymbol(temp.toString())&&temp.indexOf("=")!=-1) {
+            if (temp.toString().contains("=")) {
+                int index = temp.indexOf("=");
+                temp.replace(index, index + 1, "");
+            }
+            return Expression.calculate(temp.toString());
+        } else if (!isSymbol(temp.toString())) {
+            return Float.parseFloat(temp.toString());
+        }
+        return FIBO;
+    }
+
+    private float incrementSearch(StringBuffer frame, String axis) throws Exception {
+        StringBuilder temp = new StringBuilder();
+        int n = frame.indexOf(axis);
+
+        if (frame.charAt(n + axis.length()) == '(') {
+            for (int i = n + axis.length(); i < frame.length(); i++) {
+                if (readUp(frame.charAt(i))) {
+                    temp.append(frame.charAt(i));
+                } else {
+                    break;
+                }
+            }
+            return Expression.calculate(temp.toString());
+        }
+        return Float.parseFloat(temp.toString());
+    }
+
+    private boolean containsAxis(StringBuffer frame, String axis) {
+        if (contains(frame, axis)) {
+            int n = frame.indexOf(axis) + 1;
+            char c = frame.charAt(n);
+            switch (c) {
+                case '-':
+                case '=':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
                     return true;
             }
         }
         return false;
     }
 
-    private void searchDef(ArrayList<StringBuffer> programList) {
-        for (int i = 0; i < programList.size(); i++) {
-            for (String def : defs) {
-                if (programList.get( i ).toString().contains( def ) && programList.get( i ).toString().contains( "=" )) {
-                    int n = programList.get( i ).indexOf( def ) + def.length();
-                    String key = programList.get( i ).substring( n, programList.get( i ).indexOf( "=" ) ).replace( " ", "" );
-                    String value = programList.get( i ).substring( programList.get( i ).indexOf( "=" ) + 1, programList.get( i ).length() ).replace( " ", "" );
-                    variablesList.put( key, value );
-                }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void selectCoordinateSystem(List<StringBuffer> programList) {
+        programList.forEach(valve -> {
+            if (valve.toString().contains("X"))
+                x++;
+            if (valve.toString().contains("U"))
+                u++;
+            if (x > u) {
+                horizontalAxis = "X";
+                verticalAxis = "Z";
+            } else {
+                horizontalAxis = "U";
+                verticalAxis = "W";
             }
-        }
+        });
     }
 
-    private String getParameter(String path) {
-        MyFile myFile = new MyFile();
-        File directory = new File( path );
-        File folder = new File( directory.getParent() );
-        File[] listOfFiles = folder.listFiles();
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.isFile()) {
-                if (listOfFile.getName().contains( "PAR" )) {
-                    return myFile.readFile( listOfFile.getPath() );
-                }
-            }
+    private boolean readUp(char input) {
+        switch (input) {
+            case 'C':
+            case 'X':
+            case 'G':
+            case 'M':
+            case 'F':
+            case 'W':
+            case 'Z':
+            case 'D':
+            case 'S':
+            case 'A':
+            case 'U':
+            case 'L':
+            case 'O':
+            case 'H':
+            case 'R':
+                return false;
         }
-        return "";
+        return true;
     }
 
-    private float searchOffn(StringBuffer frame) {
-        Expression expression = new Expression();
-        int n = frame.indexOf( offn );
-        String temp = frame.substring( n + offn.length(), frame.length() );
-        return expression.calculate( temp );
+    private boolean contains(StringBuffer sb, String findString) {
+        return sb.indexOf(findString) > -1;
+    }
+
+    private boolean containsGCode(StringBuffer sb) {
+        for (String g : gCodes) {
+            if (sb.indexOf(g) > -1) return true;
+        }
+        return false;
+    }
+
+    private boolean isDigit(char input) {
+        switch (input) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                return true;
+        }
+        return false;
+    }
+
+    private boolean isSymbol(String text) {
+        if (text.contains("=")) return true;
+        if (text.contains("+")) return true;
+        if (text.contains("-")) return true;
+        if (text.contains("*")) return true;
+        if (text.contains("/")) return true;
+        if (text.contains("(")) return true;
+        return text.contains(")");
+    }
+
+    private boolean activatedRadius(List<String> gCode) {
+        for (String code : gCode) {
+            switch (code) {
+                case "G2":
+                case "G02":
+                case "G3":
+                case "G03":
+                    return true;
+            }
+        }
+        return false;
     }
 }

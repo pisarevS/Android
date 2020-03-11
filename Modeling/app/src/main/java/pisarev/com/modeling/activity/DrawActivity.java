@@ -1,5 +1,7 @@
 package pisarev.com.modeling.activity;
 
+import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -12,15 +14,18 @@ import android.widget.TextView;
 
 import pisarev.com.modeling.application.App;
 
+import pisarev.com.modeling.interfaces.Callback;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.R;
+import pisarev.com.modeling.mvp.model.MyFile;
 import pisarev.com.modeling.mvp.model.Program;
 import pisarev.com.modeling.mvp.model.SQLiteData;
 
-import javax.inject.Inject;
+import java.io.File;
+import java.util.*;
 
-public class DrawActivity extends AppCompatActivity implements View.OnTouchListener, DrawMvp.DrawViewMvp {
+public class DrawActivity extends AppCompatActivity implements View.OnTouchListener, DrawMvp.DrawViewMvp, Callback {
 
     private DrawMvp.PresenterDrawViewMvp drawView;
     private ImageView buttonStart;
@@ -28,12 +33,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     private ImageView buttonSingleBlock;
     private ImageView buttonReset;
     private TextView textViewFrame, textViewX, textViewZ;
+    private Map<String, String> variablesList;
     private int count = 0;
     private Vibrator vibrator;
     private int index;
-    @Inject
-    MyData data;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
@@ -41,8 +46,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         App.getComponent().inject( this );
         setContentView( R.layout.activity_draw );
         drawView = findViewById( R.id.myView );
-        drawView.getActivity( this );
-        drawView.getIndex( index );
+        drawView.setActivity( this );
+        drawView.setIndex( index );
         textViewFrame = findViewById( R.id.textViewFrame );
         textViewX = findViewById( R.id.textViewX );
         textViewZ = findViewById( R.id.textViewZ );
@@ -55,8 +60,18 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         buttonSingleBlock.setOnTouchListener( this );
         buttonReset.setOnTouchListener( this );
         vibrator = (Vibrator) getSystemService( VIBRATOR_SERVICE );
-        Thread thread = new Thread( new Program( new SQLiteData( this, SQLiteData.DATABASE_PROGRAM ).getProgramText().get( SQLiteData.KEY_PROGRAM ) ) );
+
+        String pathParameter=new SQLiteData( this, SQLiteData.DATABASE_PATH ).getProgramText().get( SQLiteData.KEY_PROGRAM );
+        List<StringBuffer> parameterList = MyFile.getParameter(new File(pathParameter));
+        readParameterVariables(parameterList);
+
+        Thread thread = new Thread( new Program( new SQLiteData( this, SQLiteData.DATABASE_PROGRAM ).getProgramText().get( SQLiteData.KEY_PROGRAM ),variablesList, this) );
         thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -71,7 +86,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
                         break;
                     case MotionEvent.ACTION_UP:
                         if (vibrator.hasVibrator()) {
-                            vibrator.vibrate( 20 );
+                            vibrator.vibrate(20);
                         }
                         buttonStart.setImageResource( R.drawable.start );
                         break;
@@ -130,23 +145,15 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void showFrame(final String frame) {
-        DrawActivity.this.runOnUiThread( new Runnable() {
-            @Override
-            public void run() {
-                textViewFrame.setText( frame );
-            }
-        } );
+        DrawActivity.this.runOnUiThread(() -> textViewFrame.setText( frame ));
     }
 
     @Override
     public void showAxis(final String horizontalAxis, final String verticalAxis) {
-        DrawActivity.this.runOnUiThread( new Runnable() {
-            @Override
-            public void run() {
-                textViewX.setText( horizontalAxis );
-                textViewZ.setText( verticalAxis );
-            }
-        } );
+        DrawActivity.this.runOnUiThread(() -> {
+            textViewX.setText( horizontalAxis );
+            textViewZ.setText( verticalAxis );
+        });
     }
 
     @Override
@@ -164,7 +171,36 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState( savedInstanceState );
-        drawView.getIndex( savedInstanceState.getInt( "index" ) );
+        drawView.setIndex( savedInstanceState.getInt( "index" ) );
         drawView.onButtonCycleStart();
+    }
+
+
+    private void readParameterVariables(List<StringBuffer> parameterList) {
+        variablesList = new LinkedHashMap<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            parameterList.forEach(p -> {
+                if (p.toString().contains(";")) p.delete(p.indexOf(";"), p.length());
+                if (p.toString().contains("=")) {
+                    int key = 0;
+                    for (int j = p.indexOf("=") - 1; j >= 0; j--) {
+                        char c = p.charAt(j);
+                        if (c == ' ') {
+                            key = j;
+                            break;
+                        }
+                    }
+                    variablesList.put(
+                            p.substring(key, p.indexOf("=")).replace(" ", "")
+                            , p.substring(p.indexOf("=") + 1, p.length()).replace(" ", ""));
+                }
+            });
+        }
+    }
+
+    @Override
+    public void callingBack(MyData data) {
+        drawView.setData(data);
+
     }
 }

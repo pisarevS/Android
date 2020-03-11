@@ -48,13 +48,12 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private int index;
     private ScaleGestureDetector scaleGestureDetector;
     private ArrayList<String> errorList;
-    private boolean isSingleBlockDown = false;
+    private boolean isSingleBlockDown;
     private boolean isResetDown = false;
     private boolean isStartDown = false;
     private final String TEG = getClass().getName();
     private SharedPreferences myPreferences;
-    @Inject
-    MyData data;
+    private MyData data;
 
     public DrawView(Context context) {
         super( context );
@@ -73,6 +72,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     }
 
     private void init() {
+        data=new MyData();
         paintCoordinateDottedLine = new Paint();
         paintCoordinateDottedLine.setColor( Color.LTGRAY );
         paintCoordinateDottedLine.setStyle( Paint.Style.STROKE );
@@ -261,15 +261,19 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     }
 
     @Override
-    public void getActivity(DrawMvp.DrawViewMvp secondView) {
+    public void setActivity(DrawMvp.DrawViewMvp secondView) {
         this.drawActivity = secondView;
     }
 
     @Override
-    public void getIndex(int index) {
+    public void setIndex(int index) {
         this.index = index;
     }
 
+    @Override
+    public void setData(MyData data) {
+        this.data=data;
+    }
 
     public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 

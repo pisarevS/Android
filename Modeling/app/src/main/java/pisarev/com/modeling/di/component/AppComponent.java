@@ -12,8 +12,6 @@ import pisarev.com.modeling.mvp.view.customview.DrawView;
 @Singleton
 @Component(modules = AppModule.class)
 public interface AppComponent {
-    void inject(Program program);
-
     void inject(DrawActivity drawActivity);
 
     void inject(DrawView drawView);
