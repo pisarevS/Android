@@ -1,13 +1,18 @@
 package pisarev.com.modeling.activity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pisarev.com.modeling.interfaces.MainMvp;
+import pisarev.com.modeling.mvp.model.StyleText;
 import pisarev.com.modeling.mvp.model.SQLiteData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
@@ -33,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText editText;
     private SQLiteData sqLiteData;
 
+    @SuppressLint("ResourceAsColor")
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -43,8 +51,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FloatingActionButton fab = findViewById( R.id.fab );
         fab.setOnClickListener( this );
         editText = findViewById( R.id.editText );
+        editText.setBackgroundColor(Color.rgb(64,64,64));
+        editText.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        editText.requestFocus();
+
         sqLiteData = new SQLiteData( this, SQLiteData.DATABASE_PROGRAM );
         editText.setText( sqLiteData.getProgramText().get( SQLiteData.KEY_PROGRAM ) );
+
+        StyleText.setStyle(editText);
+
     }
 
     @Override
@@ -62,23 +77,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_openProgram:
                 new ChooserDialog( MainActivity.this )
                         .withStartFile( sdcard.getPath() )
-                        .withChosenListener( new ChooserDialog.Result() {
-                            @Override
-                            public void onChoosePath(String path, File pathFile) {
-                                Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
-                                presenter.openProgram( path );
-                                Map<String, String> stringMap = new HashMap<>();
-                                stringMap.put( SQLiteData.KEY_PROGRAM, path );
-                                new SQLiteData( getApplication(), SQLiteData.DATABASE_PATH ).setProgramText( stringMap );
-                            }
-                        } )
+                        .withChosenListener((path, pathFile) -> {
+                            Toast.makeText( MainActivity.this, "FILE: " + path, Toast.LENGTH_SHORT ).show();
+                            presenter.openProgram( path );
+                            Map<String, String> stringMap = new HashMap<>();
+                            stringMap.put( SQLiteData.KEY_PROGRAM, path );
+                            new SQLiteData( getApplication(), SQLiteData.DATABASE_PATH ).setProgramText( stringMap );
+                        })
                         // to handle the back key pressed or clicked outside the dialog:
-                        .withOnCancelListener( new DialogInterface.OnCancelListener() {
-                            public void onCancel(DialogInterface dialog) {
-                                Log.d( "CANCEL", "CANCEL" );
-                                dialog.cancel(); // MUST have
-                            }
-                        } )
+                        .withOnCancelListener(dialog -> {
+                            Log.d( "CANCEL", "CANCEL" );
+                            dialog.cancel(); // MUST have
+                        })
                         .build()
                         .show();
                 return true;
@@ -95,9 +105,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected( item );
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void showProgram(String program) {
         editText.setText( program );
+        StyleText.setStyle(editText);
     }
 
     @Override
@@ -126,5 +138,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stringMap.put( SQLiteData.KEY_PROGRAM, editText.getText().toString() );
         sqLiteData.deleteProgramText();
         sqLiteData.setProgramText( stringMap );
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StyleText.setStyle(editText);
+        editText.requestFocus();
+        //editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE);
     }
 }

@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.inject.Inject;
-
-import pisarev.com.modeling.application.App;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.IDraw;
 import pisarev.com.modeling.mvp.model.DrawHorizontalTurning;
@@ -48,7 +45,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private int index;
     private ScaleGestureDetector scaleGestureDetector;
     private ArrayList<String> errorList;
-    private boolean isSingleBlockDown;
+    private boolean isSingleBlockDown=false;
     private boolean isResetDown = false;
     private boolean isStartDown = false;
     private final String TEG = getClass().getName();
@@ -59,7 +56,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         super( context );
         init();
         scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
-        App.getComponent().inject( this );
         myPreferences= PreferenceManager.getDefaultSharedPreferences( context);
     }
 
@@ -67,7 +63,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         super( context, attrs );
         init();
         scaleGestureDetector = new ScaleGestureDetector( context, new ScaleListener() );
-        App.getComponent().inject( this );
         myPreferences= PreferenceManager.getDefaultSharedPreferences( context );
     }
 

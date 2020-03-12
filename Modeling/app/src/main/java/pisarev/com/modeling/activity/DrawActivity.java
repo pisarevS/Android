@@ -12,8 +12,6 @@ import android.widget.ImageView;
 
 import android.widget.TextView;
 
-import pisarev.com.modeling.application.App;
-
 import pisarev.com.modeling.interfaces.Callback;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.mvp.model.MyData;
@@ -43,7 +41,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
         super.onCreate( savedInstanceState );
-        App.getComponent().inject( this );
         setContentView( R.layout.activity_draw );
         drawView = findViewById( R.id.myView );
         drawView.setActivity( this );
@@ -172,7 +169,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState( savedInstanceState );
         drawView.setIndex( savedInstanceState.getInt( "index" ) );
-        drawView.onButtonCycleStart();
+        //drawView.onButtonSingleBlock(false);
     }
 
 
