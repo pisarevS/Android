@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sqLiteData = new SQLiteData( this, SQLiteData.DATABASE_PROGRAM );
         editText.setText( sqLiteData.getProgramText().get( SQLiteData.KEY_PROGRAM ) );
 
-        StyleText.setStyle(editText);
+        //StyleText.setStyle(editText);
 
     }
 
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void showProgram(String program) {
         editText.setText( program );
-        StyleText.setStyle(editText);
+        //StyleText.setStyle(editText);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        StyleText.setStyle(editText);
+        //StyleText.setStyle(editText);
         editText.requestFocus();
         //editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE);
     }

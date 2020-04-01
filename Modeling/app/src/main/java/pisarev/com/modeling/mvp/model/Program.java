@@ -100,19 +100,23 @@ public class Program implements Runnable {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void addFrameList() {
-        selectCoordinateSystem(programList);
+        String CR = "CR=";
+        String RND = "RND=";
+        String IC = "=IC";
         StringBuffer strFrame;
         boolean isHorizontalAxis = false;
         boolean isVerticalAxis = false;
         float tempHorizontal = 650;
         float tempVertical = 250;
         float tempCR = 0;
+        float tempRND = 0;
         boolean isCR = false;
+        boolean isRND = false;
         boolean isRadius = false;
+        selectCoordinateSystem(programList);
         for (int i = 0; i < programList.size(); i++) {
             strFrame = programList.get(i);
             Frame frame = new Frame();
-
             try {
                 if (containsGCode(strFrame)) {
                     List<String> gCode = searchGCog(strFrame.toString());
@@ -126,10 +130,9 @@ public class Program implements Runnable {
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
             }
-
             try {
-                if (contains(strFrame, horizontalAxis + "=IC")) {
-                    tempHorizontal = tempHorizontal + incrementSearch(strFrame, horizontalAxis + "=IC");
+                if (contains(strFrame, horizontalAxis + IC)) {
+                    tempHorizontal = tempHorizontal + incrementSearch(strFrame, horizontalAxis + IC);
                     isHorizontalAxis = true;
                 } else if (containsAxis(strFrame, horizontalAxis)) {
                     tempHorizontal = coordinateSearch(strFrame, horizontalAxis);
@@ -142,10 +145,9 @@ public class Program implements Runnable {
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
             }
-
             try {
-                if (contains(strFrame, verticalAxis + "=IC")) {
-                    tempVertical = tempVertical + incrementSearch(strFrame, verticalAxis + "=IC");
+                if (contains(strFrame, verticalAxis + IC)) {
+                    tempVertical = tempVertical + incrementSearch(strFrame, verticalAxis + IC);
                     isVerticalAxis = true;
                 } else if (containsAxis(strFrame, verticalAxis)) {
                     tempVertical = coordinateSearch(strFrame, verticalAxis);
@@ -158,11 +160,9 @@ public class Program implements Runnable {
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
             }
-
-            String radiusCR = "CR=";
             try {
-                if (contains(strFrame, radiusCR) && isRadius) {
-                    tempCR = coordinateSearch(strFrame, radiusCR);
+                if (contains(strFrame, CR) && isRadius) {
+                    tempCR = coordinateSearch(strFrame, CR);
                     if (tempCR != FIBO) {
                         isCR = true;
                     }
@@ -170,7 +170,16 @@ public class Program implements Runnable {
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
             }
-
+            try {
+                if (contains(strFrame, RND)&&isHorizontalAxis||contains(strFrame, RND)&&isVerticalAxis) {
+                    tempRND = coordinateSearch(strFrame, RND);
+                    if (tempRND != FIBO) {
+                        isRND = true;
+                    }
+                }
+            } catch (Exception e) {
+                errorListMap.put(i, strFrame.toString());
+            }
             if (isCR) {
                 frame.setX(tempHorizontal);
                 frame.setZ(tempVertical);
@@ -183,7 +192,18 @@ public class Program implements Runnable {
                 isVerticalAxis = false;
                 isCR = false;
             }
-
+            if (isRND) {
+                frame.setX(tempHorizontal);
+                frame.setZ(tempVertical);
+                frame.setRnd(tempRND);
+                frame.setRND(true);
+                frame.setAxisContains(true);
+                frame.setId(i);
+                frameList.add(frame);
+                isHorizontalAxis = false;
+                isVerticalAxis = false;
+                isRND = false;
+            }
             if (isHorizontalAxis || isVerticalAxis) {
                 frame.setX(tempHorizontal);
                 frame.setZ(tempVertical);

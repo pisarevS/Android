@@ -14,11 +14,8 @@ import android.widget.TextView;
 
 import pisarev.com.modeling.interfaces.Callback;
 import pisarev.com.modeling.interfaces.DrawMvp;
-import pisarev.com.modeling.mvp.model.MyData;
+import pisarev.com.modeling.mvp.model.*;
 import pisarev.com.modeling.R;
-import pisarev.com.modeling.mvp.model.MyFile;
-import pisarev.com.modeling.mvp.model.Program;
-import pisarev.com.modeling.mvp.model.SQLiteData;
 
 import java.io.File;
 import java.util.*;
@@ -169,7 +166,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState( savedInstanceState );
         drawView.setIndex( savedInstanceState.getInt( "index" ) );
-        //drawView.onButtonSingleBlock(false);
     }
 
 

@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pisarev.com.modeling.interfaces.IDraw;
-import pisarev.com.modeling.mvp.model.Frame;
-import pisarev.com.modeling.mvp.model.MyData;
 import pisarev.com.modeling.mvp.model.Point;
+import pisarev.com.modeling.mvp.model.Point2D;
 
 public abstract class BaseDraw {
 
@@ -21,21 +20,19 @@ public abstract class BaseDraw {
     private Paint paintDottedLine;
     protected boolean clockwise;
     protected Paint line;
-    private List<StringBuffer> programList;
-    protected List<Frame> frameList;
     protected IDraw draw;
-    protected MyData data;
     protected boolean isG17;
+    protected boolean isNumberLine;
+    protected int numberLine;
+    protected int colorPoint=Color.RED;
+    protected int colorTouchPoint=Color.rgb(0,128,255);
 
-    protected BaseDraw(IDraw draw, MyData data) {
+    protected BaseDraw(IDraw draw) {
         this.draw = draw;
-        this.data = data;
         init();
     }
 
     private void init() {
-        programList = data.getProgramList();
-        frameList = data.getFrameList();
         line = new Paint();
         paintFullLine = new Paint();
         paintFullLine.setColor(Color.GREEN);
@@ -47,8 +44,6 @@ public abstract class BaseDraw {
         paintDottedLine.setAntiAlias(true);
         paintDottedLine.setPathEffect(new DashPathEffect(new float[]{12f, 7f}, 0f));
     }
-
-    public abstract void drawContour(Canvas canvas, Point pointCoordinateZero, float zoom, int index);
 
     protected void drawLine(Canvas canvas, Paint paint, Point pointCoordinateZero, Point pointStart, Point pointEnd, float zoom) {
         Path path = new Path();
@@ -143,11 +138,57 @@ public abstract class BaseDraw {
         canvas.drawPath(path, paint);
     }
 
-    protected void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd, float zoom) {
-        float radiusPoint = 7F;
+    protected void drawRND(Canvas canvas,Paint paint, Point pointSystemCoordinate, Point pointStart, Point pointEnd, Point pointF, float radiusRND, float zoom) {
+        Point pointStartCR = new Point();
+        Point pointEndCR = new Point();
+        float differenceX;
+        float differenceZ;
+        float cathet;
+        boolean clockwiseRND = false;
+        float angle = new Point2D(pointEnd.getX() - pointStart.getX(), pointEnd.getZ() - pointStart.getZ()).angle(pointEnd.getX() - pointF.getX(), pointEnd.getZ() - pointF.getZ());
+        float firstDistance = new Point2D(pointStart.getX(), pointStart.getZ()).distance(pointEnd.getX(), pointEnd.getZ());
+        float secondDistance = new Point2D(pointEnd.getX(), pointEnd.getZ()).distance(pointF.getX(), pointF.getZ());
+        if (angle == 90) {
+            cathet = radiusRND;
+        } else {
+            cathet = (float) ((180 - angle) / 2 * (Math.PI / 180) * radiusRND);
+        }
+        differenceX = pointStart.getX() - pointEnd.getX();
+        differenceZ = pointStart.getZ() - pointEnd.getZ();
+
+        pointStartCR.setX(differenceX * cathet / firstDistance);
+        pointStartCR.setZ(differenceZ * cathet / firstDistance);
+        pointStartCR.setX(pointEnd.getX() + pointStartCR.getX());
+        pointStartCR.setZ(pointEnd.getZ() + pointStartCR.getZ());
+
+        differenceX = pointF.getX() - pointEnd.getX();
+        differenceZ = pointF.getZ() - pointEnd.getZ();
+
+        pointEndCR.setX(differenceX * cathet / secondDistance);
+        pointEndCR.setZ(differenceZ * cathet / secondDistance);
+        pointEndCR.setX(pointEnd.getX() + pointEndCR.getX());
+        pointEndCR.setZ(pointEnd.getZ() + pointEndCR.getZ());
+
+        if (pointStart.getX()>pointF.getX()&&(pointStart.getZ()+pointF.getZ())/2>pointEnd.getZ()) {
+            clockwiseRND = true;
+        }
+        if(pointStart.getX()>pointF.getX()&&(pointStart.getZ()+pointF.getZ())/2<pointEnd.getZ()){
+            clockwiseRND=false;
+        }
+        if(pointStart.getX()<pointF.getX()&&(pointStart.getZ()+pointF.getZ())/2<pointEnd.getZ()){
+            clockwiseRND=true;
+        }
+        drawLine(canvas,paint, pointSystemCoordinate, pointStart, pointStartCR, zoom);
+        drawArc(canvas, paint, pointSystemCoordinate, pointStartCR, pointEndCR, radiusRND, zoom, clockwiseRND);
+        pointEnd.setX(pointEndCR.getX());
+        pointEnd.setZ(pointEndCR.getZ());
+    }
+
+    protected void drawPoint(Canvas canvas, Point pointCoordinateZero, Point pointEnd,int color, float zoom) {
+        float radiusPoint = 9F;
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.RED);
+        paint.setColor(color);
         Path path = new Path();
         Point pEnd = new Point(pointEnd.getX(), pointEnd.getZ());
         pEnd.setX(pEnd.getX() * zoom);

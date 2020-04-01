@@ -7,12 +7,30 @@ public class Frame {
     private float x;
     private float z;
     private float cr;
+    private float rnd;
     private boolean isCR = false;
+    private boolean isRND = false;
     private boolean isAxisContains = false;
     private List<String> gCode = new ArrayList<>();
 
     public boolean isAxisContains() {
         return isAxisContains;
+    }
+
+    public float getRnd() {
+        return rnd;
+    }
+
+    public void setRnd(float rnd) {
+        this.rnd = rnd;
+    }
+
+    public boolean isRND() {
+        return isRND;
+    }
+
+    public void setRND(boolean RND) {
+        isRND = RND;
     }
 
     public void setAxisContains(boolean axisContains) {

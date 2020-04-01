@@ -2,9 +2,9 @@ package pisarev.com.modeling.mvp.model;
 
 public class Point {
 
-    private float x;
+    protected float x;
 
-    private float z;
+    protected float z;
 
     public Point() {
 
