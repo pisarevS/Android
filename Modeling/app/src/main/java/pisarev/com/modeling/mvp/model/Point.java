@@ -2,12 +2,17 @@ package pisarev.com.modeling.mvp.model;
 
 public class Point {
 
-    protected float x;
+    protected float x = Constant.N_GANTRYPOS_X;
 
-    protected float z;
+    protected float z = Constant.N_GANTRYPOS_Z;
 
     public Point() {
 
+    }
+
+    public Point(Point point){
+        this.x= point.getX();
+        this.z= point.getZ();
     }
 
     public Point(float x, float z) {

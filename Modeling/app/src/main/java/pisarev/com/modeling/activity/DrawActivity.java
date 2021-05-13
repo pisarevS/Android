@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,6 +33,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     private int count = 0;
     private Vibrator vibrator;
     private int index;
+    private boolean isSingleBlock;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -56,19 +58,22 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
         vibrator = (Vibrator) getSystemService( VIBRATOR_SERVICE );
 
         String pathParameter=new SQLiteData( this, SQLiteData.DATABASE_PATH ).getProgramText().get( SQLiteData.KEY_PROGRAM );
+        assert pathParameter != null;
         List<StringBuffer> parameterList = MyFile.getParameter(new File(pathParameter));
         readParameterVariables(parameterList);
 
         Thread thread = new Thread( new Program( new SQLiteData( this, SQLiteData.DATABASE_PROGRAM ).getProgramText().get( SQLiteData.KEY_PROGRAM ),variablesList, this) );
         thread.start();
-        try {
+
+       /* try {
             thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (v.getId()) {
@@ -107,13 +112,15 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
                         if (vibrator.hasVibrator()) {
                             vibrator.vibrate( 20 );
                         }
-                        drawView.onButtonSingleBlock( true );
+                        isSingleBlock=true;
+                        drawView.onButtonSingleBlock(true);
                         buttonSingleBlock.setImageResource( R.drawable.single_block_down );
                     } else {
                         if (vibrator.hasVibrator()) {
                             vibrator.vibrate( 20 );
                         }
-                        drawView.onButtonSingleBlock( false );
+                        isSingleBlock=false;
+                        drawView.onButtonSingleBlock(false);
                         buttonSingleBlock.setImageResource( R.drawable.single_block );
                     }
                 }
@@ -159,13 +166,19 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState( outState );
         outState.putInt( "index", index );
-
+        outState.putBoolean( "singleBlock", isSingleBlock);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState( savedInstanceState );
         drawView.setIndex( savedInstanceState.getInt( "index" ) );
+        drawView.onButtonSingleBlock(isSingleBlock);
+        if(isSingleBlock){
+            count++;
+            buttonSingleBlock.setImageResource( R.drawable.single_block_down );
+        }
+        else  buttonSingleBlock.setImageResource( R.drawable.single_block );
     }
 
 
@@ -194,6 +207,5 @@ public class DrawActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     public void callingBack(MyData data) {
         drawView.setData(data);
-
     }
 }

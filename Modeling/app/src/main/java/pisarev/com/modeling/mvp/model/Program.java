@@ -1,33 +1,35 @@
 package pisarev.com.modeling.mvp.model;
 
+import android.annotation.TargetApi;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import pisarev.com.modeling.interfaces.Callback;
+import pisarev.com.modeling.mvp.model.base.BaseDraw;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Program implements Runnable {
+public class Program extends BaseDraw implements Runnable {
 
     private List<StringBuffer> programList;
-    private String[] defs = {"DEF REAL", "DEF INT"};
-    private MyData data = new MyData();
-    private Callback callback;
+    private final String[] defs = {"DEF REAL", "DEF INT"};
+    private final MyData data = new MyData();
+    private final Callback callback;
     private int x;
     private int u;
     private String horizontalAxis;
     private String verticalAxis;
-    private String program;
+    private final String program;
     private ArrayList<String> listIgnore;
-    private Map<String, String> variablesList;
+    private final Map<String, String> variablesList;
     private ArrayList<Frame> frameList;
     private Map<Integer, String> errorListMap;
     private final float FIBO = 1123581220;
-    private String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18"};
+    private final String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18", "G41", "G42","G40"};
 
     public Program(String program, Map<String, String> variablesList, Callback callback) {
+        super();
         this.program = program;
         this.variablesList = variablesList;
         this.callback = callback;
@@ -77,7 +79,7 @@ public class Program implements Runnable {
         variablesList.put("$P_TOOLR", "16");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     @Override
     public void run() {
         replaceParameterVariables(variablesList);
@@ -98,21 +100,31 @@ public class Program implements Runnable {
         callback.callingBack(data);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     private void addFrameList() {
-        String CR = "CR=";
-        String RND = "RND=";
-        String IC = "=IC";
-        StringBuffer strFrame;
+        final String CR = "CR";
+        final String RND = "RND";
+        final String IC = "=IC";
+        final String OFFN = "OFFN";
+        final String TOOL = "T";
+        final String DIAMON = "DIAMON";
+        final String DIAMOF = "DIAMOF";
+        final String HOME = "HOME";
         boolean isHorizontalAxis = false;
         boolean isVerticalAxis = false;
-        float tempHorizontal = 650;
-        float tempVertical = 250;
+        float tempHorizontal = new Point().getX();
+        float tempVertical = new Point().getZ();
         float tempCR = 0;
         float tempRND = 0;
+        float tempOFFN = 0;
+        String tempTOOL="";
         boolean isCR = false;
         boolean isRND = false;
+        boolean isOFFN = false;
+        boolean isTOOL = false;
         boolean isRadius = false;
+        boolean isDiamon = false;
+        StringBuffer strFrame;
         selectCoordinateSystem(programList);
         for (int i = 0; i < programList.size(); i++) {
             strFrame = programList.get(i);
@@ -171,7 +183,7 @@ public class Program implements Runnable {
                 errorListMap.put(i, strFrame.toString());
             }
             try {
-                if (contains(strFrame, RND)&&isHorizontalAxis||contains(strFrame, RND)&&isVerticalAxis) {
+                if (contains(strFrame, RND) && isHorizontalAxis && !contains(strFrame, CR) || contains(strFrame, RND) && isVerticalAxis && !contains(strFrame, CR)) {
                     tempRND = coordinateSearch(strFrame, RND);
                     if (tempRND != FIBO) {
                         isRND = true;
@@ -180,35 +192,89 @@ public class Program implements Runnable {
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
             }
+            try {
+                if (contains(strFrame, OFFN)) {
+                    tempOFFN = coordinateSearch(strFrame, OFFN);
+                    if (tempOFFN != FIBO) {
+                        isOFFN = true;
+                    }
+                }
+            } catch (Exception e) {
+                errorListMap.put(i, strFrame.toString());
+            }
+            try {
+                if(contains(strFrame,DIAMON)||contains(strFrame,DIAMOF)){
+                    if (contains(strFrame, DIAMON)) {
+                        isDiamon=true;
+                    }
+                    if (contains(strFrame, DIAMOF)) {
+                        isDiamon=false;
+                    }
+                }
+            } catch (Exception e) {
+                errorListMap.put(i, strFrame.toString());
+            }
+            try {
+                if (contains(strFrame, HOME)) {
+                    isVerticalAxis = true;
+                    isHorizontalAxis = true;
+                    tempHorizontal=Constant.N_GANTRYPOS_X*2;
+                    tempVertical=Constant.N_GANTRYPOS_Z;
+                }
+            } catch (Exception e) {
+                errorListMap.put(i, strFrame.toString());
+            }
+
+            if (containsTool(strFrame)) {
+                frame.setId(i);
+                frame.setDiamon(isDiamon);
+                tempTOOL=readTool(strFrame);
+                isTOOL=true;
+                frame.setTool(tempTOOL);
+                frame.setTool(isTOOL);
+                frame.setX(new Point().getX());
+                frame.setZ(new Point().getZ());
+                frame.setAxisContains(true);
+                frameList.add(frame);
+            }
             if (isCR) {
+                frame.setId(i);
+                frame.setDiamon(isDiamon);
                 frame.setX(tempHorizontal);
                 frame.setZ(tempVertical);
+                frame.setOffn(tempOFFN);
+                frame.setOffn(isOFFN);
                 frame.setCr(tempCR);
                 frame.setIsCR(true);
                 frame.setAxisContains(true);
-                frame.setId(i);
                 frameList.add(frame);
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
                 isCR = false;
             }
             if (isRND) {
+                frame.setId(i);
+                frame.setDiamon(isDiamon);
                 frame.setX(tempHorizontal);
                 frame.setZ(tempVertical);
+                frame.setOffn(tempOFFN);
+                frame.setOffn(isOFFN);
                 frame.setRnd(tempRND);
                 frame.setRND(true);
                 frame.setAxisContains(true);
-                frame.setId(i);
                 frameList.add(frame);
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
                 isRND = false;
             }
             if (isHorizontalAxis || isVerticalAxis) {
+                frame.setId(i);
+                frame.setDiamon(isDiamon);
                 frame.setX(tempHorizontal);
                 frame.setZ(tempVertical);
+                frame.setOffn(tempOFFN);
+                frame.setOffn(isOFFN);
                 frame.setAxisContains(true);
-                frame.setId(i);
                 frameList.add(frame);
                 isHorizontalAxis = false;
                 isVerticalAxis = false;
@@ -218,34 +284,58 @@ public class Program implements Runnable {
         Set<Frame> s = new LinkedHashSet<>(frameList);
         frameList.clear();
         frameList.addAll(s);
+        correctionForOffn(frameList);
+        correctionForDiamon(frameList);
         data.setFrameList(frameList);
+    }
+
+    private void correctionForDiamon(List<Frame> frameList) {
+        for(int i=0;i<frameList.size();i++){
+            if(frameList.get(i).getDiamon()&&frameList.get(i).isAxisContains()){
+                frameList.get(i).setX(frameList.get(i).getX()/2);
+            }
+        }
     }
 
     private void removeLockedFrame(StringBuffer frame) {
         if (frame.toString().contains(";")) frame.delete(frame.indexOf(";"), frame.length());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     private void removeIgnore(StringBuffer frame) {
         listIgnore.forEach(ignore -> {
             if (frame.toString().contains(ignore)) frame.delete(0, frame.length());
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     private void replaceParameterVariables(Map<String, String> variablesList) {
         variablesList.forEach((key, value1) -> {
             String value = value1;
             for (String keys : variablesList.keySet()) {
                 if (value.contains(keys)) {
-                    value = value.replace(keys, variablesList.get(keys));
+                    value = value.replace(keys, Objects.requireNonNull(variablesList.get(keys)));
                     variablesList.put(key, value);
                 }
             }
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    private boolean containsTool(StringBuffer sb) {
+        for (String tool : toolsMap.keySet()) {
+            if (sb.indexOf(tool) > -1) return true;
+        }
+        return false;
+    }
+
+    private String readTool(StringBuffer strFrame) {
+        for(String tool:toolsMap.keySet()){
+            if(strFrame.indexOf(tool)>-1) return tool;
+        }
+        return "";
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
     private void replaceProgramVariables(StringBuffer frame) {
         variablesList.forEach((key, value) -> {
             if (frame.toString().contains(key)) {
@@ -307,7 +397,7 @@ public class Program implements Runnable {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     private void initVariables(StringBuffer frame) {
         for (String def : defs) {
             if (frame.indexOf(def) == -1) {
@@ -369,13 +459,13 @@ public class Program implements Runnable {
                 break;
             }
         }
-        if (isSymbol(temp.toString())&&temp.indexOf("=")!=-1) {
-            if (temp.toString().contains("=")) {
+        if (isSymbol(temp.toString()) && temp.indexOf("=") == 0) {
+            if (temp.indexOf("=") != -1) {
                 int index = temp.indexOf("=");
                 temp.replace(index, index + 1, "");
             }
             return Expression.calculate(temp.toString());
-        } else if (!isSymbol(temp.toString())) {
+        } else if (!isSymbol(temp.toString()) || temp.indexOf("-") == 0) {
             return Float.parseFloat(temp.toString());
         }
         return FIBO;
@@ -421,7 +511,7 @@ public class Program implements Runnable {
         return false;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @TargetApi(Build.VERSION_CODES.N)
     private void selectCoordinateSystem(List<StringBuffer> programList) {
         programList.forEach(valve -> {
             if (valve.toString().contains("X"))
@@ -506,6 +596,11 @@ public class Program implements Runnable {
                 case "G3":
                 case "G03":
                     return true;
+                case "G01":
+                case "G1":
+                case "G0":
+                case "G00":
+                    return false;
             }
         }
         return false;

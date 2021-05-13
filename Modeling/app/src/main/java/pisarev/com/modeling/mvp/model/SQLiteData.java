@@ -1,5 +1,6 @@
 package pisarev.com.modeling.mvp.model;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -51,7 +52,7 @@ public class SQLiteData extends SQLiteOpenHelper implements ISQLiteData {
         Map<String, String> programs = new HashMap<>();
         String selectQuery = "SELECT  * FROM " + TABLE_PROGRAM;
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        @SuppressLint("Recycle") Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
                 programs.put(KEY_PROGRAM, cursor.getString(0));

@@ -1,5 +1,6 @@
 package pisarev.com.modeling.mvp.view.customview;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -52,6 +53,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private MyData data;
     private Drawing drawing;
     private boolean isDrawPoint = false;
+    private Point pointStopCanvas;
+    private boolean isZooming=false;
 
     public DrawView(Context context) {
         super(context);
@@ -74,11 +77,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         paintCoordinateDottedLine.setPathEffect(new DashPathEffect(new float[]{20f, 10f}, 0f));
         pointSystemCoordinate = new Point();
         errorList = new ArrayList<>();
-        if (myPreferences.getBoolean("RADIOBUTTON", false)) {
-            drawing = new DrawVerticalTurning(this);
-        } else {
-            drawing = new DrawHorizontalTurning(this);
-        }
+        drawing = new DrawVerticalTurning(this);
     }
 
     @Override
@@ -87,19 +86,18 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         switch (button) {
             case START:
             case STOP:
-                drawing.drawContour(canvas,data, pointSystemCoordinate, zooming, index);
+                //zoom();
+                drawing.drawContour(canvas, data, pointSystemCoordinate, zooming, index);
                 invalidate();
                 break;
             case TAP:
                 drawing.setNumberLine(numberLine);
-                drawing.drawContour(canvas,data, pointSystemCoordinate, zooming, index);
+                drawing.drawContour(canvas, data, pointSystemCoordinate, zooming, index);
                 invalidate();
                 break;
             case RESET:
-                initSystemCoordinate(canvas, true);
                 button = 0;
                 invalidate();
-                isTouch = false;
                 drawing.setNumberLine(-1);
                 errorList.clear();
                 break;
@@ -107,57 +105,58 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         drawSystemCoordinate(canvas, isTouch);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         scaleGestureDetector.onTouchEvent(event);
-        switch (event.getAction()) {
-            case ACTION_DOWN:
-                float downX = event.getX();
-                float downZ = event.getY();
-                moveX = pointSystemCoordinate.getX() - downX;
-                moveZ = pointSystemCoordinate.getZ() - downZ;
-                isTouch = true;
-                invalidate();
-                break;
-            case ACTION_MOVE:
-                pointSystemCoordinate.setX(event.getX() + moveX);
-                pointSystemCoordinate.setZ(event.getY() + moveZ);
-                invalidate();
-                isMove=true;
-                break;
-            case ACTION_UP:
-                if(!isMove){
-                    Point point = new Point();
-                    point.setX((pointSystemCoordinate.getX() - event.getX()) * -1);
-                    point.setZ(event.getY());
-                    if (point.getZ() > 0) point.setZ(pointSystemCoordinate.getZ() - point.getZ());
-                    else point.setZ(pointSystemCoordinate.getZ() + Math.abs(point.getZ()));
-                    point.setX(point.getX() / zooming);
-                    point.setZ(point.getZ() / zooming);
-                    Optional<Frame> frame = getFrame(point);
-                    if (frame.isPresent()) {
-                        numberLine=frame.get().getId();
-                        button=TAP;
-                        invalidate();
-                        drawActivity.showFrame(data.getProgramList().get(frame.get().getId()).toString());
-                        drawActivity.showAxis("X=" + frame.get().getX(), "Z=" + frame.get().getZ());
-                        System.out.println("X="+point.getX());
-                        System.out.println("Z="+point.getZ());
-                        System.out.println(data.getProgramList().get(frame.get().getId()));
-                        isDrawPoint = true;
-                    } else if (isDrawPoint) {
-                        numberLine=-1;
-                        button=TAP;
-                        drawActivity.showFrame("");
-                        drawActivity.showAxis("", "");
-                        isDrawPoint = false;
+            switch (event.getAction()) {
+                case ACTION_DOWN:
+                    float downX = event.getX();
+                    float downZ = event.getY();
+                    moveX = pointSystemCoordinate.getX() - downX;
+                    moveZ = pointSystemCoordinate.getZ() - downZ;
+                    isTouch = true;
+                    invalidate();
+                    break;
+                case ACTION_MOVE:
+                    pointSystemCoordinate.setX(event.getX() + moveX);
+                    pointSystemCoordinate.setZ(event.getY() + moveZ);
+                    invalidate();
+                    isMove = true;
+                    break;
+                case ACTION_UP:
+                    if (!isMove) {
+                        Point point = new Point();
+                        point.setX((pointSystemCoordinate.getX() - event.getX()) * -1);
+                        point.setZ(event.getY());
+                        if (point.getZ() > 0) point.setZ(pointSystemCoordinate.getZ() - point.getZ());
+                        else point.setZ(pointSystemCoordinate.getZ() + Math.abs(point.getZ()));
+                        point.setX(point.getX() / zooming);
+                        point.setZ(point.getZ() / zooming);
+                        Optional<Frame> frame = getFrame(point);
+                        if (frame.isPresent()) {
+                            numberLine = frame.get().getId();
+                            button = TAP;
+                            invalidate();
+                            drawActivity.showFrame(data.getProgramList().get(frame.get().getId()).toString());
+                            drawActivity.showAxis("X=" + frame.get().getX(), "Z=" + frame.get().getZ());
+                            System.out.println("X=" + point.getX());
+                            System.out.println("Z=" + point.getZ());
+                            System.out.println(data.getProgramList().get(frame.get().getId()));
+                            isDrawPoint = true;
+                        } else if (isDrawPoint) {
+                            numberLine = -1;
+                            button = TAP;
+                            drawActivity.showFrame("");
+                            drawActivity.showAxis("", "");
+                            isDrawPoint = false;
+                        }
                     }
-                }
-                isMove=false;
-                invalidate();
-                break;
-        }
+                    isMove = false;
+                    invalidate();
+                    break;
+            }
         return true;
     }
 
@@ -195,7 +194,7 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         }
         if (isTouch || button == START) {
             initSystemCoordinate(canvas, false);
-            drawing.drawContour(canvas,data, pointSystemCoordinate, zooming, index);
+            drawing.drawContour(canvas, data, pointSystemCoordinate, zooming, index);
             invalidate();
         }
 
@@ -219,6 +218,19 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             path.moveTo(pointSystemCoordinate.getX(), 0);
             path.lineTo(pointSystemCoordinate.getX(), getHeight());
             canvas.drawPath(path, paintCoordinateDottedLine);
+        }
+    }
+
+    private void zoom(){
+        if (isZooming) {
+            Point point = new Point();
+            point.setX(pointStopCanvas.getX() * zooming);
+            point.setZ(pointStopCanvas.getZ() * zooming);
+            pointSystemCoordinate.setX(pointSystemCoordinate.getX() + pointStopCanvas.getX() - point.getX());
+            pointSystemCoordinate.setZ(pointSystemCoordinate.getZ() + point.getZ() - pointStopCanvas.getZ());
+            pointStopCanvas.setX(pointStopCanvas.getX() * zooming);
+            pointStopCanvas.setZ(pointStopCanvas.getZ() * zooming);
+            isZooming=false;
         }
     }
 
@@ -311,7 +323,15 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             zooming *= detector.getScaleFactor();
-            invalidate();
+
+            pointStopCanvas = new Point();
+            pointStopCanvas.setX((pointSystemCoordinate.getX() - detector.getFocusX()) * -1);
+            pointStopCanvas.setZ(detector.getFocusY());
+            if (pointStopCanvas.getZ() > 0) pointStopCanvas.setZ(pointSystemCoordinate.getZ() - pointStopCanvas.getZ());
+            else pointStopCanvas.setZ(pointSystemCoordinate.getZ() + Math.abs(pointSystemCoordinate.getZ()));
+            pointStopCanvas.setX(pointStopCanvas.getX() / zooming);
+            pointStopCanvas.setZ(pointStopCanvas.getZ() / zooming);
+            isZooming=true;
             return true;
         }
     }

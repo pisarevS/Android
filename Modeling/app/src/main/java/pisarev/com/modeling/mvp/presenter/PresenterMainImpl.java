@@ -5,8 +5,8 @@ import pisarev.com.modeling.mvp.model.MyFile;
 
 public class PresenterMainImpl implements MainMvp.PresenterMainMvp {
 
-    private MainMvp.ViewMvp viewMvp;
-    private MyFile myFile;
+    private final MainMvp.ViewMvp viewMvp;
+    private final MyFile myFile;
 
     public PresenterMainImpl(MainMvp.ViewMvp viewMvp) {
         this.viewMvp = viewMvp;

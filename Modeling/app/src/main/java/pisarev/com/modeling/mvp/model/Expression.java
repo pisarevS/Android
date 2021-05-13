@@ -43,9 +43,11 @@ public class Expression {
 
     private static String insertZero(String input) {
         StringBuilder sb = new StringBuilder(input);
+
         if (input.contains("-") && sb.charAt(0) == '-') {
             sb = sb.replace(0, 0, "0");
-        } else if (input.contains("-") && sb.indexOf("-") != 0) {
+        }
+        if (input.contains("-") && sb.indexOf("-") != 0) {
             for (int i = 0; i < sb.length(); i++) {
                 if (sb.charAt(i) == '-') {
                     if (sb.charAt(i - 1) == '(' || sb.charAt(i - 1) == '+' || sb.charAt(i - 1) == '-') {
@@ -53,7 +55,8 @@ public class Expression {
                     }
                 }
             }
-        } else if (input.contains("+") && sb.indexOf("+") != 0) {
+        }
+        if (input.contains("+") && sb.indexOf("+") != 0) {
             for (int i = 0; i < sb.length(); i++) {
                 if (sb.charAt(i) == '+') {
                     if (sb.charAt(i - 1) == '(' || sb.charAt(i - 1) == '+' || sb.charAt(i - 1) == '-') {
@@ -64,6 +67,7 @@ public class Expression {
         }
         return sb.toString();
     }
+
 
     private static String getExpression(String input) {
         StringBuilder output = new StringBuilder(); //Строка для хранения выражения

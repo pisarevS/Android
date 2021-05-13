@@ -1,12 +1,10 @@
 package pisarev.com.modeling.activity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,12 +20,10 @@ import android.widget.Toast;
 
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import pisarev.com.modeling.interfaces.MainMvp;
-import pisarev.com.modeling.mvp.model.StyleText;
 import pisarev.com.modeling.mvp.model.SQLiteData;
 import pisarev.com.modeling.mvp.presenter.PresenterMainImpl;
 import pisarev.com.modeling.R;
@@ -40,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SQLiteData sqLiteData;
 
     @SuppressLint("ResourceAsColor")
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -92,20 +87,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .build()
                         .show();
                 return true;
-            case R.id.setting:
+            /*case R.id.setting:
                 Intent intent = new Intent( MainActivity.this, SettingsActivity.class );
                 startActivity( intent );
-                return true;
+                return true;*/
             case R.id.action_exit:
                 new SQLiteData( this, SQLiteData.DATABASE_PROGRAM ).deleteProgramText();
                 new SQLiteData( this, SQLiteData.DATABASE_PARAMETER ).deleteProgramText();
+                new SQLiteData( this, SQLiteData.DATABASE_PATH ).deleteProgramText();
                 System.exit( 0 );
                 return true;
         }
         return super.onOptionsItemSelected( item );
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void showProgram(String program) {
         editText.setText( program );
@@ -140,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sqLiteData.setProgramText( stringMap );
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onResume() {
         super.onResume();

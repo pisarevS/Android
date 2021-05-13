@@ -1,24 +1,30 @@
 package pisarev.com.modeling.mvp.model;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
+
+import android.text.*;
 import android.text.style.ForegroundColorSpan;
 import android.widget.EditText;
+import com.github.akshay_naik.texthighlighterapi.TextHighlighter;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@RequiresApi(api = Build.VERSION_CODES.O)
+
+@TargetApi(Build.VERSION_CODES.O)
 public class StyleText {
 
     public static void setStyle(EditText editText){
+        TextHighlighter highlighter=new TextHighlighter();
+        highlighter.setLanguage("JAVA");
+        String highlightedText=highlighter.getHighlightedText(editText.getText().toString());
+
+        editText.setText(Html.fromHtml(highlightedText));
+        /*
         editText.setText(computeHighlighting(editText.getText().toString()));
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -35,7 +41,7 @@ public class StyleText {
             public void afterTextChanged(Editable s) {
 
             }
-        });
+        });*/
     }
 
     public static final List<String> KEYWORDS = Arrays.asList("BORE_DIAM", "WHEEL_UNMACHINED", "WHEEL_MACHINED", "SYM_FACTOR", "TREAD_HEIGHT_S1",
@@ -75,6 +81,7 @@ public class StyleText {
                     + "|(?<FIGURES>" + FIGURES_PATTERN + ")"
     );
 
+    @TargetApi(Build.VERSION_CODES.O)
     @SuppressLint("ResourceAsColor")
     private static SpannableStringBuilder computeHighlighting(String text) {
         Matcher matcher = PATTERN.matcher(text);

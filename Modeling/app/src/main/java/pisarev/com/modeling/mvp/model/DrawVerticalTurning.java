@@ -30,7 +30,8 @@ public class DrawVerticalTurning extends BaseDraw implements Drawing {
         float radiusRND;
 
         for (int i = 0; i < index; i++) {
-            isG17 = isG17(frameList.get(i).getGCode());
+            if (frameList.get(i).getGCode().contains("G17") || frameList.get(i).getGCode().contains("G18"))
+                isG17 = isG17(frameList.get(i).getGCode());
             checkGCode(frameList.get(i).getGCode());
             if (data.getErrorListMap().containsKey(frameList.get(i).getId())) {
                 draw.showError(data.getErrorListMap().get(frameList.get(i).getId()));

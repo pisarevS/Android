@@ -3,14 +3,20 @@ package pisarev.com.modeling.mvp.model;
 import java.util.*;
 
 public class Frame {
+
     private int id;
     private float x;
     private float z;
     private float cr;
+    private float offn;
     private float rnd;
     private boolean isCR = false;
+    private boolean isOffn = false;
     private boolean isRND = false;
     private boolean isAxisContains = false;
+    private boolean isDiamon=false;
+    private boolean isTool=false;
+    private String tool;
     private List<String> gCode = new ArrayList<>();
 
     public boolean isAxisContains() {
@@ -31,6 +37,22 @@ public class Frame {
 
     public void setRND(boolean RND) {
         isRND = RND;
+    }
+
+    public float getOffn() {
+        return offn;
+    }
+
+    public void setOffn(float offn) {
+        this.offn = offn;
+    }
+
+    public boolean isOffn() {
+        return isOffn;
+    }
+
+    public void setOffn(boolean offn) {
+        isOffn = offn;
     }
 
     public void setAxisContains(boolean axisContains) {
@@ -85,9 +107,32 @@ public class Frame {
         return cr;
     }
 
+    public String getTool() {
+        return tool;
+    }
+
+    public void setTool(String tool) {
+        this.tool = tool;
+    }
+
+    public boolean isTool() {
+        return isTool;
+    }
+
+    public void setTool(boolean tool) {
+        isTool = tool;
+    }
+
+    public boolean getDiamon() {
+        return isDiamon;
+    }
+
+    public void setDiamon(boolean diamon) {
+        isDiamon = diamon;
+    }
+
     @Override
     public String toString() {
-        String frame = id + " " + gCode + " " + x + " " + z + " " + cr;
-        return frame;
+        return id + " " + gCode + " " + x + " " + z + " " + cr;
     }
 }

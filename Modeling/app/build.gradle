@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 29
     defaultConfig {
         applicationId "pisarev.com.modeling"
         minSdkVersion 19
@@ -16,6 +16,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion = '29.0.3'
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -31,4 +32,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.github.hedzr:android-file-chooser:v1.1.14'
+    implementation 'com.github.nakshay:texthighlighterapi:1.2.2'
 }
