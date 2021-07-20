@@ -26,7 +26,7 @@ public class Program extends BaseDraw implements Runnable {
     private ArrayList<Frame> frameList;
     private Map<Integer, String> errorListMap;
     private final float FIBO = 1123581220;
-    private final String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18", "G41", "G42","G40"};
+    private final String[] gCodes = {"G0", "G00", "G1", "G01", "G2", "G02", "G3", "G03", "G17", "G18", "G41", "G42", "G40"};
 
     public Program(String program, Map<String, String> variablesList, Callback callback) {
         super();
@@ -117,7 +117,7 @@ public class Program extends BaseDraw implements Runnable {
         float tempCR = 0;
         float tempRND = 0;
         float tempOFFN = 0;
-        String tempTOOL="";
+        String tempTOOL = "";
         boolean isCR = false;
         boolean isRND = false;
         boolean isOFFN = false;
@@ -203,12 +203,12 @@ public class Program extends BaseDraw implements Runnable {
                 errorListMap.put(i, strFrame.toString());
             }
             try {
-                if(contains(strFrame,DIAMON)||contains(strFrame,DIAMOF)){
+                if (contains(strFrame, DIAMON) || contains(strFrame, DIAMOF)) {
                     if (contains(strFrame, DIAMON)) {
-                        isDiamon=true;
+                        isDiamon = true;
                     }
                     if (contains(strFrame, DIAMOF)) {
-                        isDiamon=false;
+                        isDiamon = false;
                     }
                 }
             } catch (Exception e) {
@@ -218,8 +218,9 @@ public class Program extends BaseDraw implements Runnable {
                 if (contains(strFrame, HOME)) {
                     isVerticalAxis = true;
                     isHorizontalAxis = true;
-                    tempHorizontal=Constant.N_GANTRYPOS_X*2;
-                    tempVertical=Constant.N_GANTRYPOS_Z;
+                    frame.setHome(true);
+                    tempHorizontal = Constant.N_GANTRYPOS_X;
+                    tempVertical = Constant.N_GANTRYPOS_Z;
                 }
             } catch (Exception e) {
                 errorListMap.put(i, strFrame.toString());
@@ -228,8 +229,8 @@ public class Program extends BaseDraw implements Runnable {
             if (containsTool(strFrame)) {
                 frame.setId(i);
                 frame.setDiamon(isDiamon);
-                tempTOOL=readTool(strFrame);
-                isTOOL=true;
+                tempTOOL = readTool(strFrame);
+                isTOOL = true;
                 frame.setTool(tempTOOL);
                 frame.setTool(isTOOL);
                 frame.setX(new Point().getX());
@@ -290,9 +291,10 @@ public class Program extends BaseDraw implements Runnable {
     }
 
     private void correctionForDiamon(List<Frame> frameList) {
-        for(int i=0;i<frameList.size();i++){
-            if(frameList.get(i).getDiamon()&&frameList.get(i).isAxisContains()){
-                frameList.get(i).setX(frameList.get(i).getX()/2);
+        for (int i = 0; i < frameList.size(); i++) {
+            if (frameList.get(i).getDiamon() && frameList.get(i).isAxisContains()) {
+                if (frameList.get(i).getTool() == null && !frameList.get(i).isHome())
+                    frameList.get(i).setX(frameList.get(i).getX() / 2);
             }
         }
     }
@@ -329,8 +331,8 @@ public class Program extends BaseDraw implements Runnable {
     }
 
     private String readTool(StringBuffer strFrame) {
-        for(String tool:toolsMap.keySet()){
-            if(strFrame.indexOf(tool)>-1) return tool;
+        for (String tool : toolsMap.keySet()) {
+            if (strFrame.indexOf(tool) > -1) return tool;
         }
         return "";
     }

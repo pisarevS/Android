@@ -11,8 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -21,6 +19,8 @@ import android.view.View;
 
 import java.util.*;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.Drawing;
 import pisarev.com.modeling.interfaces.IDraw;
@@ -54,7 +54,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
     private Drawing drawing;
     private boolean isDrawPoint = false;
     private Point pointStopCanvas;
-    private boolean isZooming=false;
 
     public DrawView(Context context) {
         super(context);
@@ -86,7 +85,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         switch (button) {
             case START:
             case STOP:
-                //zoom();
                 drawing.drawContour(canvas, data, pointSystemCoordinate, zooming, index);
                 invalidate();
                 break;
@@ -193,8 +191,8 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             invalidate();
         }
         if (isTouch || button == START) {
-            initSystemCoordinate(canvas, false);
             drawing.drawContour(canvas, data, pointSystemCoordinate, zooming, index);
+            initSystemCoordinate(canvas, false);
             invalidate();
         }
 
@@ -218,19 +216,6 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
             path.moveTo(pointSystemCoordinate.getX(), 0);
             path.lineTo(pointSystemCoordinate.getX(), getHeight());
             canvas.drawPath(path, paintCoordinateDottedLine);
-        }
-    }
-
-    private void zoom(){
-        if (isZooming) {
-            Point point = new Point();
-            point.setX(pointStopCanvas.getX() * zooming);
-            point.setZ(pointStopCanvas.getZ() * zooming);
-            pointSystemCoordinate.setX(pointSystemCoordinate.getX() + pointStopCanvas.getX() - point.getX());
-            pointSystemCoordinate.setZ(pointSystemCoordinate.getZ() + point.getZ() - pointStopCanvas.getZ());
-            pointStopCanvas.setX(pointStopCanvas.getX() * zooming);
-            pointStopCanvas.setZ(pointStopCanvas.getZ() * zooming);
-            isZooming=false;
         }
     }
 
@@ -324,14 +309,18 @@ public class DrawView extends View implements IDraw, DrawMvp.PresenterDrawViewMv
         public boolean onScale(ScaleGestureDetector detector) {
             zooming *= detector.getScaleFactor();
 
-            pointStopCanvas = new Point();
-            pointStopCanvas.setX((pointSystemCoordinate.getX() - detector.getFocusX()) * -1);
-            pointStopCanvas.setZ(detector.getFocusY());
-            if (pointStopCanvas.getZ() > 0) pointStopCanvas.setZ(pointSystemCoordinate.getZ() - pointStopCanvas.getZ());
-            else pointStopCanvas.setZ(pointSystemCoordinate.getZ() + Math.abs(pointSystemCoordinate.getZ()));
-            pointStopCanvas.setX(pointStopCanvas.getX() / zooming);
-            pointStopCanvas.setZ(pointStopCanvas.getZ() / zooming);
-            isZooming=true;
+            Point point = new Point();
+            point.setX((pointSystemCoordinate.getX() - detector.getFocusX()) * -1);
+            point.setZ(detector.getFocusY());
+            if (point.getZ() > 0) point.setZ(pointSystemCoordinate.getZ() - point.getZ());
+            else point.setZ(pointSystemCoordinate.getZ() + Math.abs(point.getZ()));
+            pointStopCanvas = new Point(point.getX(), point.getZ());
+            point.setX(pointStopCanvas.getX() * zooming);
+            point.setZ(pointStopCanvas.getZ() * zooming);
+            pointSystemCoordinate.setX(pointSystemCoordinate.getX() + pointStopCanvas.getX() - point.getX());
+            pointSystemCoordinate.setZ(pointSystemCoordinate.getZ() + point.getZ() - pointStopCanvas.getZ());
+            pointStopCanvas.setX(pointStopCanvas.getX() * zooming);
+            pointStopCanvas.setZ(pointStopCanvas.getZ() * zooming);
             return true;
         }
     }
