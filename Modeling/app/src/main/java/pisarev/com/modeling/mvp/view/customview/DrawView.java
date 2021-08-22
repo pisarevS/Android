@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,8 +21,6 @@ import android.view.View;
 
 import java.util.*;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import pisarev.com.modeling.interfaces.DrawMvp;
 import pisarev.com.modeling.interfaces.Drawing;
 import pisarev.com.modeling.interfaces.IDraw;

@@ -110,20 +110,18 @@ public class Program extends BaseDraw implements Runnable {
         final String DIAMON = "DIAMON";
         final String DIAMOF = "DIAMOF";
         final String HOME = "HOME";
+        String tempTOOL = "";
+        float tempHorizontal = Constant.N_GANTRYPOS_X;
+        float tempVertical = Constant.N_GANTRYPOS_Z;
+        float tempCR = 0, tempRND = 0, tempOFFN = 0;
         boolean isHorizontalAxis = false;
         boolean isVerticalAxis = false;
-        float tempHorizontal = new Point().getX();
-        float tempVertical = new Point().getZ();
-        float tempCR = 0;
-        float tempRND = 0;
-        float tempOFFN = 0;
-        String tempTOOL = "";
         boolean isCR = false;
         boolean isRND = false;
         boolean isOFFN = false;
         boolean isTOOL = false;
         boolean isRadius = false;
-        boolean isDiamon = false;
+        boolean isDiamon = true;
         StringBuffer strFrame;
         selectCoordinateSystem(programList);
         for (int i = 0; i < programList.size(); i++) {
@@ -291,10 +289,10 @@ public class Program extends BaseDraw implements Runnable {
     }
 
     private void correctionForDiamon(List<Frame> frameList) {
-        for (int i = 0; i < frameList.size(); i++) {
-            if (frameList.get(i).getDiamon() && frameList.get(i).isAxisContains()) {
-                if (frameList.get(i).getTool() == null && !frameList.get(i).isHome())
-                    frameList.get(i).setX(frameList.get(i).getX() / 2);
+        for (Frame frame : frameList) {
+            if (frame.getDiamon() && frame.isAxisContains()) {
+                if (frame.getTool() == null && !frame.isHome())
+                    frame.setX(frame.getX() / 2);
             }
         }
     }
